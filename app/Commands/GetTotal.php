@@ -27,7 +27,7 @@ class GetTotal extends Command
     public function handle(TimelyService $timely)
     {
         $since = config('timely.since');
-        dump(json_decode($timely->getTotalLoggedHours($since)));
-        dump(json_decode($timely->getCapacities()));
+        dump($timely->getTotalLoggedHours($since));
+        dump($timely->getCapacities());
     }
 }

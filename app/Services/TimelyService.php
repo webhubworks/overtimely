@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\DataTransferObjects\CapacityData;
+use App\DataTransferObjects\LoggedHoursData;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Collection;
 
@@ -13,21 +16,28 @@ final readonly class TimelyService
         private readonly int $userId,
     ) {}
 
-    public function getTotalLoggedHours(?string $since = null): Collection
+    public function getTotalLoggedHours(?string $since = null): LoggedHoursData
     {
-        return $this->client->get("{$this->accountId}/reports/filter", [
-            'scope' => 'totals',
-            'group_by' => 'users',
-            'user_ids' => $this->userId,
-            'since' => $since,
-            'until' => now()->format('Y-m-d'),
-        ])->collect('totals.duration');
+        return LoggedHoursData::from(
+            $this->client->get("{$this->accountId}/reports/filter", [
+                'scope' => 'totals',
+                'group_by' => 'users',
+                'user_ids' => $this->userId,
+                'since' => $since,
+                'until' => now()->format('Y-m-d'),
+            ])->json('totals.duration')
+        );
     }
 
+    /** @return Collection<int, CapacityData>
+     * @throws ConnectionException
+     */
     public function getCapacities(): Collection
     {
-        return $this->client
-            ->get("{$this->accountId}/users/{$this->userId}/capacities")
-            ->collect();
+        return CapacityData::collect(
+            $this->client
+                ->get("{$this->accountId}/users/{$this->userId}/capacities")
+                ->collect()
+        );
     }
 }
