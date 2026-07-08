@@ -31,7 +31,11 @@ class AppServiceProvider extends ServiceProvider
                 ->retry(3, 200)
                 ->throw();
 
-            return new TimelyService($client);
+            return new TimelyService(
+                $client,
+                $config['account_id'],
+                $config['user_id']
+            );
         });
     }
 }

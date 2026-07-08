@@ -2,7 +2,7 @@
 
 namespace App\Commands;
 
-use Illuminate\Console\Scheduling\Schedule;
+use App\Services\TimelyService;
 use LaravelZero\Framework\Commands\Command;
 
 class GetTotal extends Command
@@ -24,8 +24,10 @@ class GetTotal extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(TimelyService $timely)
     {
-        //
+        $since = config('timely.since');
+        dump(json_decode($timely->getTotalLoggedHours($since)));
+        dump(json_decode($timely->getCapacities()));
     }
 }

@@ -6,4 +6,5 @@ return [
     'timeout' => env('TIMELY_API_TIMEOUT', 15),
     'account_id' => env('TIMELY_ACCOUNT_ID'),
     'user_id' => env('TIMELY_USER_ID'),
+    'since' => env('TIMELY_SINCE'),
 ];
