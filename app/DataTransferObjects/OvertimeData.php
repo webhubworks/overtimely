@@ -12,7 +12,7 @@ final class OvertimeData extends Data
         public float $balance,
     ) {}
 
-    public static function fromCalculationResults(LoggedHoursData $logged, ExpectedHoursData $expected): self
+    public static function fromHours(LoggedHoursData $logged, ExpectedHoursData $expected): self
     {
         return new self(
             logged: $logged,

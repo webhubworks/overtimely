@@ -11,9 +11,9 @@ use Illuminate\Support\Collection;
 final readonly class TimelyService
 {
     public function __construct(
-        private readonly PendingRequest $client,
-        private readonly int $accountId,
-        private readonly int $userId,
+        private PendingRequest $client,
+        private int $accountId,
+        private int $userId,
     ) {}
 
     public function getTotalLoggedHours(?string $since = null): LoggedHoursData

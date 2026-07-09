@@ -2,6 +2,7 @@
 
 namespace App\Commands;
 
+use App\Services\OvertimeCalculationService;
 use App\Services\TimelyService;
 use LaravelZero\Framework\Commands\Command;
 
@@ -24,7 +25,7 @@ class GetTotal extends Command
     /**
      * Execute the console command.
      */
-    public function handle(TimelyService $timely)
+    public function handle(TimelyService $timely, OvertimeCalculationService $overtimeCalculation): void
     {
         $since = config('timely.since');
 

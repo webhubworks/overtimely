@@ -10,7 +10,7 @@ use Carbon\CarbonImmutable;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Collection;
 
-final class OvertimeCalculator
+final readonly class OvertimeCalculationService
 {
     /**
      * Cumulative overtime balance over [since, until]: logged hours minus the
@@ -25,7 +25,7 @@ final class OvertimeCalculator
         CarbonImmutable $since,
         CarbonImmutable $until,
     ): OvertimeData {
-        return OvertimeData::fromCalculationResults(
+        return OvertimeData::fromHours(
             logged: $logged,
             expected: $this->expectedHours($capacities, $since, $until),
         );
