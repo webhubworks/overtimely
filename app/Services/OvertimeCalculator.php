@@ -16,8 +16,8 @@ final class OvertimeCalculator
      * Cumulative overtime balance over [since, until]: logged hours minus the
      * expected working hours derived from the user's capacities.
      *
-     * @param Collection<int, CapacityData> $capacities
-     * @param CarbonImmutable $until Last completed day (typically yesterday)
+     * @param  Collection<int, CapacityData>  $capacities
+     * @param  CarbonImmutable  $until  Last completed day (typically yesterday)
      */
     public function forPeriod(
         LoggedHoursData $logged,
@@ -52,7 +52,7 @@ final class OvertimeCalculator
      * latest start date, so a specific dated capacity wins over the open-ended
      * default (start 1970-01-01).
      *
-     * @param Collection<int, CapacityData> $capacities
+     * @param  Collection<int, CapacityData>  $capacities
      */
     private function capacityFor(Collection $capacities, CarbonImmutable $day): ?CapacityData
     {
