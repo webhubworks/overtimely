@@ -26,24 +26,25 @@ final readonly class OvertimeCalculationService
     ): OvertimeData {
         return OvertimeData::fromHours(
             logged: $logged,
-            expected: $this->expectedHours($capacities, $since, $until),
+            expected: $this->calculateTotalCapacityForPeriod($capacities, $since, $until),
         );
     }
 
     /** @param Collection<int, CapacityData> $capacities */
-    private function expectedHours(Collection $capacities, CarbonImmutable $since, CarbonImmutable $until): HoursData
+    private function calculateTotalCapacityForPeriod(Collection $capacities, CarbonImmutable $since, CarbonImmutable $until): HoursData
     {
-        $expected = 0.0;
+        $totalCapacity = 0.0;
 
         foreach (CarbonPeriod::create($since, $until) as $day) {
-            $capacity = $this->capacityFor($capacities, CarbonImmutable::instance($day));
+            $day = CarbonImmutable::instance($day);
+            $capacity = $this->determineCapacityForDay($day, $capacities);
 
-            if ($capacity !== null && $this->isWorkingDay($capacity, $day)) {
-                $expected += $this->dailyCapacity($capacity);
+            if ($capacity !== null && $this->isWorkDayOfCapacity($capacity, $day)) {
+                $totalCapacity += $this->getOrCalculateDailyCapacity($capacity);
             }
         }
 
-        return HoursData::fromHours($expected);
+        return HoursData::fromHours($totalCapacity);
     }
 
     /**
@@ -53,22 +54,21 @@ final readonly class OvertimeCalculationService
      *
      * @param  Collection<int, CapacityData>  $capacities
      */
-    private function capacityFor(Collection $capacities, CarbonImmutable $day): ?CapacityData
+    private function determineCapacityForDay(CarbonImmutable $day, Collection $capacities): ?CapacityData
     {
         return $capacities
-            ->filter(fn (CapacityData $c): bool => $day->greaterThanOrEqualTo($c->startDate)
-                && ($c->endDate === null || $day->lessThanOrEqualTo($c->endDate)))
-            ->sortByDesc(fn (CapacityData $c): int => $c->startDate->getTimestamp())
-            ->first();
+            ->sortByDesc(fn (CapacityData $capacity): int => $capacity->startDate->getTimestamp())
+            ->first(fn (CapacityData $capacity): bool => $day->greaterThanOrEqualTo($capacity->startDate));
     }
 
-    private function isWorkingDay(CapacityData $capacity, CarbonImmutable $day): bool
+    private function isWorkDayOfCapacity(CapacityData $capacity, CarbonImmutable $day): bool
     {
-        // work_days is "MON,TUE,WED,THU,FRI"; format('D') yields "Mon","Tue",...
-        return in_array(strtoupper($day->format('D')), explode(',', $capacity->workDays), true);
+        $workDaysOfCapacity = collect(explode(',', $capacity->workDays));
+
+        return $workDaysOfCapacity->contains(strtoupper($day->format('D')));
     }
 
-    private function dailyCapacity(CapacityData $capacity): float
+    private function getOrCalculateDailyCapacity(CapacityData $capacity): float
     {
         if ($capacity->dailyCapacity > 0) {
             return $capacity->dailyCapacity;
