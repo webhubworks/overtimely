@@ -48,15 +48,17 @@ class GetTotal extends Command
                     $this->formatHours($results->balance),
                 ],
             ],
+            'default' // Possible table styles: default, markdown, borderless, compact, symfony-style-guide, box, box-double
         );
     }
 
-   private function formatHours(HoursData $data): string
-   {
-       $hoursDecimal = round($data->totalHours, 2);
-       $hoursWithUnit = $data->hours !== 0 ? "{$data->hours}h " : "";
-       $minutesWithUnit = $data->minutes !== 0 ? "{$data->minutes}m " : "";
-       $secondsWithUnit = $data->seconds !== 0 ? "{$data->seconds}s" : "";
-       return $hoursDecimal." ({$hoursWithUnit}{$minutesWithUnit}{$secondsWithUnit})";
-   }
+    private function formatHours(HoursData $data): string
+    {
+        $hoursDecimal = round($data->totalHours, 2);
+        $hoursWithUnit = $data->hours !== 0 ? "{$data->hours}h " : '';
+        $minutesWithUnit = $data->minutes !== 0 ? "{$data->minutes}m " : '';
+        $secondsWithUnit = $data->seconds !== 0 ? "{$data->seconds}s" : '';
+
+        return $hoursDecimal." ({$hoursWithUnit}{$minutesWithUnit}{$secondsWithUnit})";
+    }
 }
