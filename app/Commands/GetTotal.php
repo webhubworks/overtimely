@@ -49,7 +49,7 @@ class GetTotal extends Command
                     $this->formatHours($results->balance),
                 ],
             ],
-            'default' // Possible table styles: default, markdown, borderless, compact, symfony-style-guide, box, box-double
+            env('TABLE_STYLE', 'default'),
         );
     }
 
