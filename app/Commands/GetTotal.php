@@ -27,16 +27,17 @@ class GetTotal extends Command
     /**
      * Execute the console command.
      */
-    public function handle(TimelyService $timely, OvertimeCalculationService $overtimeCalculation): void
+    public function handle(TimelyService $timely): void
     {
         $since = CarbonImmutable::createFromFormat('Y-m-d', $this->option('since') ?? config('timely.since'));
         $until = $this->option('until') ? CarbonImmutable::createFromFormat('Y-m-d', $this->option('until')) : CarbonImmutable::yesterday();
 
+        $overtimeCalculation = new OvertimeCalculationService($timely->getCapacities());
+
         $results = $overtimeCalculation->forPeriod(
+            $timely->getTotalLoggedHours($since, $until),
             $since,
             $until,
-            $timely->getTotalLoggedHours($since, $until),
-            $timely->getCapacities()
         );
 
         $this->table(

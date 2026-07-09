@@ -11,33 +11,35 @@ use Illuminate\Support\Collection;
 
 final readonly class OvertimeCalculationService
 {
+    /** @param Collection<int, CapacityData> $capacities */
+    public function __construct(
+        private Collection $capacities,
+    ) {}
+
     /**
      * Cumulative overtime balance over [since, until]: logged hours minus the
      * expected working hours derived from the user's capacities.
      *
-     * @param  Collection<int, CapacityData>  $capacities
      * @param  CarbonImmutable  $until  Last completed day (typically yesterday)
      */
     public function forPeriod(
+        HoursData $logged,
         CarbonImmutable $since,
         CarbonImmutable $until,
-        HoursData $logged,
-        Collection $capacities,
     ): OvertimeData {
         return OvertimeData::fromHours(
             logged: $logged,
-            expected: $this->calculateTotalCapacityForPeriod($capacities, $since, $until),
+            expected: $this->calculateTotalCapacityForPeriod($since, $until),
         );
     }
 
-    /** @param Collection<int, CapacityData> $capacities */
-    private function calculateTotalCapacityForPeriod(Collection $capacities, CarbonImmutable $since, CarbonImmutable $until): HoursData
+    private function calculateTotalCapacityForPeriod(CarbonImmutable $since, CarbonImmutable $until): HoursData
     {
         $totalCapacity = 0.0;
 
         foreach (CarbonPeriod::create($since, $until) as $day) {
             $day = CarbonImmutable::instance($day);
-            $capacity = $this->determineCapacityForDay($day, $capacities);
+            $capacity = $this->determineCapacityForDay($day);
 
             if ($capacity !== null && $this->isWorkDayOfCapacity($capacity, $day)) {
                 $totalCapacity += $this->getOrCalculateDailyCapacity($capacity);
@@ -51,12 +53,10 @@ final readonly class OvertimeCalculationService
      * The applicable capacity for a given day: the covering window with the
      * latest start date, so a specific dated capacity wins over the open-ended
      * default (start 1970-01-01).
-     *
-     * @param  Collection<int, CapacityData>  $capacities
      */
-    private function determineCapacityForDay(CarbonImmutable $day, Collection $capacities): ?CapacityData
+    private function determineCapacityForDay(CarbonImmutable $day): ?CapacityData
     {
-        return $capacities
+        return $this->capacities
             ->sortByDesc(fn (CapacityData $capacity): int => $capacity->startDate->getTimestamp())
             ->first(fn (CapacityData $capacity): bool => $day->greaterThanOrEqualTo($capacity->startDate));
     }
