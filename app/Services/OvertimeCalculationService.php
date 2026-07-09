@@ -3,8 +3,7 @@
 namespace App\Services;
 
 use App\DataTransferObjects\CapacityData;
-use App\DataTransferObjects\ExpectedHoursData;
-use App\DataTransferObjects\LoggedHoursData;
+use App\DataTransferObjects\HoursData;
 use App\DataTransferObjects\OvertimeData;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonPeriod;
@@ -20,10 +19,10 @@ final readonly class OvertimeCalculationService
      * @param  CarbonImmutable  $until  Last completed day (typically yesterday)
      */
     public function forPeriod(
-        LoggedHoursData $logged,
-        Collection $capacities,
         CarbonImmutable $since,
         CarbonImmutable $until,
+        HoursData $logged,
+        Collection $capacities,
     ): OvertimeData {
         return OvertimeData::fromHours(
             logged: $logged,
@@ -32,7 +31,7 @@ final readonly class OvertimeCalculationService
     }
 
     /** @param Collection<int, CapacityData> $capacities */
-    private function expectedHours(Collection $capacities, CarbonImmutable $since, CarbonImmutable $until): ExpectedHoursData
+    private function expectedHours(Collection $capacities, CarbonImmutable $since, CarbonImmutable $until): HoursData
     {
         $expected = 0.0;
 
@@ -44,7 +43,7 @@ final readonly class OvertimeCalculationService
             }
         }
 
-        return ExpectedHoursData::fromHours($expected);
+        return HoursData::fromHours($expected);
     }
 
     /**

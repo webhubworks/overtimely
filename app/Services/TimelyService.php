@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\DataTransferObjects\CapacityData;
-use App\DataTransferObjects\LoggedHoursData;
+use App\DataTransferObjects\HoursData;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Collection;
@@ -16,9 +16,9 @@ final readonly class TimelyService
         private int $userId,
     ) {}
 
-    public function getTotalLoggedHours(?string $since = null): LoggedHoursData
+    public function getTotalLoggedHours(?string $since = null): HoursData
     {
-        return LoggedHoursData::from(
+        return HoursData::from(
             $this->client->get("{$this->accountId}/reports/filter", [
                 'scope' => 'totals',
                 'group_by' => 'users',

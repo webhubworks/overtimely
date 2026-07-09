@@ -7,17 +7,17 @@ use Spatie\LaravelData\Data;
 final class OvertimeData extends Data
 {
     public function __construct(
-        public LoggedHoursData $logged,
-        public ExpectedHoursData $expected,
-        public float $balance,
+        public HoursData $logged,
+        public HoursData $expected,
+        public HoursData $balance,
     ) {}
 
-    public static function fromHours(LoggedHoursData $logged, ExpectedHoursData $expected): self
+    public static function fromHours(HoursData $logged, HoursData $expected): self
     {
         return new self(
             logged: $logged,
             expected: $expected,
-            balance: round($logged->totalHours - $expected->totalHours, 1),
+            balance: HoursData::fromHours($logged->totalHours - $expected->totalHours),
         );
     }
 }
