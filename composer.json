@@ -48,5 +48,5 @@
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
-    "bin": ["overtime"]
+    "bin": ["overtimely"]
 }
