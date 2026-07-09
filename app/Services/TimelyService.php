@@ -24,7 +24,7 @@ final readonly class TimelyService
                 'group_by' => 'users',
                 'user_ids' => $this->userId,
                 'since' => $since,
-                'until' => now()->format('Y-m-d'),
+                'until' => now()->subDay()->format('Y-m-d'), // yesterday
             ])->json('totals.duration')
         );
     }
