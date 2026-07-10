@@ -49,7 +49,7 @@ class GetTotal extends Command
                     $this->formatHours($results->balance),
                 ],
             ],
-            env('TABLE_STYLE', 'default'),
+            config('display.table_style'),
         );
     }
 
