@@ -2,8 +2,11 @@
 
 namespace App\Commands;
 
-use Illuminate\Console\Scheduling\Schedule;
+use App\Support\UserConfig;
 use LaravelZero\Framework\Commands\Command;
+
+use function Laravel\Prompts\info;
+use function Laravel\Prompts\note;
 use function Laravel\Prompts\select;
 
 class SetTableStyle extends Command
@@ -29,19 +32,29 @@ class SetTableStyle extends Command
         'borderless',
         'symfony-style-guide',
         'box',
-        'box-double'
+        'box-double',
     ];
 
     /**
      * Execute the console command.
      */
-    public function handle(): void
+    public function handle(): int
     {
         $styleArg = $this->argument('style');
-        $style = in_array($styleArg, self::STYLES)
-            ? $styleArg
-            : select( 'Select a table style', self::STYLES);
 
+        if ($styleArg !== null && ! in_array($styleArg, self::STYLES, true)) {
+            $this->error("Unknown table style '{$styleArg}'. Choose one of: ".implode(', ', self::STYLES));
 
+            return self::FAILURE;
+        }
+
+        $style = $styleArg ?? select('Select a table style', self::STYLES);
+
+        UserConfig::setTableStyle($style);
+
+        info("Table style set to '{$style}'.");
+        note('Config file: '.UserConfig::path());
+
+        return self::SUCCESS;
     }
 }
