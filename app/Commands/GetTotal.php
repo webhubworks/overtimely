@@ -55,11 +55,19 @@ class GetTotal extends Command
 
     private function formatHours(HoursData $data): string
     {
-        $hoursDecimal = round($data->totalHours, 2);
-        $hoursWithUnit = $data->hours !== 0 ? "{$data->hours}h " : '';
-        $minutesWithUnit = $data->minutes !== 0 ? "{$data->minutes}m " : '';
-        $secondsWithUnit = $data->seconds !== 0 ? "{$data->seconds}s" : '';
+        $timeComponents = collect([
+            'h' => $data->hours,
+            'm' => $data->minutes,
+            's' => $data->seconds,
+        ])->filter()
+            ->map(fn (int $value, string $unit): string => "{$value}{$unit}")
+            ->implode(' ');
 
-        return $hoursDecimal." ({$hoursWithUnit}{$minutesWithUnit}{$secondsWithUnit})";
+        $decimalHours = round($data->totalHours, 2);
+        $sign = $data->totalSeconds < 0 ? '-' : '';
+
+        return $timeComponents === ''
+            ? (string) $decimalHours
+            : "$decimalHours ({$sign}{$timeComponents})";
     }
 }
