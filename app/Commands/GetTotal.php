@@ -6,6 +6,7 @@ use App\DataTransferObjects\HoursData;
 use App\Services\OvertimeCalculationService;
 use App\Services\TimelyService;
 use Carbon\CarbonImmutable;
+use Illuminate\Http\Client\ConnectionException;
 use LaravelZero\Framework\Commands\Command;
 
 class GetTotal extends Command
@@ -15,17 +16,19 @@ class GetTotal extends Command
      *
      * @var string
      */
-    protected $signature = 'get:total {--since= : [YYYY-MM-DD] Can be set via an environment variable.} {--until= : [YYYY-MM-DD] Defaults to yesterday.}';
+    protected $signature = 'get:total {--since= : Start of the fetched report period. Can be omitted if a default is set via set:since (Format: YYYY-MM-DD) } {--until= : End of the fetched report period. Defaults to yesterday if omitted. (Format: YYYY-MM-DD)}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Fetches your total logged hours and capacity and calculates overtime.';
+    protected $description = 'Fetches your total logged hours and capacities for the period of SINCE to UNTIL and calculates the total overtime balance.';
 
     /**
      * Execute the console command.
+     *
+     * @throws ConnectionException
      */
     public function handle(TimelyService $timely): void
     {
@@ -33,15 +36,20 @@ class GetTotal extends Command
         $until = $this->option('until') ? CarbonImmutable::createFromFormat('Y-m-d', $this->option('until')) : CarbonImmutable::yesterday();
 
         $overtimeCalculation = new OvertimeCalculationService($timely->getCapacities());
+        $totalLoggedHours = $timely->getTotalLoggedHours($since, $until);
 
         $results = $overtimeCalculation->forPeriod(
-            $timely->getTotalLoggedHours($since, $until),
+            $totalLoggedHours,
             $since,
             $until,
         );
 
         $this->table(
-            ['Total Logged Hours', 'Total Expected Hours', 'Overtime Balance'],
+            [
+                'Total Logged Hours',
+                'Total Expected Hours',
+                'Overtime Balance',
+            ],
             [
                 [
                     $this->formatHours($results->logged),
