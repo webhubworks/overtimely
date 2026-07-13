@@ -30,7 +30,7 @@ class AppSetup extends Command
      * @var list<string>
      */
     private const array SETUP_COMMANDS = [
-        'set:api-key',
+        'set:api-token',
         'set:account-id',
         'set:user-id',
         'set:since',
@@ -45,7 +45,7 @@ class AppSetup extends Command
         if (UserConfig::isConfigured()) {
             info('overtimely is already fully configured. Update the values below or press enter to keep them.');
         } else {
-            info("Running setup:");
+            info('Running setup:');
         }
 
         foreach (self::SETUP_COMMANDS as $command) {

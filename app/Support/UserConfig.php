@@ -64,16 +64,6 @@ final class UserConfig
         @chmod($path, 0600);
     }
 
-    public static function getBaseUrl(): ?string
-    {
-        return self::getString('base_url');
-    }
-
-    public static function setBaseUrl(string $baseUrl): void
-    {
-        self::put('base_url', $baseUrl);
-    }
-
     public static function getApiToken(): ?string
     {
         return self::getString('api_token');
