@@ -1,29 +1,28 @@
 <?php
 
-namespace App\Commands;
+namespace App\Commands\Set;
 
 use App\Support\UserConfig;
 use LaravelZero\Framework\Commands\Command;
-
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\note;
 use function Laravel\Prompts\text;
 
-class SetAccountId extends Command
+class SetUserId extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'set:account-id {id?}';
+    protected $signature = 'set:user-id {id?}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Set your Timely account ID.';
+    protected $description = 'Set your Timely user ID.';
 
     /**
      * Execute the console command.
@@ -31,23 +30,23 @@ class SetAccountId extends Command
     public function handle(): int
     {
         $id = $this->argument('id') ?? text(
-            label: 'Timely account ID',
-            default: (string) config('timely.account_id'),
+            label: 'Timely user ID',
+            default: (string) config('timely.user_id'),
             required: true,
             validate: fn (string $value): ?string => ctype_digit($value)
                 ? null
-                : 'The account ID must be numeric.',
+                : 'The user ID must be numeric.',
         );
 
         if (! ctype_digit($id)) {
-            $this->error("Invalid account ID '{$id}'. It must be numeric.");
+            $this->error("Invalid user ID '{$id}'. It must be numeric.");
 
             return self::FAILURE;
         }
 
-        UserConfig::setAccountId($id);
+        UserConfig::setUserId($id);
 
-        info("Account ID set to {$id}.");
+        info("User ID set to {$id}.");
         note('Config file: '.UserConfig::path());
 
         return self::SUCCESS;

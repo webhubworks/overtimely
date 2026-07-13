@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Commands;
+namespace App\Commands\Set;
 
 use App\Support\UserConfig;
 use Carbon\CarbonImmutable;
 use LaravelZero\Framework\Commands\Command;
-
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\note;
 use function Laravel\Prompts\text;

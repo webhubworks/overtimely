@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Commands;
+namespace App\Commands\Get;
 
 use App\DataTransferObjects\HoursData;
 use App\Services\OvertimeCalculationService;
