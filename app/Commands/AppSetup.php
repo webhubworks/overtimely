@@ -29,7 +29,7 @@ class AppSetup extends Command
      *
      * @var list<string>
      */
-    private const array STEPS = [
+    private const array SETUP_COMMANDS = [
         'set:api-key',
         'set:account-id',
         'set:user-id',
@@ -43,14 +43,14 @@ class AppSetup extends Command
     public function handle(): int
     {
         if (UserConfig::isConfigured()) {
-            info('overtimely is already configured. Update the values below or press enter to keep them.');
+            info('overtimely is already fully configured. Update the values below or press enter to keep them.');
         } else {
-            info("Let's set up overtimely.");
+            info("Running setup:");
         }
 
-        foreach (self::STEPS as $command) {
+        foreach (self::SETUP_COMMANDS as $command) {
             if ($this->call($command) !== self::SUCCESS) {
-                $this->warn("Setup aborted at `{$command}`.");
+                $this->warn("Setup aborted at {$command}.");
 
                 return self::FAILURE;
             }

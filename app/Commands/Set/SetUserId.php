@@ -15,14 +15,14 @@ class SetUserId extends Command
      *
      * @var string
      */
-    protected $signature = 'set:user-id {id?}';
+    protected $signature = 'set:user-id {id? : Timely user ID. [non-interactive]}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Set your Timely user ID.';
+    protected $description = 'Sets your Timely user ID.';
 
     /**
      * Execute the console command.

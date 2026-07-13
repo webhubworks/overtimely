@@ -15,14 +15,14 @@ class SetTableStyle extends Command
      *
      * @var string
      */
-    protected $signature = 'set:table-style {style?}';
+    protected $signature = 'set:table-style {style? : One of the available table styles. [non-interactive]}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Sets the table style for the output.';
+    protected $description = 'Sets your preferred table border style for the output.';
 
     const array STYLES = [
         'default',

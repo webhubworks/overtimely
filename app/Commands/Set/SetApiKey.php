@@ -15,21 +15,21 @@ class SetApiKey extends Command
      *
      * @var string
      */
-    protected $signature = 'set:api-key {--key= : Timely API key (set non-interactively)}';
+    protected $signature = 'set:api-key {key? : Timely API key. [non-interactive]}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Set your Timely API key.';
+    protected $description = 'Sets your Timely API key.';
 
     /**
      * Execute the console command.
      */
     public function handle(): int
     {
-        $key = $this->option('key') ?? password(
+        $key = $this->argument('key') ?? password(
             label: 'Timely API key',
             required: UserConfig::getApiToken() === null,
             hint: UserConfig::getApiToken() ? 'Leave blank to keep the existing key.' : '',

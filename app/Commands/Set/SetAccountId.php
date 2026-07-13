@@ -15,14 +15,14 @@ class SetAccountId extends Command
      *
      * @var string
      */
-    protected $signature = 'set:account-id {id?}';
+    protected $signature = 'set:account-id {id? : Timely account ID. [non-interactive]}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Set your Timely account ID.';
+    protected $description = 'Sets your Timely account ID.';
 
     /**
      * Execute the console command.
@@ -39,7 +39,7 @@ class SetAccountId extends Command
         );
 
         if (! ctype_digit($id)) {
-            $this->error("Invalid account ID '{$id}'. It must be numeric.");
+            $this->error("The account ID must be numeric");
 
             return self::FAILURE;
         }
