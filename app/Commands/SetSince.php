@@ -33,8 +33,8 @@ class SetSince extends Command
     {
         $date = $this->argument('date') ?? text(
             label: 'Report start date (Y-m-d)',
-            default: (string) config('timely.since'),
             placeholder: '2026-01-01',
+            default: (string) config('timely.since'),
             validate: fn (string $value): ?string => CarbonImmutable::hasFormat($value, 'Y-m-d')
                 ? null
                 : 'Use the format Y-m-d, e.g. 2026-01-01.',
