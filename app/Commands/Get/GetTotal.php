@@ -2,6 +2,7 @@
 
 namespace App\Commands\Get;
 
+use App\Concerns\EnsuresConfiguration;
 use App\DataTransferObjects\HoursData;
 use App\Services\OvertimeCalculationService;
 use App\Services\TimelyService;
@@ -11,6 +12,8 @@ use LaravelZero\Framework\Commands\Command;
 
 class GetTotal extends Command
 {
+    use EnsuresConfiguration;
+
     /**
      * The name and signature of the console command.
      *
@@ -30,8 +33,14 @@ class GetTotal extends Command
      *
      * @throws ConnectionException
      */
-    public function handle(TimelyService $timely): void
+    public function handle(): int
     {
+        if (! $this->ensureConfigured()) {
+            return self::FAILURE;
+        }
+
+        $timely = app(TimelyService::class);
+
         $since = CarbonImmutable::createFromFormat('Y-m-d', $this->option('since') ?? config('timely.since'));
         $until = $this->option('until') ? CarbonImmutable::createFromFormat('Y-m-d', $this->option('until')) : CarbonImmutable::yesterday();
 
@@ -59,6 +68,8 @@ class GetTotal extends Command
             ],
             config('display.table_style'),
         );
+
+        return self::SUCCESS;
     }
 
     private function formatHours(HoursData $data): string

@@ -23,12 +23,12 @@ class GetLastWeek extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): void
+    public function handle(): int
     {
         $since = now()->subWeek()->startOfWeek()->format('Y-m-d');
         $until = now()->subWeek()->endOfWeek()->format('Y-m-d');
 
-        $this->call('get:total', [
+        return $this->call('get:total', [
             '--since' => $since,
             '--until' => $until,
         ]);

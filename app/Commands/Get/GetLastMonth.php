@@ -23,12 +23,12 @@ class GetLastMonth extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): void
+    public function handle(): int
     {
         $since = now()->subMonth()->startOfMonth()->format('Y-m-d');
         $until = now()->subMonth()->endOfMonth()->format('Y-m-d');
 
-        $this->call('get:total', [
+        return $this->call('get:total', [
             '--since' => $since,
             '--until' => $until,
         ]);
