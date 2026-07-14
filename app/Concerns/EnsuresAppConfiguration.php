@@ -12,35 +12,30 @@ use App\Support\UserConfig;
  * Call ensureConfigured() at the very top of handle(), before resolving
  * TimelyService (which is built from config('timely.*')).
  */
-trait EnsuresConfiguration
+trait EnsuresAppConfiguration
 {
-    protected function ensureConfigured(): bool
+    protected function isAppConfigured(): bool
     {
-        // Effective config (env > user file > default), so a dev whose
-        // credentials live only in .env is never forced through setup.
-        if ($this->credentialsPresent()) {
+        if ($this->hasCredentials()) {
             return true;
         }
 
-        // No TTY (piped/CI): fail with guidance rather than hanging on a prompt.
         if (! $this->input->isInteractive()) {
-            $this->error('overtimely is not configured. Run `overtimely app:setup` or set the TIMELY_* environment variables.');
+            $this->error('overtimely is not yet configured. Please run app:setup or set the corresponding environment variables.');
 
             return false;
         }
 
-        $this->warn('overtimely is not configured yet - running setup first.');
+        $this->warn('overtimely is not configured yet. Running app:setup first ...');
         $this->call('app:setup');
 
-        // File-based recheck: did setup actually persist the credentials?
         if (! UserConfig::isConfigured()) {
-            $this->error('Setup did not complete; aborting.');
+            $this->error("Command execution aborted because the setup wasn't successful. Please run app:setup again.");
 
             return false;
         }
 
-        // AppServiceProvider::boot() merged config before this command ran, so
-        // fold the freshly-saved values into config for the rest of this run.
+        // AppServiceProvider::boot() merged the config before this command ran, so we load the saved JSON values into the config here for the rest of this runtime.
         config()->set('timely.token', UserConfig::getApiToken());
         config()->set('timely.account_id', UserConfig::getAccountId());
         config()->set('timely.user_id', UserConfig::getUserId());
@@ -48,7 +43,7 @@ trait EnsuresConfiguration
         return true;
     }
 
-    private function credentialsPresent(): bool
+    private function hasCredentials(): bool
     {
         return filled(config('timely.token'))
             && filled(config('timely.account_id'))

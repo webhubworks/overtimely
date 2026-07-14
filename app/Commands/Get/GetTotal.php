@@ -2,7 +2,7 @@
 
 namespace App\Commands\Get;
 
-use App\Concerns\EnsuresConfiguration;
+use App\Concerns\EnsuresAppConfiguration;
 use App\DataTransferObjects\HoursData;
 use App\Services\OvertimeCalculationService;
 use App\Services\TimelyService;
@@ -12,7 +12,7 @@ use LaravelZero\Framework\Commands\Command;
 
 class GetTotal extends Command
 {
-    use EnsuresConfiguration;
+    use EnsuresAppConfiguration;
 
     /**
      * The name and signature of the console command.
@@ -35,7 +35,7 @@ class GetTotal extends Command
      */
     public function handle(): int
     {
-        if (! $this->ensureConfigured()) {
+        if (! $this->isAppConfigured()) {
             return self::FAILURE;
         }
 

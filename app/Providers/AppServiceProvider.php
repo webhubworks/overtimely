@@ -29,15 +29,15 @@ class AppServiceProvider extends ServiceProvider
             ['display.table_style', 'TABLE_STYLE',          UserConfig::getTableStyle()],
         ];
 
-        foreach ($map as [$configKey, $envKey, $userValue]) {
-            // An explicitly-set env var always wins (dev / CI override).
+        foreach ($map as [$configKey, $envKey, $userConfigValue]) {
+            // An explicit environment variable should always win. So we let the config.php take precedence.
             $env = env($envKey);
             if (is_string($env) && trim($env) !== '') {
                 continue;
             }
 
-            if ($userValue !== null && $userValue !== '') {
-                config()->set($configKey, $userValue);
+            if ($userConfigValue !== null && $userConfigValue !== '') {
+                config()->set($configKey, $userConfigValue);
             }
         }
     }
