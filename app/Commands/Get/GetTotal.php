@@ -3,17 +3,18 @@
 namespace App\Commands\Get;
 
 use App\Concerns\EnsuresAppConfiguration;
-use App\Concerns\ParsesDateOptions;
+use App\Concerns\HasDateOptions;
 use App\DataTransferObjects\BalanceData;
 use App\Services\CapacityCalculationService;
 use App\Services\TimelyService;
-use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\ConnectionException;
 use LaravelZero\Framework\Commands\Command;
 
 class GetTotal extends Command
 {
-    use EnsuresAppConfiguration, ParsesDateOptions;
+    use EnsuresAppConfiguration, HasDateOptions;
+
+    private TimelyService $timely;
 
     /**
      * The name and signature of the console command.
@@ -42,28 +43,20 @@ class GetTotal extends Command
             return self::FAILURE;
         }
 
-        $timely = app(TimelyService::class);
+        $this->timely = app(TimelyService::class);
 
-        $since = $this->parseDateOption(
-            '--since',
-            $this->option('since') ?? config('timely.since') ?? $timely->getCreationDate(),
-        );
-
-        $until = $this->parseDateOption(
-            '--until',
-            $this->option('until') ?? CarbonImmutable::yesterday()
-        );
+        [$since, $until] = $this->parsePeriodOptions();
 
         if ($since === null || $until === null) {
             return self::FAILURE;
         }
 
         $this->info('Fetching and calculating your total capacity ...');
-        $totalCapacity = CapacityCalculationService::fromCapacities($timely->getCapacities())
+        $totalCapacity = CapacityCalculationService::fromCapacities($this->timely->getCapacities())
             ->forPeriod($since, $until);
 
         $this->info('Fetching your total logged hours ...');
-        $totalLoggedHours = $timely->getTotalLoggedHoursForPeriod($since, $until);
+        $totalLoggedHours = $this->timely->getTotalLoggedHoursForPeriod($since, $until);
 
         $balance = BalanceData::fromOperands($totalLoggedHours, $totalCapacity);
 

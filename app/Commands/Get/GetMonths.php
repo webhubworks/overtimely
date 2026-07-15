@@ -3,13 +3,12 @@
 namespace App\Commands\Get;
 
 use App\Concerns\EnsuresAppConfiguration;
-use App\Concerns\ParsesDateOptions;
+use App\Concerns\HasDateOptions;
 use App\DataTransferObjects\BalanceData;
 use App\DataTransferObjects\MonthlyBalanceData;
 use App\DataTransferObjects\PeriodData;
 use App\Services\CapacityCalculationService;
 use App\Services\TimelyService;
-use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
 use LaravelZero\Framework\Commands\Command;
@@ -19,12 +18,14 @@ use Symfony\Component\Console\Helper\TableStyle;
 
 class GetMonths extends Command
 {
-    use EnsuresAppConfiguration, ParsesDateOptions;
+    use EnsuresAppConfiguration, HasDateOptions;
 
     /**
      * @var Collection<int, MonthlyBalanceData>
      */
     private Collection $months;
+
+    private TimelyService $timely;
 
     /**
      * The name and signature of the console command.
@@ -53,31 +54,23 @@ class GetMonths extends Command
             return self::FAILURE;
         }
 
-        $timely = app(TimelyService::class);
+        $this->timely = app(TimelyService::class);
 
-        $since = $this->parseDateOption(
-            '--since',
-            $this->option('since') ?? config('timely.since') ?? $timely->getCreationDate()->format('Y-m-d'),
-        );
-
-        $until = $this->parseDateOption(
-            '--until',
-            $this->option('until') ?? CarbonImmutable::yesterday()->format('Y-m-d')
-        );
+        [$since, $until] = $this->parsePeriodOptions();
 
         if ($since === null || $until === null) {
             return self::FAILURE;
         }
 
         $this->info('Fetching your capacities ...');
-        $capacity = CapacityCalculationService::fromCapacities($timely->getCapacities());
+        $capacity = CapacityCalculationService::fromCapacities($this->timely->getCapacities());
 
         $this->info('Fetching your logged hours per month ...');
         $this->months = PeriodData::months($since, $until)->map(
             fn (PeriodData $month): MonthlyBalanceData => new MonthlyBalanceData(
                 month: $month,
                 balance: BalanceData::fromOperands(
-                    $timely->getTotalLoggedHoursForPeriod($month->start, $month->end),
+                    $this->timely->getTotalLoggedHoursForPeriod($month->start, $month->end),
                     $capacity->forPeriod($month->start, $month->end),
                 ),
             ),
@@ -104,8 +97,6 @@ class GetMonths extends Command
     /**
      * Rows grouped by year (the year cell spans its months), a rule between
      * year groups, and a grand total set off by a final rule.
-     *
-     * @return array
      */
     private function buildMonthRows(): array
     {
