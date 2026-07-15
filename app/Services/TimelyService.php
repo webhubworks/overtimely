@@ -20,7 +20,7 @@ final readonly class TimelyService
     /**
      * @throws ConnectionException
      */
-    public function getTotalLoggedHours(?CarbonImmutable $since = null, ?CarbonImmutable $until = null): HoursData
+    public function getTotalLoggedHoursForPeriod(?CarbonImmutable $since = null, ?CarbonImmutable $until = null): HoursData
     {
         return HoursData::from(
             $this->client

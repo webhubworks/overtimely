@@ -16,6 +16,11 @@ final readonly class OvertimeBalanceCalculationService
         private Collection $capacities,
     ) {}
 
+    public function fromCapacities(Collection $capacities): self
+    {
+        return new self($capacities);
+    }
+
     /**
      * Cumulative overtime balance over [since, until]: logged hours minus the
      * expected working hours derived from the user's capacities.
@@ -23,9 +28,9 @@ final readonly class OvertimeBalanceCalculationService
      * @param  CarbonImmutable  $until  Last completed day (typically yesterday)
      */
     public function forPeriod(
-        HoursData $logged,
         CarbonImmutable $since,
         CarbonImmutable $until,
+        HoursData $logged,
     ): OvertimeData {
         return OvertimeData::fromHours(
             logged: $logged,

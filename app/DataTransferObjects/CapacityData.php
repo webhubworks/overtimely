@@ -16,17 +16,17 @@ use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 final class CapacityData extends Data
 {
     public function __construct(
-        public ?int $id,                                            // null for the account default capacity
-        public float $weeklyCapacity,
-        public float $dailyCapacity,
-        public ?string $weekdays,                                   // legacy format, e.g. "MO,TU,WE,TH,FR"
-        public string $workDays,                                    // "MON,TUE,WED,THU,FRI"
-        public ?int $totalWorkingDays,                              // null for open-ended capacities
-        public int $weeklyWorkingDays,
-        public bool $current,                                       // true = active capacity (has no end date)
+        public ?int $id,                                            // Capacity ID. Null for default capacity
+        public float $weeklyCapacity,                               // Specifies the user's weekly hour capacity. The default is account's weekly capacity. Can only have a decimal place of .5 (e.g. 3.5 hours)
+        public float $dailyCapacity,                                // Specifies the user's daily hour capacity
+        public ?string $weekdays,                                   // Legacy weekday format. Example: 'MO,TU,WE,TH,FR'
+        public string $workDays,                                    // Comma-separated working days. Example: 'MON,TUE,WED,THU,FRI'
+        public ?int $totalWorkingDays,                              // Total working days in the capacity period. Null for open-ended capacities
+        public int $weeklyWorkingDays,                              // Specifies the number of user's weekly working days
+        public bool $current,                                       // True if this is the active capacity (no end date)
         #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
-        public CarbonImmutable $startDate,
+        public CarbonImmutable $startDate,                          // ISO8601 start date
         #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
-        public ?CarbonImmutable $endDate,                           // null for open-ended capacities
+        public ?CarbonImmutable $endDate,                           // ISO8601 end date. Null for open-ended capacities
     ) {}
 }

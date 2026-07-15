@@ -19,7 +19,7 @@ class GetTotal extends Command
      *
      * @var string
      */
-    protected $signature = 'get:total {--since= : Start of the fetched report period. Can be omitted if a default is set via set:since (Format: YYYY-MM-DD) } {--until= : End of the fetched report period. Defaults to yesterday if omitted. (Format: YYYY-MM-DD)}';
+    protected $signature = 'get:total {--since= : Start of the fetched report period. Defaults to 1970-01-01. Persistent custom default can be set via set:since. (Format: YYYY-MM-DD) } {--until= : End of the fetched report period. Defaults to yesterday if omitted. (Format: YYYY-MM-DD)}';
 
     /**
      * The console command description.
@@ -41,16 +41,23 @@ class GetTotal extends Command
 
         $timely = app(TimelyService::class);
 
-        $since = CarbonImmutable::createFromFormat('Y-m-d', $this->option('since') ?? config('timely.since'));
-        $until = $this->option('until') ? CarbonImmutable::createFromFormat('Y-m-d', $this->option('until')) : CarbonImmutable::yesterday();
+        $since = CarbonImmutable::createFromFormat(
+            'Y-m-d',
+            $this->option('since')
+                ?? config('timely.since')
+                ?? '1970-01-01'
+        );
+        $until = $this->option('until')
+            ? CarbonImmutable::createFromFormat('Y-m-d', $this->option('until'))
+            : CarbonImmutable::yesterday();
 
-        $overtimeCalculation = new OvertimeBalanceCalculationService($timely->getCapacities());
-        $totalLoggedHours = $timely->getTotalLoggedHours($since, $until);
+        $overtimeCalculation = OvertimeBalanceCalculationService::fromCapacities($timely->getCapacities());
+        $totalLoggedHours = $timely->getTotalLoggedHoursForPeriod($since, $until);
 
         $results = $overtimeCalculation->forPeriod(
-            $totalLoggedHours,
             $since,
             $until,
+            $totalLoggedHours,
         );
 
         $this->table(
