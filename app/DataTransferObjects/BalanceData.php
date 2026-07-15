@@ -12,7 +12,7 @@ final class BalanceData extends Data
         public DurationData $balance,
     ) {}
 
-    public static function fromHours(DurationData $logged, DurationData $expected): self
+    public static function fromOperands(DurationData $logged, DurationData $expected): self
     {
         return new self(
             logged: $logged,

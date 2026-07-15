@@ -3,8 +3,9 @@
 namespace App\Commands\Get;
 
 use App\Concerns\EnsuresAppConfiguration;
+use App\DataTransferObjects\BalanceData;
 use App\DataTransferObjects\DurationData;
-use App\Services\OvertimeBalanceCalculationService;
+use App\Services\CapacityCalculationService;
 use App\Services\TimelyService;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\ConnectionException;
@@ -49,18 +50,23 @@ class GetTotal extends Command
             ?? config('timely.since')
             ?? '1970-01-01'
         );
+
         $until = $this->option('until')
             ? CarbonImmutable::createFromFormat('Y-m-d', $this->option('until'))
             : CarbonImmutable::yesterday();
 
-        $overtimeCalculation = OvertimeBalanceCalculationService::fromCapacities($timely->getCapacities());
+        $this->info('Fetching your total logged hours ...');
         $totalLoggedHours = $timely->getTotalLoggedHoursForPeriod($since, $until);
 
-        $results = $overtimeCalculation->forPeriod(
-            $since,
-            $until,
-            $totalLoggedHours,
-        );
+        $this->info('Fetching and calculating your total capacity ...');
+        $totalCapacity = CapacityCalculationService::fromCapacities($timely->getCapacities())
+            ->forPeriod($since, $until);
+
+        $this->info('Calculating your overtime balance ...');
+        $balance = BalanceData::fromOperands($totalLoggedHours, $totalCapacity);
+
+        $this->newLine();
+        $this->info("Your overtime balance for the period of {$since->format('jS F Y')} to {$until->format('jS F Y')}:");
 
         $this->table(
             [
@@ -70,9 +76,9 @@ class GetTotal extends Command
             ],
             [
                 [
-                    $this->formatHours($results->logged),
-                    $this->formatHours($results->expected),
-                    $this->formatHours($results->balance),
+                    $this->formatHours($balance->logged),
+                    $this->formatHours($balance->expected),
+                    $this->formatHours($balance->balance),
                 ],
             ],
             config('display.table_style'),
@@ -81,18 +87,18 @@ class GetTotal extends Command
         return self::SUCCESS;
     }
 
-    private function formatHours(DurationData $data): string
+    private function formatHours(DurationData $duration): string
     {
         $timeComponents = collect([
-            'h' => $data->hours,
-            'm' => $data->minutes,
-            's' => $data->seconds,
+            'h' => $duration->hours,
+            'm' => $duration->minutes,
+            's' => $duration->seconds,
         ])->filter()
             ->map(fn (int $value, string $unit): string => "{$value}{$unit}")
             ->implode(' ');
 
-        $decimalHours = round($data->totalHours, 2);
-        $sign = $data->totalSeconds < 0 ? '-' : '';
+        $decimalHours = round($duration->totalHours, 2);
+        $sign = $duration->totalSeconds < 0 ? '-' : '';
 
         return $timeComponents === ''
             ? (string) $decimalHours

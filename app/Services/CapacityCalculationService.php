@@ -2,14 +2,13 @@
 
 namespace App\Services;
 
-use App\DataTransferObjects\BalanceData;
 use App\DataTransferObjects\CapacityData;
 use App\DataTransferObjects\DurationData;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonPeriodImmutable;
 use Illuminate\Support\Collection;
 
-final readonly class OvertimeBalanceCalculationService
+final readonly class CapacityCalculationService
 {
     private Collection $capacities;
 
@@ -35,32 +34,23 @@ final readonly class OvertimeBalanceCalculationService
     public function forPeriod(
         CarbonImmutable $since,
         CarbonImmutable $until,
-        DurationData $logged,
-    ): BalanceData {
-        return BalanceData::fromHours(
-            logged: $logged,
-            expected: $this->calculateTotalCapacityForPeriod($since, $until),
-        );
-    }
-
-    private function calculateTotalCapacityForPeriod(CarbonImmutable $since, CarbonImmutable $until): DurationData
-    {
+    ): DurationData {
         $totalCapacity = 0.0;
 
         foreach (CarbonPeriodImmutable::create($since, $until) as $day) {
-            $totalCapacity += $this->getCapacityForDay($day);
+            $totalCapacity += $this->getCapacityOfDay($day);
         }
 
         return DurationData::fromTotalHours($totalCapacity);
     }
 
-    private function getCapacityForDay(CarbonImmutable $day): float
+    private function getCapacityOfDay(CarbonImmutable $day): float
     {
         $capacityForDay = $this->determineCapacityForDay($day);
 
-        $isWorkDayOfThisCapacity = $this->isWorkDayOfCapacity($capacityForDay, $day);
+        $isWorkDay = $this->isWorkDayOfCapacity($capacityForDay, $day);
 
-        return $isWorkDayOfThisCapacity
+        return $isWorkDay
             ? $capacityForDay->dailyCapacity
             : 0.0;
     }
