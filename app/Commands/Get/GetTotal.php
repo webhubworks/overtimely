@@ -3,6 +3,7 @@
 namespace App\Commands\Get;
 
 use App\Concerns\EnsuresAppConfiguration;
+use App\Concerns\ParsesDateOptions;
 use App\DataTransferObjects\BalanceData;
 use App\DataTransferObjects\DurationData;
 use App\Services\CapacityCalculationService;
@@ -13,7 +14,7 @@ use LaravelZero\Framework\Commands\Command;
 
 class GetTotal extends Command
 {
-    use EnsuresAppConfiguration;
+    use EnsuresAppConfiguration, ParsesDateOptions;
 
     /**
      * The name and signature of the console command.
@@ -88,17 +89,6 @@ class GetTotal extends Command
         );
 
         return self::SUCCESS;
-    }
-
-    private function parseDateOption(string $option, string $value): ?CarbonImmutable
-    {
-        if (! CarbonImmutable::hasFormat($value, 'Y-m-d')) {
-            $this->error("Cannot parse {$option} date '{$value}'. All dates must be provided in the ISO 8601 format: YYYY-MM-DD");
-
-            return null;
-        }
-
-        return CarbonImmutable::createFromFormat('!Y-m-d', $value);
     }
 
     private static function formatDuration(DurationData $duration): string
