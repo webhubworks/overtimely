@@ -61,7 +61,7 @@ function makeCapacity(
         totalWorkingDays: null,
         weeklyWorkingDays: $weeklyWorkingDays,
         current: $current,
-        startDate: CarbonImmutable::createFromFormat('Y-m-d', $startDate),
-        endDate: CarbonImmutable::createFromFormat('Y-m-d', $endDate),
+        startDate: CarbonImmutable::createFromFormat('Y-m-d', $startDate)->startOfDay(),
+        endDate: $endDate ? CarbonImmutable::createFromFormat('Y-m-d', $endDate)->startOfDay() : null,
     );
 }

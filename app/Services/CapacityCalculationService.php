@@ -14,7 +14,7 @@ final readonly class CapacityCalculationService
 
     public function __construct(CapacityData|Collection $capacities)
     {
-        $this->capacities = collect($capacities)
+        $this->capacities = Collection::wrap($capacities)
             ->sortByDesc(fn (CapacityData $capacity): int => $capacity->startDate->getTimestamp())
             ->values();
     }
