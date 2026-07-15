@@ -34,6 +34,18 @@ final readonly class TimelyService
         );
     }
 
+    /**
+     * @throws ConnectionException
+     */
+    public function getCreationDate(): CarbonImmutable
+    {
+        return CarbonImmutable::createFromTimestamp(
+            $this->client
+                ->get("{$this->accountId}/users/{$this->userId}")
+                ->json('created_at')
+        )->startOfDay();
+    }
+
     /** @return Collection<int, CapacityData>
      * @throws ConnectionException
      */

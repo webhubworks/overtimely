@@ -21,7 +21,7 @@ class GetTotal extends Command
      * @var string
      */
     protected $signature = 'get:total
-    {--since= : Start of the fetched report period. Defaults to 1970-01-01. Persistent custom default can be set via set:since. (Format: YYYY-MM-DD)}
+    {--since= : Start of the fetched report period. Defaults to the date your Timely account was created. Persistent custom default can be set via set:since. (Format: YYYY-MM-DD)}
     {--until= : End of the fetched report period. Defaults to yesterday if omitted. (Format: YYYY-MM-DD)}';
 
     /**
@@ -42,21 +42,21 @@ class GetTotal extends Command
             return self::FAILURE;
         }
 
+        $timely = app(TimelyService::class);
+
         $since = $this->parseDateOption(
             '--since',
-            $this->option('since') ?? config('timely.since') ?? '1970-01-01',
+            $this->option('since') ?? config('timely.since') ?? $timely->getCreationDate(),
         );
 
         $until = $this->parseDateOption(
             '--until',
-            $this->option('until') ?? CarbonImmutable::yesterday()->format('Y-m-d')
+            $this->option('until') ?? CarbonImmutable::yesterday()
         );
 
         if ($since === null || $until === null) {
             return self::FAILURE;
         }
-
-        $timely = app(TimelyService::class);
 
         $this->info('Fetching and calculating your total capacity ...');
         $totalCapacity = CapacityCalculationService::fromCapacities($timely->getCapacities())

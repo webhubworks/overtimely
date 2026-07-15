@@ -6,8 +6,12 @@ use Carbon\CarbonImmutable;
 
 trait ParsesDateOptions
 {
-    protected function parseDateOption(string $option, string $value): ?CarbonImmutable
+    protected function parseDateOption(string $option, string|CarbonImmutable $value): ?CarbonImmutable
     {
+        if ($value instanceof CarbonImmutable) {
+            return $value->startOfDay();
+        }
+
         if (! CarbonImmutable::hasFormat($value, 'Y-m-d')) {
             $this->error("Cannot parse {$option} date '{$value}'. All dates must be provided in the ISO 8601 format: YYYY-MM-DD");
 
