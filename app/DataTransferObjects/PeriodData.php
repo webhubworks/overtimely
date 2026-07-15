@@ -3,14 +3,15 @@
 namespace App\DataTransferObjects;
 
 use Carbon\CarbonImmutable;
+use Carbon\CarbonPeriodImmutable;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
 
 final class PeriodData extends Data
 {
     public function __construct(
-        public CarbonImmutable $since,
-        public CarbonImmutable $until,
+        public CarbonImmutable $start,
+        public CarbonImmutable $end,
     ) {}
 
     /**
@@ -18,25 +19,20 @@ final class PeriodData extends Data
      * last entries are clamped to the range, so partial months are kept as the
      * slice that falls inside the range.
      *
-     * Dates are treated as calendar-only (midnight): month ends are normalized
-     * with startOfDay() to stay consistent with the rest of the app, and the
-     * cursor advances from the first of the month to avoid month-overflow.
+     * A monthly period anchored on the first of the start month yields each
+     * month's opening day; anchoring there keeps the "+1 month" step off
+     * day-of-month overflow. Each boundary is then clamped into the range with
+     * max()/min(), and month ends are normalized to midnight to stay
+     * calendar-only like the rest of the app.
      *
      * @return Collection<int, self>
      */
-    public static function monthlySplit(CarbonImmutable $since, CarbonImmutable $until): Collection
+    public static function months(CarbonImmutable $from, CarbonImmutable $to): Collection
     {
-        $periods = new Collection;
-
-        for ($cursor = $since; $cursor->lessThanOrEqualTo($until); $cursor = $cursor->startOfMonth()->addMonth()) {
-            $monthEnd = $cursor->endOfMonth()->startOfDay();
-
-            $periods->push(new self(
-                since: $cursor,
-                until: $monthEnd->min($until),
+        return collect(CarbonPeriodImmutable::create($from->startOfMonth(), '1 month', $to))
+            ->map(fn (CarbonImmutable $monthStart): self => new self(
+                start: $monthStart->startOfDay()->max($from),
+                end: $monthStart->endOfMonth()->startOfDay()->min($to),
             ));
-        }
-
-        return $periods;
     }
 }
