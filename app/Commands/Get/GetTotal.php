@@ -19,14 +19,16 @@ class GetTotal extends Command
      *
      * @var string
      */
-    protected $signature = 'get:total {--since= : Start of the fetched report period. Defaults to 1970-01-01. Persistent custom default can be set via set:since. (Format: YYYY-MM-DD) } {--until= : End of the fetched report period. Defaults to yesterday if omitted. (Format: YYYY-MM-DD)}';
+    protected $signature = 'get:total
+    {--since= : Start of the fetched report period. Defaults to 1970-01-01. Persistent custom default can be set via set:since. (Format: YYYY-MM-DD)}
+    {--until= : End of the fetched report period. Defaults to yesterday if omitted. (Format: YYYY-MM-DD)}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Fetches your total logged hours and capacities for the period of SINCE to UNTIL and calculates the total overtime balance.';
+    protected $description = 'Fetches your capacities and total logged hours for the period of SINCE to UNTIL and calculates the total overtime balance.';
 
     /**
      * Execute the console command.
@@ -44,8 +46,8 @@ class GetTotal extends Command
         $since = CarbonImmutable::createFromFormat(
             'Y-m-d',
             $this->option('since')
-                ?? config('timely.since')
-                ?? '1970-01-01'
+            ?? config('timely.since')
+            ?? '1970-01-01'
         );
         $until = $this->option('until')
             ? CarbonImmutable::createFromFormat('Y-m-d', $this->option('until'))
