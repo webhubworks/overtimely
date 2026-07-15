@@ -38,22 +38,21 @@ class GetTotal extends Command
      */
     public function handle(): int
     {
-        if (! $this->isAppConfigured()) {
-            return self::FAILURE;
-        }
+        if (! $this->isAppConfigured()) return self::FAILURE;
 
-        $timely = app(TimelyService::class);
-
-        $since = CarbonImmutable::createFromFormat(
-            'Y-m-d',
-            $this->option('since')
-            ?? config('timely.since')
-            ?? '1970-01-01'
+        $since = $this->parseDateOption(
+            '--since',
+            $this->option('since') ?? config('timely.since') ?? '1970-01-01',
         );
 
-        $until = $this->option('until')
-            ? CarbonImmutable::createFromFormat('Y-m-d', $this->option('until'))
-            : CarbonImmutable::yesterday();
+        $until = $this->parseDateOption(
+            '--until',
+            $this->option('until') ?? CarbonImmutable::yesterday()->format('Y-m-d')
+        );
+
+        if ($since === null || $until === null) return self::FAILURE;
+
+        $timely = app(TimelyService::class);
 
         $this->info('Fetching your total logged hours ...');
         $totalLoggedHours = $timely->getTotalLoggedHoursForPeriod($since, $until);
@@ -87,6 +86,17 @@ class GetTotal extends Command
         return self::SUCCESS;
     }
 
+    private function parseDateOption(string $option, string $value): ?CarbonImmutable
+    {
+        if (! CarbonImmutable::hasFormat($value, 'Y-m-d')) {
+            $this->error("Cannot parse {$option} date '{$value}'. All dates must be provided in the ISO 8601 format: YYYY-MM-DD");
+
+            return null;
+        }
+
+        return CarbonImmutable::createFromFormat('Y-m-d', $value)->startOfDay();
+    }
+
     private static function formatDuration(DurationData $duration): string
     {
         $timeComponents = collect([
@@ -100,8 +110,6 @@ class GetTotal extends Command
         $decimalHours = round($duration->totalHours, 2);
         $sign = $duration->totalSeconds < 0 ? '-' : '';
 
-        return $timeComponents === ''
-            ? (string) $decimalHours
-            : "{$decimalHours}h ({$sign}{$timeComponents})";
+        return "{$sign}{$timeComponents} ({$decimalHours}h)";
     }
 }
