@@ -76,6 +76,9 @@ class GetMonths extends Command
             ),
         );
 
+        // Right-align the three duration columns (indexes 2-4) so they line up.
+        $rightAligned = (new TableStyle)->setPadType(STR_PAD_LEFT);
+
         $this->newLine();
         $this->table(
             [
@@ -87,8 +90,7 @@ class GetMonths extends Command
             ],
             $this->buildMonthRows(),
             config('display.table_style'),
-            // Right-align the balance column (index 4) so the durations line up.
-            [4 => (new TableStyle)->setPadType(STR_PAD_LEFT)],
+            [2 => $rightAligned, 3 => $rightAligned, 4 => $rightAligned],
         );
 
         return self::SUCCESS;
@@ -127,7 +129,7 @@ class GetMonths extends Command
     }
 
     /**
-     * @param  Collection<int, MonthlyBalanceData>  $months
+     * @return array
      */
     private function totalsRow(): array
     {
