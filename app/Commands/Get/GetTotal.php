@@ -3,7 +3,7 @@
 namespace App\Commands\Get;
 
 use App\Concerns\EnsuresAppConfiguration;
-use App\DataTransferObjects\HoursData;
+use App\DataTransferObjects\DurationData;
 use App\Services\OvertimeBalanceCalculationService;
 use App\Services\TimelyService;
 use Carbon\CarbonImmutable;
@@ -81,7 +81,7 @@ class GetTotal extends Command
         return self::SUCCESS;
     }
 
-    private function formatHours(HoursData $data): string
+    private function formatHours(DurationData $data): string
     {
         $timeComponents = collect([
             'h' => $data->hours,

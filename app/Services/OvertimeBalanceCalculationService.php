@@ -2,21 +2,26 @@
 
 namespace App\Services;
 
+use App\DataTransferObjects\BalanceData;
 use App\DataTransferObjects\CapacityData;
-use App\DataTransferObjects\HoursData;
-use App\DataTransferObjects\OvertimeData;
+use App\DataTransferObjects\DurationData;
 use Carbon\CarbonImmutable;
-use Carbon\CarbonPeriod;
+use Carbon\CarbonPeriodImmutable;
 use Illuminate\Support\Collection;
 
 final readonly class OvertimeBalanceCalculationService
 {
-    /** @param Collection<int, CapacityData> $capacities */
-    public function __construct(
-        private Collection $capacities,
-    ) {}
+    private Collection $capacities;
 
-    public function fromCapacities(Collection $capacities): self
+    /** @param Collection<int, CapacityData> $capacities */
+    public function __construct(Collection $capacities)
+    {
+        $this->capacities = $capacities
+            ->sortByDesc(fn (CapacityData $capacity): int => $capacity->startDate->getTimestamp())
+            ->values();
+    }
+
+    public static function fromCapacities(Collection $capacities): self
     {
         return new self($capacities);
     }
@@ -30,57 +35,49 @@ final readonly class OvertimeBalanceCalculationService
     public function forPeriod(
         CarbonImmutable $since,
         CarbonImmutable $until,
-        HoursData $logged,
-    ): OvertimeData {
-        return OvertimeData::fromHours(
+        DurationData $logged,
+    ): BalanceData {
+        return BalanceData::fromHours(
             logged: $logged,
             expected: $this->calculateTotalCapacityForPeriod($since, $until),
         );
     }
 
-    private function calculateTotalCapacityForPeriod(CarbonImmutable $since, CarbonImmutable $until): HoursData
+    private function calculateTotalCapacityForPeriod(CarbonImmutable $since, CarbonImmutable $until): DurationData
     {
         $totalCapacity = 0.0;
 
-        foreach (CarbonPeriod::create($since, $until) as $day) {
-            $day = CarbonImmutable::instance($day);
-            $capacity = $this->determineCapacityForDay($day);
-
-            if ($capacity !== null && $this->isWorkDayOfCapacity($capacity, $day)) {
-                $totalCapacity += $this->getOrCalculateDailyCapacity($capacity);
-            }
+        foreach (CarbonPeriodImmutable::create($since, $until) as $day) {
+            $totalCapacity += $this->getCapacityForDay($day);
         }
 
-        return HoursData::fromTotalHours($totalCapacity);
+        return DurationData::fromTotalHours($totalCapacity);
+    }
+
+    private function getCapacityForDay(CarbonImmutable $day): float
+    {
+        $capacityForDay = $this->determineCapacityForDay($day);
+
+        $isWorkDayOfThisCapacity = $this->isWorkDayOfCapacity($capacityForDay, $day);
+
+        return $isWorkDayOfThisCapacity
+            ? $capacityForDay->dailyCapacity
+            : 0.0;
     }
 
     /**
-     * The applicable capacity for a given day: the covering window with the
-     * latest start date, so a specific dated capacity wins over the open-ended
-     * default (start 1970-01-01).
+     * The applicable capacity for a given day:
+     * Capacities are sorted by start date so the "latest" capacity wins.
      */
     private function determineCapacityForDay(CarbonImmutable $day): ?CapacityData
     {
         return $this->capacities
-            ->sortByDesc(fn (CapacityData $capacity): int => $capacity->startDate->getTimestamp())
             ->first(fn (CapacityData $capacity): bool => $day->greaterThanOrEqualTo($capacity->startDate));
     }
 
     private function isWorkDayOfCapacity(CapacityData $capacity, CarbonImmutable $day): bool
     {
-        $workDaysOfCapacity = collect(explode(',', $capacity->workDays));
-
-        return $workDaysOfCapacity->contains(strtoupper($day->format('D')));
-    }
-
-    private function getOrCalculateDailyCapacity(CapacityData $capacity): float
-    {
-        if ($capacity->dailyCapacity > 0) {
-            return $capacity->dailyCapacity;
-        }
-
-        return $capacity->weeklyWorkingDays > 0
-            ? $capacity->weeklyCapacity / $capacity->weeklyWorkingDays
-            : 0.0;
+        return $capacity->workDays
+            ->contains(strtoupper($day->format('D')));
     }
 }

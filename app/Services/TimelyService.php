@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\DataTransferObjects\CapacityData;
-use App\DataTransferObjects\HoursData;
+use App\DataTransferObjects\DurationData;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
@@ -20,9 +20,9 @@ final readonly class TimelyService
     /**
      * @throws ConnectionException
      */
-    public function getTotalLoggedHoursForPeriod(?CarbonImmutable $since = null, ?CarbonImmutable $until = null): HoursData
+    public function getTotalLoggedHoursForPeriod(?CarbonImmutable $since = null, ?CarbonImmutable $until = null): DurationData
     {
-        return HoursData::from(
+        return DurationData::from(
             $this->client
                 ->get("{$this->accountId}/reports/filter", [
                     'scope' => 'totals',

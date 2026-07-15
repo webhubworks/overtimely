@@ -7,7 +7,7 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 
 #[MapInputName(SnakeCaseMapper::class)]
-final class HoursData extends Data
+final class DurationData extends Data
 {
     public function __construct(
         public int $hours,
