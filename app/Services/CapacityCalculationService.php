@@ -12,15 +12,17 @@ final readonly class CapacityCalculationService
 {
     private Collection $capacities;
 
-    /** @param Collection<int, CapacityData> $capacities */
-    public function __construct(Collection $capacities)
+    /**
+     * @param CapacityData|Collection $capacities
+     */
+    public function __construct(CapacityData|Collection $capacities)
     {
-        $this->capacities = $capacities
+        $this->capacities = collect($capacities)
             ->sortByDesc(fn (CapacityData $capacity): int => $capacity->startDate->getTimestamp())
             ->values();
     }
 
-    public static function fromCapacities(Collection $capacities): self
+    public static function fromCapacities(CapacityData|Collection $capacities): self
     {
         return new self($capacities);
     }
