@@ -38,7 +38,9 @@ class GetTotal extends Command
      */
     public function handle(): int
     {
-        if (! $this->isAppConfigured()) return self::FAILURE;
+        if (! $this->isAppConfigured()) {
+            return self::FAILURE;
+        }
 
         $since = $this->parseDateOption(
             '--since',
@@ -50,18 +52,19 @@ class GetTotal extends Command
             $this->option('until') ?? CarbonImmutable::yesterday()->format('Y-m-d')
         );
 
-        if ($since === null || $until === null) return self::FAILURE;
+        if ($since === null || $until === null) {
+            return self::FAILURE;
+        }
 
         $timely = app(TimelyService::class);
-
-        $this->info('Fetching your total logged hours ...');
-        $totalLoggedHours = $timely->getTotalLoggedHoursForPeriod($since, $until);
 
         $this->info('Fetching and calculating your total capacity ...');
         $totalCapacity = CapacityCalculationService::fromCapacities($timely->getCapacities())
             ->forPeriod($since, $until);
 
-        $this->info('Calculating your overtime balance ...');
+        $this->info('Fetching your total logged hours ...');
+        $totalLoggedHours = $timely->getTotalLoggedHoursForPeriod($since, $until);
+
         $balance = BalanceData::fromOperands($totalLoggedHours, $totalCapacity);
 
         $this->newLine();
@@ -94,7 +97,7 @@ class GetTotal extends Command
             return null;
         }
 
-        return CarbonImmutable::createFromFormat('Y-m-d', $value)->startOfDay();
+        return CarbonImmutable::createFromFormat('!Y-m-d', $value);
     }
 
     private static function formatDuration(DurationData $duration): string

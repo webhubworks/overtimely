@@ -28,9 +28,9 @@ final class CapacityData extends Data
         public ?int $totalWorkingDays,                              // Total working days in the capacity period. Null for open-ended capacities
         public int $weeklyWorkingDays,                              // Specifies the number of user's weekly working days
         public bool $current,                                       // True if this is the active capacity (no end date)
-        #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
+        #[WithCast(DateTimeInterfaceCast::class, format: '!Y-m-d')]
         public CarbonImmutable $startDate,                          // ISO8601 start date
-        #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
+        #[WithCast(DateTimeInterfaceCast::class, format: '!Y-m-d')]
         public ?CarbonImmutable $endDate,                           // ISO8601 end date. Null for open-ended capacities
     ) {}
 }
