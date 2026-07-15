@@ -68,7 +68,7 @@ class GetTotal extends Command
         $balance = BalanceData::fromOperands($totalLoggedHours, $totalCapacity);
 
         $this->newLine();
-        $this->info("Your overtime for the period from {$since->format('jS \o\f F Y')} to {$until->format('jS \o\f F Y')} is ".$this->formatDuration($balance->balance, false)).".";
+        $this->info("Your overtime for the period from {$since->format('jS \o\f F Y')} to {$until->format('jS \o\f F Y')} is {$balance->balance->formatted}h.");
         $this->newLine();
 
         $this->table(
