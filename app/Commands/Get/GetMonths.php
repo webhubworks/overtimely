@@ -4,6 +4,8 @@ namespace App\Commands\Get;
 
 use App\Concerns\EnsuresAppConfiguration;
 use App\Concerns\ParsesDateOptions;
+use App\DataTransferObjects\BalanceData;
+use App\DataTransferObjects\PeriodData;
 use App\Services\CapacityCalculationService;
 use App\Services\TimelyService;
 use Carbon\CarbonImmutable;
@@ -20,7 +22,7 @@ class GetMonths extends Command
      * @var string
      */
     protected $signature = 'get:months
-    {--since= : Start of the fetched report period. Defaults to 1970-01-01. Persistent custom default can be set via set:since. (Format: YYYY-MM-DD)}
+    {--since= : Start of the fetched report period. Defaults to the date your Timely account was created. Persistent custom default can be set via set:since. (Format: YYYY-MM-DD)}
     {--until= : End of the fetched report period. Defaults to yesterday if omitted. (Format: YYYY-MM-DD)}';
 
     /**
@@ -35,15 +37,17 @@ class GetMonths extends Command
      *
      * @throws ConnectionException
      */
-    public function handle()
+    public function handle(): int
     {
         if (! $this->isAppConfigured()) {
             return self::FAILURE;
         }
 
+        $timely = app(TimelyService::class);
+
         $since = $this->parseDateOption(
             '--since',
-            $this->option('since') ?? config('timely.since') ?? '1970-01-01',
+            $this->option('since') ?? config('timely.since') ?? $timely->getCreationDate()->format('Y-m-d'),
         );
 
         $until = $this->parseDateOption(
@@ -55,9 +59,35 @@ class GetMonths extends Command
             return self::FAILURE;
         }
 
-        $timely = app(TimelyService::class);
-
         $this->info('Fetching your capacities ...');
         $capacity = CapacityCalculationService::fromCapacities($timely->getCapacities());
+
+        $this->info('Fetching your logged hours per month ...');
+        $rows = PeriodData::monthlySplit($since, $until)->map(function (PeriodData $period) use ($timely, $capacity): array {
+            $expected = $capacity->forPeriod($period->since, $period->until);
+            $logged = $timely->getTotalLoggedHoursForPeriod($period->since, $period->until);
+            $balance = BalanceData::fromOperands($logged, $expected);
+
+            return [
+                $period->since->format('F Y'),
+                $balance->logged->toComponentsString(),
+                $balance->expected->toComponentsString(),
+                $balance->balance->toComponentsString(),
+            ];
+        });
+
+        $this->newLine();
+        $this->table(
+            [
+                'Month',
+                'Logged Hours',
+                'Expected Hours',
+                'Overtime Balance',
+            ],
+            $rows->all(),
+            config('display.table_style'),
+        );
+
+        return self::SUCCESS;
     }
 }
