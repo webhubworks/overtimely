@@ -1,6 +1,7 @@
 <?php
 
 use App\Providers\AppServiceProvider;
+use Intonate\TinkerZero\TinkerZeroServiceProvider;
 use Spatie\LaravelData\LaravelDataServiceProvider;
 
 return [
@@ -59,6 +60,7 @@ return [
     'providers' => [
         AppServiceProvider::class,
         LaravelDataServiceProvider::class,
+        TinkerZeroServiceProvider::class,
     ],
 
 ];
