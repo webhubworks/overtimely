@@ -76,9 +76,9 @@ class GetTotal extends Command
             ],
             [
                 [
-                    $this->formatHours($balance->logged),
-                    $this->formatHours($balance->expected),
-                    $this->formatHours($balance->balance),
+                    $this->formatDuration($balance->logged),
+                    $this->formatDuration($balance->expected),
+                    $this->formatDuration($balance->balance),
                 ],
             ],
             config('display.table_style'),
@@ -87,7 +87,7 @@ class GetTotal extends Command
         return self::SUCCESS;
     }
 
-    private function formatHours(DurationData $duration): string
+    private static function formatDuration(DurationData $duration): string
     {
         $timeComponents = collect([
             'h' => $duration->hours,
@@ -102,6 +102,6 @@ class GetTotal extends Command
 
         return $timeComponents === ''
             ? (string) $decimalHours
-            : "$decimalHours ({$sign}{$timeComponents})";
+            : "{$decimalHours}h ({$sign}{$timeComponents})";
     }
 }

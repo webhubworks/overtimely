@@ -12,9 +12,6 @@ final readonly class CapacityCalculationService
 {
     private Collection $capacities;
 
-    /**
-     * @param CapacityData|Collection $capacities
-     */
     public function __construct(CapacityData|Collection $capacities)
     {
         $this->capacities = collect($capacities)
