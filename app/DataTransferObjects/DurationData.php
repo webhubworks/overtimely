@@ -9,15 +9,24 @@ use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 #[MapInputName(SnakeCaseMapper::class)]
 final class DurationData extends Data
 {
+    public bool $isNegative;
+
     public function __construct(
         public int $hours,
         public int $minutes,
         public int $seconds,
         public string $formatted, // "h:i"
         public float $totalHours,
-        public float $totalMinutes,
+        public int $totalMinutes,
         public int $totalSeconds,
-    ) {}
+    ) {
+        $this->isNegative = $this->totalSeconds < 0;
+    }
+
+    public static function fromTotalHours(float $totalHours): self
+    {
+        return self::fromTotalSeconds((int) round($totalHours * 3600));
+    }
 
     /**
      * Build the same field set the Timely `duration` object provides from a
@@ -27,9 +36,8 @@ final class DurationData extends Data
      * Handles negatives: the hours/minutes/seconds components carry the
      * magnitude and the sign lives in `formatted` and the signed totals.
      */
-    public static function fromTotalHours(float $totalHours): self
+    public static function fromTotalSeconds(int $totalSeconds): self
     {
-        $totalSeconds = (int) round($totalHours * 3600);
         $magnitude = abs($totalSeconds);
 
         $hours = intdiv($magnitude, 3600);
@@ -41,9 +49,24 @@ final class DurationData extends Data
             minutes: $minutes,
             seconds: $seconds,
             formatted: sprintf('%s%02d:%02d', $totalSeconds < 0 ? '-' : '', $hours, $minutes),
-            totalHours: $totalHours,
-            totalMinutes: $totalSeconds / 60,
+            totalHours: $totalSeconds / 3600,
+            totalMinutes: intdiv($totalSeconds, 60),
             totalSeconds: $totalSeconds,
         );
+    }
+
+    public function toComponentsString(string $glue = ' '): string
+    {
+        $durationComponents = collect([
+            'h' => $this->hours,
+            'm' => $this->minutes,
+            's' => $this->seconds,
+        ])->filter()
+            ->map(fn (int $value, string $unit): string => "{$value}{$unit}")
+            ->implode($glue);
+
+        $sign = $this->isNegative ? '-' : '';
+
+        return $sign.$durationComponents;
     }
 }

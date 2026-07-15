@@ -5,7 +5,6 @@ namespace App\Commands\Get;
 use App\Concerns\EnsuresAppConfiguration;
 use App\Concerns\ParsesDateOptions;
 use App\DataTransferObjects\BalanceData;
-use App\DataTransferObjects\DurationData;
 use App\Services\CapacityCalculationService;
 use App\Services\TimelyService;
 use Carbon\CarbonImmutable;
@@ -80,30 +79,14 @@ class GetTotal extends Command
             ],
             [
                 [
-                    $this->formatDuration($balance->logged),
-                    $this->formatDuration($balance->expected),
-                    $this->formatDuration($balance->balance),
+                    $balance->logged->toComponentsString(),
+                    $balance->expected->toComponentsString(),
+                    $balance->balance->toComponentsString(),
                 ],
             ],
             config('display.table_style'),
         );
 
         return self::SUCCESS;
-    }
-
-    private static function formatDuration(DurationData $duration): string
-    {
-        $timeComponents = collect([
-            'h' => $duration->hours,
-            'm' => $duration->minutes,
-            's' => $duration->seconds,
-        ])->filter()
-            ->map(fn (int $value, string $unit): string => "{$value}{$unit}")
-            ->implode(' ');
-
-        $decimalHours = round($duration->totalHours, 2);
-        $sign = $duration->totalSeconds < 0 ? '-' : '';
-
-        return "{$sign}{$timeComponents} ({$decimalHours}h)";
     }
 }

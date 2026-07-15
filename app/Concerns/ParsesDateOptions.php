@@ -3,7 +3,6 @@
 namespace App\Concerns;
 
 use Carbon\CarbonImmutable;
-use Illuminate\Console\Command;
 
 trait ParsesDateOptions
 {

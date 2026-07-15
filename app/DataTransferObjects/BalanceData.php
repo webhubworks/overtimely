@@ -17,7 +17,7 @@ final class BalanceData extends Data
         return new self(
             logged: $logged,
             expected: $expected,
-            balance: DurationData::fromTotalHours($logged->totalHours - $expected->totalHours),
+            balance: DurationData::fromTotalSeconds($logged->totalSeconds - $expected->totalSeconds),
         );
     }
 }
