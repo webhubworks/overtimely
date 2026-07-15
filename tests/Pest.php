@@ -1,5 +1,7 @@
 <?php
 
+use App\DataTransferObjects\CapacityData;
+use Carbon\CarbonImmutable;
 use Tests\TestCase;
 
 /*
@@ -41,7 +43,25 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something(): void
-{
-    // ..
+function makeCapacity(
+    float $weeklyCapacity = 40.0,
+    float $dailyCapacity = 8.0,
+    string $workDays = 'MON,TUE,WED,THU,FRI',
+    int $weeklyWorkingDays = 5,
+    bool $current = true,
+    string $startDate = '1970-01-01',
+    ?string $endDate = null,
+): CapacityData {
+    return new CapacityData(
+        id: null,
+        weeklyCapacity: $weeklyCapacity,
+        dailyCapacity: $dailyCapacity,
+        weekdays: null,
+        workDays: collect(explode(',', $workDays)),
+        totalWorkingDays: null,
+        weeklyWorkingDays: $weeklyWorkingDays,
+        current: $current,
+        startDate: CarbonImmutable::createFromFormat('Y-m-d', $startDate),
+        endDate: CarbonImmutable::createFromFormat('Y-m-d', $endDate),
+    );
 }
