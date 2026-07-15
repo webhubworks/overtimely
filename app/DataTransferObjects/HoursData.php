@@ -27,7 +27,7 @@ final class HoursData extends Data
      * Handles negatives: the hours/minutes/seconds components carry the
      * magnitude and the sign lives in `formatted` and the signed totals.
      */
-    public static function fromHours(float $totalHours): self
+    public static function fromTotalHours(float $totalHours): self
     {
         $totalSeconds = (int) round($totalHours * 3600);
         $magnitude = abs($totalSeconds);

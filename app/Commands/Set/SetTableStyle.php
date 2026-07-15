@@ -4,6 +4,7 @@ namespace App\Commands\Set;
 
 use App\Support\UserConfig;
 use LaravelZero\Framework\Commands\Command;
+
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\note;
 use function Laravel\Prompts\select;

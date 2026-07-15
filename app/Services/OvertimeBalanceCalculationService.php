@@ -9,7 +9,7 @@ use Carbon\CarbonImmutable;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Collection;
 
-final readonly class OvertimeCalculationService
+final readonly class OvertimeBalanceCalculationService
 {
     /** @param Collection<int, CapacityData> $capacities */
     public function __construct(
@@ -46,7 +46,7 @@ final readonly class OvertimeCalculationService
             }
         }
 
-        return HoursData::fromHours($totalCapacity);
+        return HoursData::fromTotalHours($totalCapacity);
     }
 
     /**

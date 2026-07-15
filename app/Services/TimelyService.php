@@ -23,13 +23,14 @@ final readonly class TimelyService
     public function getTotalLoggedHours(?CarbonImmutable $since = null, ?CarbonImmutable $until = null): HoursData
     {
         return HoursData::from(
-            $this->client->get("{$this->accountId}/reports/filter", [
-                'scope' => 'totals',
-                'group_by' => 'users',
-                'user_ids' => $this->userId,
-                'since' => $since?->format('Y-m-d'),
-                'until' => $until?->format('Y-m-d'),
-            ])->json('totals.duration')
+            $this->client
+                ->get("{$this->accountId}/reports/filter", [
+                    'scope' => 'totals',
+                    'group_by' => 'users',
+                    'user_ids' => $this->userId,
+                    'since' => $since?->format('Y-m-d'),
+                    'until' => $until?->format('Y-m-d'),
+                ])->json('totals.duration')
         );
     }
 

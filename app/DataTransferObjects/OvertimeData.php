@@ -17,7 +17,7 @@ final class OvertimeData extends Data
         return new self(
             logged: $logged,
             expected: $expected,
-            balance: HoursData::fromHours($logged->totalHours - $expected->totalHours),
+            balance: HoursData::fromTotalHours($logged->totalHours - $expected->totalHours),
         );
     }
 }

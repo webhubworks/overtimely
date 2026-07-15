@@ -4,6 +4,7 @@ namespace App\Commands\Set;
 
 use App\Support\UserConfig;
 use LaravelZero\Framework\Commands\Command;
+
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\note;
 use function Laravel\Prompts\text;
@@ -39,7 +40,7 @@ class SetAccountId extends Command
         );
 
         if (! ctype_digit($id)) {
-            $this->error("The account ID must be numeric");
+            $this->error('The account ID must be numeric');
 
             return self::FAILURE;
         }

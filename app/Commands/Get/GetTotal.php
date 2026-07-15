@@ -4,7 +4,7 @@ namespace App\Commands\Get;
 
 use App\Concerns\EnsuresAppConfiguration;
 use App\DataTransferObjects\HoursData;
-use App\Services\OvertimeCalculationService;
+use App\Services\OvertimeBalanceCalculationService;
 use App\Services\TimelyService;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\ConnectionException;
@@ -44,7 +44,7 @@ class GetTotal extends Command
         $since = CarbonImmutable::createFromFormat('Y-m-d', $this->option('since') ?? config('timely.since'));
         $until = $this->option('until') ? CarbonImmutable::createFromFormat('Y-m-d', $this->option('until')) : CarbonImmutable::yesterday();
 
-        $overtimeCalculation = new OvertimeCalculationService($timely->getCapacities());
+        $overtimeCalculation = new OvertimeBalanceCalculationService($timely->getCapacities());
         $totalLoggedHours = $timely->getTotalLoggedHours($since, $until);
 
         $results = $overtimeCalculation->forPeriod(
