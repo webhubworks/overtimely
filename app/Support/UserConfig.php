@@ -24,10 +24,31 @@ final class UserConfig
 
     public const TABLE_STYLE = 'table_style';
 
+    public const ACCESS_TOKEN = 'access_token';
+
+    public const REFRESH_TOKEN = 'refresh_token';
+
+    public const TOKEN_EXPIRES_AT = 'token_expires_at';
+
+    public const CLIENT_ID = 'client_id';
+
+    public const CLIENT_SECRET = 'client_secret';
+
+    public const REDIRECT_URI = 'redirect_uri';
+
+    public const CREATED_AT = 'created_at';
+
     private const array KEYS = [
         self::API_TOKEN,
+        self::ACCESS_TOKEN,
+        self::REFRESH_TOKEN,
+        self::TOKEN_EXPIRES_AT,
+        self::CLIENT_ID,
+        self::CLIENT_SECRET,
+        self::REDIRECT_URI,
         self::ACCOUNT_ID,
         self::USER_ID,
+        self::CREATED_AT,
         self::SINCE,
         self::TABLE_STYLE,
     ];
