@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Services\TimelyService;
 use App\Support\UserConfig;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ServiceProvider;
 
@@ -63,8 +64,11 @@ class AppServiceProvider extends ServiceProvider
 
             return new TimelyService(
                 $client,
-                $config['account_id'],
-                $config['user_id']
+                (int) $config['account_id'],
+                $config['user_id'] !== null ? (int) $config['user_id'] : null,
+                $config['created_at'] !== null
+                    ? CarbonImmutable::createFromFormat('!Y-m-d', $config['created_at'])
+                    : null,
             );
         });
     }

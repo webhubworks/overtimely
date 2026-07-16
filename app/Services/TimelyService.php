@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\DataTransferObjects\CapacityData;
+use App\DataTransferObjects\CurrentUserData;
 use App\DataTransferObjects\DurationData;
 use App\DataTransferObjects\PeriodData;
 use Carbon\CarbonImmutable;
@@ -15,7 +16,8 @@ final readonly class TimelyService
     public function __construct(
         private PendingRequest $client,
         private int $accountId,
-        private int $userId,
+        private ?int $userId = null,
+        private ?CarbonImmutable $createdAt = null,
     ) {}
 
     /**
@@ -35,16 +37,20 @@ final readonly class TimelyService
         );
     }
 
-    /**
-     * @throws ConnectionException
-     */
+    public function getCurrentUser(): CurrentUserData
+    {
+        return CurrentUserData::fromApi(
+            $this->client->get("{$this->accountId}/users/current")->json()
+        );
+    }
+
     public function getCreationDate(): CarbonImmutable
     {
-        return CarbonImmutable::createFromTimestamp(
-            $this->client
-                ->get("{$this->accountId}/users/{$this->userId}")
-                ->json('created_at')
-        )->startOfDay();
+        if ($this->createdAt !== null) {
+            return $this->createdAt;
+        }
+
+        return $this->getCurrentUser()->createdAt->startOfDay();
     }
 
     /** @return Collection<int, CapacityData>
