@@ -45,23 +45,21 @@ class GetTotal extends Command
 
         $this->timely = app(TimelyService::class);
 
-        [$since, $until] = $this->parsePeriodOptions();
+        $period = $this->parsePeriodOptions();
 
-        if ($since === null || $until === null) {
+        if ($period->since === null || $period->until === null) {
             return self::FAILURE;
         }
 
         $this->info('Fetching and calculating your total capacity ...');
         $totalCapacity = CapacityCalculationService::fromCapacities($this->timely->getCapacities())
-            ->forPeriod($since, $until);
+            ->forPeriod($period);
 
         $this->info('Fetching your total logged hours ...');
-        $totalLoggedHours = $this->timely->getTotalLoggedHoursForPeriod($since, $until);
+        $totalLoggedHours = $this->timely->getTotalLoggedHoursForPeriod($period);
 
         $balance = BalanceData::fromOperands($totalLoggedHours, $totalCapacity);
 
-        $this->newLine();
-        $this->info("Your overtime for the period from {$since->format('jS \o\f F Y')} to {$until->format('jS \o\f F Y')} is {$balance->balance->formatted}h.");
         $this->newLine();
 
         $this->table(

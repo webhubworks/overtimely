@@ -10,9 +10,19 @@ use Spatie\LaravelData\Data;
 final class PeriodData extends Data
 {
     public function __construct(
-        public CarbonImmutable $start,
-        public CarbonImmutable $end,
+        public ?CarbonImmutable $since,
+        public ?CarbonImmutable $until,
     ) {}
+
+    public static function fromDates(?CarbonImmutable $since, ?CarbonImmutable $until): self
+    {
+        return new self($since, $until);
+    }
+
+    public function __toString(): string
+    {
+        return "{$this->since->format('jS \o\f F Y')} to {$this->until->format('jS \o\f F Y')}";
+    }
 
     /**
      * Split [since, until] into one entry per calendar month. The first and
@@ -31,8 +41,8 @@ final class PeriodData extends Data
     {
         return collect(CarbonPeriodImmutable::create($from->startOfMonth(), '1 month', $to))
             ->map(fn (CarbonImmutable $monthStart): self => new self(
-                start: $monthStart->startOfDay()->max($from),
-                end: $monthStart->endOfMonth()->startOfDay()->min($to),
+                since: $monthStart->startOfDay()->max($from),
+                until: $monthStart->endOfMonth()->startOfDay()->min($to),
             ));
     }
 }

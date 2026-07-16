@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\DataTransferObjects\CapacityData;
 use App\DataTransferObjects\DurationData;
+use App\DataTransferObjects\PeriodData;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonPeriodImmutable;
 use Illuminate\Support\Collection;
@@ -31,12 +32,11 @@ final readonly class CapacityCalculationService
      * @param  CarbonImmutable  $until  Last completed day (typically yesterday)
      */
     public function forPeriod(
-        CarbonImmutable $since,
-        CarbonImmutable $until,
+        PeriodData $period,
     ): DurationData {
         $totalCapacity = 0.0;
 
-        foreach (CarbonPeriodImmutable::create($since, $until) as $day) {
+        foreach (CarbonPeriodImmutable::create($period->since, $period->until) as $day) {
             $totalCapacity += $this->getCapacityOfDay($day);
         }
 

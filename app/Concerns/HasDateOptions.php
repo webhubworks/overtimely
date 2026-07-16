@@ -2,6 +2,7 @@
 
 namespace App\Concerns;
 
+use App\DataTransferObjects\PeriodData;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\ConnectionException;
 
@@ -10,20 +11,20 @@ trait HasDateOptions
     /**
      * @throws ConnectionException
      */
-    private function parsePeriodOptions(): array
+    private function parsePeriodOptions(): PeriodData
     {
-        return [
+        return PeriodData::fromDates(
             $this->parseDateOption(
                 'since',
                 $this->option('since')
-                    ?? config('timely.since')
-                    ?? $this->timely->getCreationDate()
+                ?? config('timely.since')
+                ?? $this->timely->getCreationDate()
             ),
             $this->parseDateOption(
                 'until',
-                $this->option('until') ?? CarbonImmutable::yesterday()
-            ),
-        ];
+                $this->option('until')
+                ?? CarbonImmutable::yesterday()
+            ));
     }
 
     private function parseDateOption(string $option, string|CarbonImmutable $value): ?CarbonImmutable
