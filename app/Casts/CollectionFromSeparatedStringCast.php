@@ -8,11 +8,10 @@ use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataProperty;
 
 /**
- * Casts a delimiter-separated string (e.g. "MON,TUE,WED") into a list of
- * trimmed, non-empty values. The separator is configurable, mirroring how
- * DateTimeInterfaceCast takes a `format`:
+ * Casts a delimiter-separated string (e.g. "MON,TUE,WED,THU,FRI") into a list of
+ * trimmed, non-empty values. The separator is configurable.
  *
- *   #[WithCast(SeparatedStringCast::class, separator: ',')]
+ * #[WithCast(SeparatedStringCast::class, separator: ',')]
  */
 class CollectionFromSeparatedStringCast implements Cast
 {

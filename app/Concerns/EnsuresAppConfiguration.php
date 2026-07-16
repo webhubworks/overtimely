@@ -6,11 +6,8 @@ use App\Support\UserConfig;
 
 /**
  * Guards commands that need Timely credentials. On first use (nothing set via
- * env or the user config file) it drops the user into `app:setup` instead of
- * letting the command fail with a cryptic HTTP error.
- *
- * Call ensureConfigured() at the very top of handle(), before resolving
- * TimelyService (which is built from config('timely.*')).
+ * .env or the user config file), it drops the user into `app:setup` instead of
+ * letting the command fail.
  */
 trait EnsuresAppConfiguration
 {
@@ -26,7 +23,7 @@ trait EnsuresAppConfiguration
             return false;
         }
 
-        $this->warn('overtimely is not configured yet. Running app:setup first ...');
+        $this->warn('overtimely is not yet configured. Running app:setup first ...');
         $this->call('app:setup');
 
         if (! UserConfig::isConfigured()) {
@@ -35,7 +32,10 @@ trait EnsuresAppConfiguration
             return false;
         }
 
-        // AppServiceProvider::boot() merged the config before this command ran, so we load the saved JSON values into the config here for the rest of this runtime.
+        /**
+         * AppServiceProvider::boot() merged the config before this command ran,
+         * so we load the saved JSON values into the config here for the rest of this runtime.
+         */
         config()->set('timely.token', UserConfig::getApiToken());
         config()->set('timely.account_id', UserConfig::getAccountId());
         config()->set('timely.user_id', UserConfig::getUserId());

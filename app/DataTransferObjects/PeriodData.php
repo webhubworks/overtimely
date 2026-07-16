@@ -25,15 +25,9 @@ final class PeriodData extends Data
     }
 
     /**
-     * Split [since, until] into one entry per calendar month. The first and
-     * last entries are clamped to the range, so partial months are kept as the
-     * slice that falls inside the range.
-     *
-     * A monthly period anchored on the first of the start month yields each
-     * month's opening day; anchoring there keeps the "+1 month" step off
-     * day-of-month overflow. Each boundary is then clamped into the range with
-     * max()/min(), and month ends are normalized to midnight to stay
-     * calendar-only like the rest of the app.
+     * Split [`from`, `to`] into one entry per calendar month.
+     * The first and last entries are clamped to the range,
+     * so partial months are kept as the slice that falls inside the range.
      *
      * @return Collection<int, self>
      */

@@ -76,7 +76,6 @@ class GetMonths extends Command
             ),
         );
 
-        // Right-align the three duration columns (indexes 2-4) so they line up.
         $rightAligned = (new TableStyle)->setPadType(STR_PAD_LEFT);
 
         $this->newLine();
@@ -90,7 +89,7 @@ class GetMonths extends Command
             ],
             $this->buildMonthRows(),
             config('display.table_style'),
-            [2 => $rightAligned, 3 => $rightAligned, 4 => $rightAligned],
+            [2 => $rightAligned, 3 => $rightAligned, 4 => $rightAligned], // right-aligned duration columns
         );
 
         return self::SUCCESS;

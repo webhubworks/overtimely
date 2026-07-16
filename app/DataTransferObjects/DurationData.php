@@ -28,14 +28,6 @@ final class DurationData extends Data
         return self::fromTotalSeconds((int) round($totalHours * 3600));
     }
 
-    /**
-     * Build the same field set the Timely `duration` object provides from a
-     * plain hour total, so computed figures (expected hours, balance) share one
-     * DTO with the API-hydrated logged hours.
-     *
-     * Handles negatives: the hours/minutes/seconds components carry the
-     * magnitude and the sign lives in `formatted` and the signed totals.
-     */
     public static function fromTotalSeconds(int $totalSeconds): self
     {
         $magnitude = abs($totalSeconds);

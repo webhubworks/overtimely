@@ -25,12 +25,6 @@ final readonly class CapacityCalculationService
         return new self($capacities);
     }
 
-    /**
-     * Cumulative overtime balance over [since, until]: logged hours minus the
-     * expected working hours derived from the user's capacities.
-     *
-     * @param  CarbonImmutable  $until  Last completed day (typically yesterday)
-     */
     public function forPeriod(
         PeriodData $period,
     ): DurationData {
