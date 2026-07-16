@@ -30,9 +30,9 @@ class AppSetup extends Command
      * @var list<string>
      */
     private const array SETUP_COMMANDS = [
-        'set:api-token',
+        'auth:login',
         'set:account-id',
-        'set:user-id',
+        'set:identity',
         'set:since',
         'set:table-style',
     ];

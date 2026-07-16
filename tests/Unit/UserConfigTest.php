@@ -50,12 +50,12 @@ it('unsets a key when set to null', function () {
 
 it('writes many keys in a single call', function () {
     UserConfig::setMany([
-        UserConfig::API_TOKEN => 'tok',
+        UserConfig::REFRESH_TOKEN => 'tok',
         UserConfig::ACCOUNT_ID => '1',
         UserConfig::USER_ID => '2',
     ]);
 
-    expect(UserConfig::get(UserConfig::API_TOKEN))->toBe('tok')
+    expect(UserConfig::get(UserConfig::REFRESH_TOKEN))->toBe('tok')
         ->and(UserConfig::get(UserConfig::ACCOUNT_ID))->toBe('1')
         ->and(UserConfig::get(UserConfig::USER_ID))->toBe('2');
 });
@@ -64,11 +64,11 @@ it('throws on an unknown key', function () {
     UserConfig::get('nope');
 })->throws(InvalidArgumentException::class);
 
-it('is configured only when token, account and user are set', function () {
+it('is configured only when refresh token, account and user are set', function () {
     expect(UserConfig::isConfigured())->toBeFalse();
 
     UserConfig::setMany([
-        UserConfig::API_TOKEN => 'tok',
+        UserConfig::REFRESH_TOKEN => 'tok',
         UserConfig::ACCOUNT_ID => '1',
         UserConfig::USER_ID => '2',
     ]);

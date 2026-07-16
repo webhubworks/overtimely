@@ -32,20 +32,12 @@ trait EnsuresAppConfiguration
             return false;
         }
 
-        /**
-         * AppServiceProvider::boot() merged the config before this command ran,
-         * so we load the saved JSON values into the config here for the rest of this runtime.
-         */
-        config()->set('timely.token', UserConfig::get(UserConfig::API_TOKEN));
-        config()->set('timely.account_id', UserConfig::get(UserConfig::ACCOUNT_ID));
-        config()->set('timely.user_id', UserConfig::get(UserConfig::USER_ID));
-
         return true;
     }
 
     private function hasCredentials(): bool
     {
-        return filled(config('timely.token'))
+        return filled(config('timely.refresh_token'))
             && filled(config('timely.account_id'))
             && filled(config('timely.user_id'));
     }

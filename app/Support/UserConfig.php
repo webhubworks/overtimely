@@ -14,8 +14,6 @@ namespace App\Support;
  */
 final class UserConfig
 {
-    public const API_TOKEN = 'api_token';
-
     public const ACCOUNT_ID = 'account_id';
 
     public const USER_ID = 'user_id';
@@ -39,7 +37,6 @@ final class UserConfig
     public const CREATED_AT = 'created_at';
 
     private const array KEYS = [
-        self::API_TOKEN,
         self::ACCESS_TOKEN,
         self::REFRESH_TOKEN,
         self::TOKEN_EXPIRES_AT,
@@ -136,7 +133,7 @@ final class UserConfig
 
     public static function isConfigured(): bool
     {
-        return self::get(self::API_TOKEN) !== null
+        return self::get(self::REFRESH_TOKEN) !== null
             && self::get(self::ACCOUNT_ID) !== null
             && self::get(self::USER_ID) !== null;
     }

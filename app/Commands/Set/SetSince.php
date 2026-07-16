@@ -47,6 +47,7 @@ class SetSince extends Command
         }
 
         UserConfig::set(UserConfig::SINCE, $date);
+        config()->set('timely.since', $date);
 
         info("Default report start date set to {$date}.");
         note('Config file: '.UserConfig::path());

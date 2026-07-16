@@ -51,6 +51,7 @@ class SetTableStyle extends Command
         $style = $styleArg ?? select('Select a table style', self::STYLES);
 
         UserConfig::set(UserConfig::TABLE_STYLE, $style);
+        config()->set('display.table_style', $style);
 
         info("Table style set to '{$style}'.");
         note('Config file: '.UserConfig::path());

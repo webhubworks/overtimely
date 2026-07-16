@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\TimelyAuth;
 use App\Services\TimelyService;
 use App\Support\UserConfig;
 use Carbon\CarbonImmutable;
@@ -20,7 +21,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $map = [
-            ['timely.token',              'TIMELY_API_TOKEN',           UserConfig::get(UserConfig::API_TOKEN)],
             ['timely.access_token',       'TIMELY_ACCESS_TOKEN',        UserConfig::get(UserConfig::ACCESS_TOKEN)],
             ['timely.refresh_token',      'TIMELY_REFRESH_TOKEN',       UserConfig::get(UserConfig::REFRESH_TOKEN)],
             ['timely.token_expires_at',   'TIMELY_TOKEN_EXPIRES_AT',    UserConfig::get(UserConfig::TOKEN_EXPIRES_AT)],
@@ -52,11 +52,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(TimelyService::class, function () {
+        $this->app->bind(TimelyService::class, function () {
             $config = config('timely');
 
             $client = Http::baseUrl($config['base_url'])
-                ->withToken($config['token'])
+                ->withToken(app(TimelyAuth::class)->validAccessToken())
                 ->acceptJson()
                 ->timeout($config['timeout'])
                 ->retry(3, 200)
