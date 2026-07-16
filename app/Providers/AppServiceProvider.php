@@ -19,12 +19,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $map = [
-            // config key            env var                user config value
-            ['timely.token',        'TIMELY_API_TOKEN',     UserConfig::getApiToken()],
-            ['timely.account_id',   'TIMELY_ACCOUNT_ID',    UserConfig::getAccountId()],
-            ['timely.user_id',      'TIMELY_USER_ID',       UserConfig::getUserId()],
-            ['timely.since',        'TIMELY_SINCE',         UserConfig::getSince()],
-            ['display.table_style', 'TABLE_STYLE',          UserConfig::getTableStyle()],
+            ['timely.token',        'TIMELY_API_TOKEN',  UserConfig::get(UserConfig::API_TOKEN)],
+            ['timely.account_id',   'TIMELY_ACCOUNT_ID', UserConfig::get(UserConfig::ACCOUNT_ID)],
+            ['timely.user_id',      'TIMELY_USER_ID',    UserConfig::get(UserConfig::USER_ID)],
+            ['timely.since',        'TIMELY_SINCE',      UserConfig::get(UserConfig::SINCE)],
+            ['display.table_style', 'TABLE_STYLE',       UserConfig::get(UserConfig::TABLE_STYLE)],
         ];
 
         foreach ($map as [$configKey, $envKey, $userConfigValue]) {

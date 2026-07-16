@@ -14,6 +14,24 @@ namespace App\Support;
  */
 final class UserConfig
 {
+    public const API_TOKEN = 'api_token';
+
+    public const ACCOUNT_ID = 'account_id';
+
+    public const USER_ID = 'user_id';
+
+    public const SINCE = 'since';
+
+    public const TABLE_STYLE = 'table_style';
+
+    private const array KEYS = [
+        self::API_TOKEN,
+        self::ACCOUNT_ID,
+        self::USER_ID,
+        self::SINCE,
+        self::TABLE_STYLE,
+    ];
+
     public static function path(): string
     {
         $configHome = getenv('XDG_CONFIG_HOME');
@@ -64,83 +82,48 @@ final class UserConfig
         @chmod($path, 0600);
     }
 
-    public static function getApiToken(): ?string
+    public static function get(string $key): mixed
     {
-        return self::getString('api_token');
-    }
+        self::assertKnown($key);
 
-    public static function setApiToken(string $token): void
-    {
-        self::put('api_token', $token);
-    }
-
-    public static function getAccountId(): ?string
-    {
-        return self::getString('account_id');
-    }
-
-    public static function setAccountId(string $accountId): void
-    {
-        self::put('account_id', $accountId);
-    }
-
-    public static function getUserId(): ?string
-    {
-        return self::getString('user_id');
-    }
-
-    public static function setUserId(string $userId): void
-    {
-        self::put('user_id', $userId);
-    }
-
-    public static function getSince(): ?string
-    {
-        return self::getString('since');
-    }
-
-    public static function setSince(?string $since): void
-    {
-        self::put('since', $since !== null && $since !== '' ? $since : null);
-    }
-
-    public static function getTableStyle(): ?string
-    {
-        return self::getString('table_style');
-    }
-
-    public static function setTableStyle(string $tableStyle): void
-    {
-        self::put('table_style', $tableStyle);
-    }
-
-    /**
-     * True once the Timely credentials required to talk to the API are set.
-     */
-    public static function isConfigured(): bool
-    {
-        return self::getApiToken() !== null
-            && self::getAccountId() !== null
-            && self::getUserId() !== null;
-    }
-
-    private static function getString(string $key): ?string
-    {
         $value = self::load()[$key] ?? null;
 
-        return is_string($value) && $value !== '' ? $value : null;
+        return $value === '' ? null : $value;
     }
 
-    private static function put(string $key, mixed $value): void
+    public static function set(string $key, mixed $value): void
+    {
+        self::setMany([$key => $value]);
+    }
+
+    public static function setMany(array $values): void
     {
         $data = self::load();
 
-        if ($value === null) {
-            unset($data[$key]);
-        } else {
-            $data[$key] = $value;
+        foreach ($values as $key => $value) {
+            self::assertKnown($key);
+
+            if ($value === null || $value === '') {
+                unset($data[$key]);
+            } else {
+                $data[$key] = $value;
+            }
         }
 
         self::save($data);
+    }
+
+    public static function isConfigured(): bool
+    {
+        return self::get(self::API_TOKEN) !== null
+            && self::get(self::ACCOUNT_ID) !== null
+            && self::get(self::USER_ID) !== null;
+    }
+
+    private static function assertKnown(string $key): void
+    {
+        if (! in_array($key, self::KEYS, true)) {
+            throw new \InvalidArgumentException("Unknown config key: {$key}");
+        }
     }
 }

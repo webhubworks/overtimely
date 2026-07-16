@@ -32,12 +32,12 @@ class SetApiToken extends Command
     {
         $token = $this->argument('token') ?? password(
             label: 'Timely API token',
-            required: UserConfig::getApiToken() === null,
-            hint: UserConfig::getApiToken() ? 'Leave blank to keep the existing token.' : '',
+            required: UserConfig::get(UserConfig::API_TOKEN) === null,
+            hint: UserConfig::get(UserConfig::API_TOKEN) ? 'Leave blank to keep the existing token.' : '',
         );
 
         if (is_string($token) && $token !== '') {
-            UserConfig::setApiToken($token);
+            UserConfig::set(UserConfig::API_TOKEN, $token);
             info('API token saved.');
         } else {
             info('API token unchanged.');

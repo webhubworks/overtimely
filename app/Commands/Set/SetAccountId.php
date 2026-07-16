@@ -45,7 +45,7 @@ class SetAccountId extends Command
             return self::FAILURE;
         }
 
-        UserConfig::setAccountId($id);
+        UserConfig::set(UserConfig::ACCOUNT_ID, $id);
 
         info("Account ID set to {$id}.");
         note('Config file: '.UserConfig::path());

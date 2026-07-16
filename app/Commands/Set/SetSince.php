@@ -46,7 +46,7 @@ class SetSince extends Command
             return self::FAILURE;
         }
 
-        UserConfig::setSince($date);
+        UserConfig::set(UserConfig::SINCE, $date);
 
         info("Default report start date set to {$date}.");
         note('Config file: '.UserConfig::path());
