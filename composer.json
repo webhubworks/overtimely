@@ -1,13 +1,13 @@
 {
-    "name": "wehhubworks/timely-overtime-cli",
-    "description": "CLI tool to quickly and easily answer a simple question: What's my overtime count?",
-    "keywords": ["framework", "laravel", "laravel zero", "console", "cli","timely"],
+    "name": "wehhubworks/overtimely",
+    "description": "CLI tool to quickly and easily answer a simple question: What's my overtime balance?",
+    "keywords": ["framework", "laravel", "laravel zero", "console", "cli","timely","overtime"],
     "homepage": "https://webhub.de",
     "type": "project",
     "license": "MIT",
     "support": {
-        "issues": "https://github.com/laravel-zero/laravel-zero/issues",
-        "source": "https://github.com/laravel-zero/laravel-zero"
+        "issues": "https://github.com/webhubworks/overtimely/issues",
+        "source": "https://github.com/webhubworks/overtimely"
     },
     "authors": [
         {
