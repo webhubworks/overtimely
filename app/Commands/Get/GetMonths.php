@@ -116,12 +116,14 @@ class GetMonths extends Command
             ->all();
     }
 
+    /**
+     * The rows a year cell covers omit the column entirely; only the first row of the group prepends it.
+     */
     private function monthRow(MonthlyBalanceData $month, ?TableCell $yearCell): array
     {
-        // The rows a year cell covers omit the column entirely; only the first
-        // row of the group prepends it.
+
         return [
-            ...($yearCell === null ? [] : [$yearCell]),
+            ...(filled($yearCell) ? [$yearCell] : []),
             $month->month->since->format('F'),
             ...$this->balanceCells($month->balance),
         ];
@@ -132,7 +134,8 @@ class GetMonths extends Command
         $total = BalanceData::aggregate($this->months->map(fn (MonthlyBalanceData $month): BalanceData => $month->balance));
 
         return [
-            new TableCell('Total', ['colspan' => 2]),
+            'Total',
+            '',
             "$total->logged",
             "$total->expected",
             $total->balance->readable(true),
