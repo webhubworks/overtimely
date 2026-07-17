@@ -70,9 +70,9 @@ class GetTotal extends Command
             ],
             [
                 [
-                    $balance->logged->toComponentsString(),
-                    $balance->expected->toComponentsString(),
-                    $balance->balance->toComponentsString(),
+                    "$balance->logged",
+                    "$balance->expected",
+                    $balance->balance->readable(prefixPositive: true),
                 ],
             ],
             config('display.table_style'),

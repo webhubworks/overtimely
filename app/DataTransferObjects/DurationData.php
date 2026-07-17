@@ -15,7 +15,6 @@ final class DurationData extends Data
         public int $hours,
         public int $minutes,
         public int $seconds,
-        public string $formatted, // "h:i"
         public float $totalHours,
         public int $totalMinutes,
         public int $totalSeconds,
@@ -40,25 +39,60 @@ final class DurationData extends Data
             hours: $hours,
             minutes: $minutes,
             seconds: $seconds,
-            formatted: sprintf('%s%02d:%02d', $totalSeconds < 0 ? '-' : '', $hours, $minutes),
             totalHours: $totalSeconds / 3600,
             totalMinutes: intdiv($totalSeconds, 60),
             totalSeconds: $totalSeconds,
         );
     }
 
-    public function toComponentsString(string $glue = ' '): string
+    public function __toString(): string
     {
-        $durationComponents = collect([
+        return $this->readable();
+    }
+
+    /**
+     * Returns a human-readable string representation of the duration, e.g. `1h 30m`
+     * This format is used by Timely themselves throughout their app.
+     *
+     * @param  string  $glue  Glue between components.
+     * @param  bool  $prefixPositive  Prefix positive durations with a `+` sign.
+     */
+    public function readable(
+        string $glue = ' ',
+        bool $prefixPositive = false,
+    ): string {
+        if ($this->totalSeconds === 0) {
+            return '—';
+        }
+
+        $components = collect([
             'h' => $this->hours,
             'm' => $this->minutes,
-            's' => $this->seconds,
         ])->filter()
             ->map(fn (int $value, string $unit): string => "{$value}{$unit}")
             ->implode($glue);
 
-        $sign = $this->isNegative ? '-' : '';
+        $sign = $this->isNegative ? '-' : ($prefixPositive ? '+' : '');
 
-        return $sign.$durationComponents;
+        return "{$sign}{$components}";
+    }
+
+    /**
+     * Takes a `sprintf` format and injects 2 digits for hours and minutes as its values.
+     */
+    public function format(string $format): string
+    {
+        if ($this->totalSeconds === 0) {
+            return '—';
+        }
+
+        /**
+         * Hours derived from the total hours here instead of the existing hours component
+         * because they carry the duration's sign, which is needed if the passed format
+         * contains the `+` flag, which prefixes positive numbers with a `+` sign.
+         */
+        $hours = (int) $this->totalHours;
+
+        return sprintf($format, $hours, $this->minutes);
     }
 }

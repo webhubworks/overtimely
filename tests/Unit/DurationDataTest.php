@@ -8,7 +8,7 @@ it('decomposes hour totals into h/m/s', function () {
     expect($duration->hours)->toBe(45)
         ->and($duration->minutes)->toBe(30)
         ->and($duration->seconds)->toBe(0)
-        ->and($duration->formatted)->toBe('45:30');
+        ->and($duration->readable())->toBe('45h 30m');
 });
 
 it('rounds to the nearest second instead of truncating float error', function () {
@@ -23,8 +23,8 @@ it('rounds to the nearest second instead of truncating float error', function ()
 it('carries the sign for negative balances', function () {
     $duration = DurationData::fromTotalHours(-2.5);
 
-    expect($duration->hours)->toBe(2)            // magnitude in the components
-        ->and($duration->minutes)->toBe(30)
-        ->and($duration->totalSeconds)->toBe(-9000) // sign in the totals
-        ->and($duration->formatted)->toBe('-02:30');
+    expect($duration->hours)->toBe(2) // Only magnitude in the components
+        ->and($duration->minutes)->toBe(30) // Only magnitude in the components
+        ->and($duration->totalSeconds)->toBe(-9000) // Sign in the totals
+        ->and($duration->readable())->toBe('-2h 30m');
 });

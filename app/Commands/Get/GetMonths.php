@@ -132,17 +132,19 @@ class GetMonths extends Command
         $total = BalanceData::aggregate($this->months->map(fn (MonthlyBalanceData $month): BalanceData => $month->balance));
 
         return [
-            new TableCell('Total', ['colspan' => 2]),
-            ...$this->balanceCells($total),
+            new TableCell('Total ', ['colspan' => 2]),
+            "$total->logged",
+            "$total->expected",
+            $total->balance->readable(prefixPositive: true),
         ];
     }
 
     private function balanceCells(BalanceData $balance): array
     {
         return [
-            $balance->logged->toComponentsString(),
-            $balance->expected->toComponentsString(),
-            $balance->balance->toComponentsString(),
+            $balance->logged->format('%02dh %02dm'),
+            $balance->expected->format('%02dh %02dm'),
+            $balance->balance->format('%+02dh %02dm'),
         ];
     }
 }
