@@ -37,12 +37,12 @@ class AppServiceProvider extends ServiceProvider
         foreach (self::CONFIG_MAP as [$configKey, $envKey, $userConfigKey]) {
             // An explicit environment variable should always win. So we let the config.php take precedence.
             $envValue = env($envKey);
-            if (! blank($envValue)) {
+            if (filled($envValue)) {
                 continue;
             }
 
             $userConfigValue = UserConfig::get($userConfigKey);
-            if (! blank($userConfigValue)) {
+            if (filled($userConfigValue)) {
                 config()->set($configKey, $userConfigValue);
             }
         }
@@ -66,8 +66,8 @@ class AppServiceProvider extends ServiceProvider
             return new TimelyService(
                 $client,
                 $config['account_id'],
-                ! blank($config['user_id']) ? $config['user_id'] : null,
-                ! blank($config['created_at'])
+                filled($config['user_id']) ? $config['user_id'] : null,
+                filled($config['created_at'])
                     ? CarbonImmutable::createFromFormat('!Y-m-d', $config['created_at'])
                     : null,
             );
