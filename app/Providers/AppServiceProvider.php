@@ -11,6 +11,20 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
+    private const array CONFIG_MAP = [
+        ['timely.access_token',         'TIMELY_ACCESS_TOKEN',        UserConfig::ACCESS_TOKEN],
+        ['timely.refresh_token',        'TIMELY_REFRESH_TOKEN',       UserConfig::REFRESH_TOKEN],
+        ['timely.token_expires_at',     'TIMELY_TOKEN_EXPIRES_AT',    UserConfig::TOKEN_EXPIRES_AT],
+        ['timely.oauth.client_id',      'TIMELY_OAUTH_CLIENT_ID',     UserConfig::CLIENT_ID],
+        ['timely.oauth.client_secret',  'TIMELY_OAUTH_CLIENT_SECRET', UserConfig::CLIENT_SECRET],
+        ['timely.oauth.redirect_uri',   'TIMELY_OAUTH_REDIRECT_URI',  UserConfig::REDIRECT_URI],
+        ['timely.account_id',           'TIMELY_ACCOUNT_ID',          UserConfig::ACCOUNT_ID],
+        ['timely.user_id',              'TIMELY_USER_ID',             UserConfig::USER_ID],
+        ['timely.created_at',           'TIMELY_CREATED_AT',          UserConfig::CREATED_AT],
+        ['timely.since',                'TIMELY_SINCE',               UserConfig::SINCE],
+        ['display.table_style',         'TABLE_STYLE',                UserConfig::TABLE_STYLE],
+    ];
+
     /**
      * Bootstrap any application services.
      *
@@ -20,27 +34,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $map = [
-            ['timely.access_token',       'TIMELY_ACCESS_TOKEN',        UserConfig::get(UserConfig::ACCESS_TOKEN)],
-            ['timely.refresh_token',      'TIMELY_REFRESH_TOKEN',       UserConfig::get(UserConfig::REFRESH_TOKEN)],
-            ['timely.token_expires_at',   'TIMELY_TOKEN_EXPIRES_AT',    UserConfig::get(UserConfig::TOKEN_EXPIRES_AT)],
-            ['timely.oauth.client_id',    'TIMELY_OAUTH_CLIENT_ID',     UserConfig::get(UserConfig::CLIENT_ID)],
-            ['timely.oauth.client_secret', 'TIMELY_OAUTH_CLIENT_SECRET', UserConfig::get(UserConfig::CLIENT_SECRET)],
-            ['timely.oauth.redirect_uri', 'TIMELY_OAUTH_REDIRECT_URI',  UserConfig::get(UserConfig::REDIRECT_URI)],
-            ['timely.account_id',         'TIMELY_ACCOUNT_ID',          UserConfig::get(UserConfig::ACCOUNT_ID)],
-            ['timely.user_id',            'TIMELY_USER_ID',             UserConfig::get(UserConfig::USER_ID)],
-            ['timely.created_at',         'TIMELY_CREATED_AT',          UserConfig::get(UserConfig::CREATED_AT)],
-            ['timely.since',              'TIMELY_SINCE',               UserConfig::get(UserConfig::SINCE)],
-            ['display.table_style',       'TABLE_STYLE',                UserConfig::get(UserConfig::TABLE_STYLE)],
-        ];
-
-        foreach ($map as [$configKey, $envKey, $userConfigValue]) {
+        foreach (self::CONFIG_MAP as [$configKey, $envKey, $userConfigKey]) {
             // An explicit environment variable should always win. So we let the config.php take precedence.
-            $env = env($envKey);
-            if (is_string($env) && trim($env) !== '') {
+            $envValue = env($envKey);
+            if (is_string($envValue) && trim($envValue) !== '') {
                 continue;
             }
 
+            $userConfigValue = $userConfigKey;
             if ($userConfigValue !== null && $userConfigValue !== '') {
                 config()->set($configKey, $userConfigValue);
             }

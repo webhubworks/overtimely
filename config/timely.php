@@ -9,8 +9,8 @@ return [
         'token_url' => env('TIMELY_OAUTH_TOKEN_URL', 'https://api.timelyapp.com/1.1/oauth/token'),
         'client_id' => env('TIMELY_OAUTH_CLIENT_ID'),
         'client_secret' => env('TIMELY_OAUTH_CLIENT_SECRET'),
+        'redirect_uri' => env('TIMELY_OAUTH_REDIRECT_URI', 'urn:ietf:wg:oauth:2.0:oob'),
         'scope' => 'manage',
-        'redirect_uri' => env('TIMELY_OAUTH_REDIRECT_URI'),
     ],
 
     'access_token' => null,
@@ -19,6 +19,7 @@ return [
 
     'account_id' => env('TIMELY_ACCOUNT_ID'),
     'user_id' => env('TIMELY_USER_ID'),
-    'created_at' => null,
+    'created_at' => env('TIMELY_CREATED_AT'),
+
     'since' => env('TIMELY_SINCE'),
 ];
