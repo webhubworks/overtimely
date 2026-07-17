@@ -51,15 +51,15 @@ final class DurationData extends Data
     }
 
     /**
-     * Returns a human-readable string representation of the duration, e.g. `1h 30m`
+     * Returns a human-readable string representation of the duration, e.g. `1h 30m`, `8h` or `24m`.
      * This format is used by Timely themselves throughout their app.
      *
      * @param  string  $glue  Glue between components.
      * @param  bool  $prefixPositive  Prefix positive durations with a `+` sign.
      */
     public function readable(
-        string $glue = ' ',
         bool $prefixPositive = false,
+        string $glue = ' ',
     ): string {
         if ($this->totalSeconds === 0) {
             return '—';
@@ -75,6 +75,16 @@ final class DurationData extends Data
         $sign = $this->isNegative ? '-' : ($prefixPositive ? '+' : '');
 
         return "{$sign}{$components}";
+    }
+
+    /**
+     * Returns a table-friendly string representation of the duration, e.g. `01h 30m`, `08h 00m` or `00h 24m`.
+     */
+    public function tabular(bool $prefixPositive = false): string
+    {
+        $plus = $prefixPositive ? '+' : '';
+
+        return $this->format("%{$plus}02dh %02dm");
     }
 
     /**

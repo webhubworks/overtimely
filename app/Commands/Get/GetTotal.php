@@ -72,7 +72,7 @@ class GetTotal extends Command
                 [
                     "$balance->logged",
                     "$balance->expected",
-                    $balance->balance->readable(prefixPositive: true),
+                    $balance->balance->readable(true),
                 ],
             ],
             config('display.table_style'),
