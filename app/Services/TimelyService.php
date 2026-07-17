@@ -37,20 +37,21 @@ final readonly class TimelyService
         );
     }
 
+    /**
+     * @throws ConnectionException
+     */
     public function getCurrentUser(): CurrentUserData
     {
-        return CurrentUserData::fromApi(
-            $this->client->get("{$this->accountId}/users/current")->json()
+        return CurrentUserData::from(
+            $this->client
+                ->get("{$this->accountId}/users/current")
+                ->json()
         );
     }
 
     public function getCreationDate(): CarbonImmutable
     {
-        if ($this->createdAt !== null) {
-            return $this->createdAt;
-        }
-
-        return $this->getCurrentUser()->createdAt->startOfDay();
+        return $this->createdAt ?? $this->getCurrentUser()->createdAt->startOfDay();
     }
 
     /** @return Collection<int, CapacityData>
