@@ -8,7 +8,7 @@ use App\DataTransferObjects\BalanceData;
 use App\DataTransferObjects\MonthlyBalanceData;
 use App\DataTransferObjects\PeriodData;
 use App\Services\CapacityCalculationService;
-use App\Services\TimelyService;
+use App\Services\TimelyDataService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
 use LaravelZero\Framework\Commands\Command;
@@ -25,7 +25,7 @@ class GetMonths extends Command
      */
     private Collection $months;
 
-    private TimelyService $timely;
+    private TimelyDataService $timely;
 
     /**
      * The name and signature of the console command.
@@ -54,7 +54,7 @@ class GetMonths extends Command
             return self::FAILURE;
         }
 
-        $this->timely = app(TimelyService::class);
+        $this->timely = app(TimelyDataService::class);
 
         $period = $this->parsePeriodOptions();
 

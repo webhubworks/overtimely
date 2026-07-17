@@ -7,7 +7,7 @@ use App\Support\UserConfig;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
-final class TimelyAuth
+final readonly class TimelyAuthService
 {
     public function authorizeUrl(): string
     {

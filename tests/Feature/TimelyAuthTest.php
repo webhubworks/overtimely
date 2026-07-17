@@ -1,7 +1,7 @@
 <?php
 
 use App\DataTransferObjects\OAuthTokenData;
-use App\Services\TimelyAuth;
+use App\Services\TimelyAuthService;
 use App\Support\UserConfig;
 use Illuminate\Support\Facades\Http;
 
@@ -41,7 +41,7 @@ afterEach(function () {
 });
 
 it('builds the authorize url from config', function () {
-    $url = app(TimelyAuth::class)->authorizeUrl();
+    $url = app(TimelyAuthService::class)->authorizeUrl();
 
     expect($url)->toStartWith('https://timely.test/oauth/authorize?')
         ->toContain('response_type=code')
@@ -62,7 +62,7 @@ it('exchanges an authorization code for tokens', function () {
         ]),
     ]);
 
-    $token = app(TimelyAuth::class)->exchangeCode('code123');
+    $token = app(TimelyAuthService::class)->exchangeCode('code123');
 
     expect($token->accessToken)->toBe('at')
         ->and($token->refreshToken)->toBe('rt')
@@ -81,7 +81,7 @@ it('exchanges an authorization code for tokens', function () {
 it('persists tokens, keeping the existing refresh token when not rotated', function () {
     UserConfig::set(UserConfig::REFRESH_TOKEN, 'old-refresh');
 
-    app(TimelyAuth::class)->persist(new OAuthTokenData(
+    app(TimelyAuthService::class)->persist(new OAuthTokenData(
         accessToken: 'new-access',
         refreshToken: null,
         expiresIn: 7200,
@@ -111,7 +111,7 @@ it('refreshes an expired access token and persists the result', function () {
         ]),
     ]);
 
-    $token = app(TimelyAuth::class)->validAccessToken();
+    $token = app(TimelyAuthService::class)->validAccessToken();
 
     expect($token)->toBe('fresh')
         ->and(config('timely.access_token'))->toBe('fresh')
@@ -128,7 +128,7 @@ it('returns the stored token while it is still valid', function () {
 
     Http::fake();
 
-    expect(app(TimelyAuth::class)->validAccessToken())->toBe('good');
+    expect(app(TimelyAuthService::class)->validAccessToken())->toBe('good');
 
     Http::assertNothingSent();
 });
@@ -139,11 +139,11 @@ it('returns the stored token when it never expires', function () {
 
     Http::fake();
 
-    expect(app(TimelyAuth::class)->validAccessToken())->toBe('forever');
+    expect(app(TimelyAuthService::class)->validAccessToken())->toBe('forever');
 
     Http::assertNothingSent();
 });
 
 it('throws when no tokens are present', function () {
-    app(TimelyAuth::class)->validAccessToken();
+    app(TimelyAuthService::class)->validAccessToken();
 })->throws(RuntimeException::class);

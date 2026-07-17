@@ -11,7 +11,7 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Collection;
 
-final readonly class TimelyService
+final readonly class TimelyDataService
 {
     public function __construct(
         private PendingRequest $client,
@@ -30,7 +30,7 @@ final readonly class TimelyService
                 ->get("{$this->accountId}/reports/filter", [
                     'scope' => 'totals',
                     'group_by' => 'users',
-                    'user_ids' => $this->userId,
+                    'user_ids' => 'self',
                     'since' => $period->since?->format('Y-m-d'),
                     'until' => $period->until?->format('Y-m-d'),
                 ])->json('totals.duration')
@@ -49,6 +49,9 @@ final readonly class TimelyService
         );
     }
 
+    /**
+     * @throws ConnectionException
+     */
     public function getCreationDate(): CarbonImmutable
     {
         return $this->createdAt ?? $this->getCurrentUser()->createdAt->startOfDay();

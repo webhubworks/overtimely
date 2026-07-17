@@ -2,7 +2,7 @@
 
 namespace App\Commands\Auth;
 
-use App\Services\TimelyAuth;
+use App\Services\TimelyAuthService;
 use App\Support\UserConfig;
 use LaravelZero\Framework\Commands\Command;
 use Throwable;
@@ -18,7 +18,7 @@ class AuthLogin extends Command
 
     protected $description = 'Authorizes overtimely with your Timely account via OAuth.';
 
-    public function handle(TimelyAuth $auth): int
+    public function handle(TimelyAuthService $auth): int
     {
         if (! $this->ensureOAuthApp()) {
             return self::FAILURE;

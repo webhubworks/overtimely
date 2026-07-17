@@ -2,7 +2,7 @@
 
 namespace App\Commands\Set;
 
-use App\Services\TimelyService;
+use App\Services\TimelyDataService;
 use App\Support\UserConfig;
 use LaravelZero\Framework\Commands\Command;
 use Throwable;
@@ -31,7 +31,7 @@ class SetIdentity extends Command
         }
 
         try {
-            $user = app(TimelyService::class)->getCurrentUser();
+            $user = app(TimelyDataService::class)->getCurrentUser();
         } catch (Throwable $e) {
             $this->error('Could not fetch your Timely user: '.$e->getMessage());
 

@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Services\TimelyAuth;
-use App\Services\TimelyService;
+use App\Services\TimelyAuthService;
+use App\Services\TimelyDataService;
 use App\Support\UserConfig;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Http;
@@ -53,17 +53,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(TimelyService::class, function () {
+        $this->app->bind(TimelyDataService::class, function () {
             $config = config('timely');
 
             $client = Http::baseUrl($config['base_url'])
-                ->withToken(app(TimelyAuth::class)->validAccessToken())
+                ->withToken(app(TimelyAuthService::class)->validAccessToken())
                 ->acceptJson()
                 ->timeout($config['timeout'])
                 ->retry(3, 200)
                 ->throw();
 
-            return new TimelyService(
+            return new TimelyDataService(
                 $client,
                 $config['account_id'],
                 filled($config['user_id']) ? $config['user_id'] : null,

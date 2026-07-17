@@ -6,7 +6,7 @@ use App\Concerns\EnsuresAppConfiguration;
 use App\Concerns\HasDateOptions;
 use App\DataTransferObjects\BalanceData;
 use App\Services\CapacityCalculationService;
-use App\Services\TimelyService;
+use App\Services\TimelyDataService;
 use Illuminate\Http\Client\ConnectionException;
 use LaravelZero\Framework\Commands\Command;
 
@@ -14,7 +14,7 @@ class GetTotal extends Command
 {
     use EnsuresAppConfiguration, HasDateOptions;
 
-    private TimelyService $timely;
+    private TimelyDataService $timely;
 
     /**
      * The name and signature of the console command.
@@ -43,7 +43,7 @@ class GetTotal extends Command
             return self::FAILURE;
         }
 
-        $this->timely = app(TimelyService::class);
+        $this->timely = app(TimelyDataService::class);
 
         $period = $this->parsePeriodOptions();
 
