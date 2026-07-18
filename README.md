@@ -1,12 +1,12 @@
 # overtimely
 A simple CLI tool that interacts with the Timely API to fetch the relevant data and calculate your overtime balance from it.
 
-Built with [Laravel Zero](https://laravel-zero.com/)
+Built with [Laravel Zero](https://laravel-zero.com/).
 
 ## Requirements
 - PHP ^8.5 
 - Composer
-- A Timely OAuth application [see below](#setup)
+- A Timely OAuth application ([details below](#setup))
 
 ## Installation
 This app is bundled into a standalone PHAR you can download via composer:
