@@ -84,12 +84,12 @@ return [
     */
 
     'remove' => Phar::running() ? [
-            VendorPublishCommand::class,
-            ScheduleRunCommand::class,
-            ScheduleListCommand::class,
-            ScheduleFinishCommand::class,
-            DataStructuresCacheCommand::class,
-            TinkerZeroCommand::class,
-        ] : [],
+        VendorPublishCommand::class,
+        ScheduleRunCommand::class,
+        ScheduleListCommand::class,
+        ScheduleFinishCommand::class,
+        DataStructuresCacheCommand::class,
+        TinkerZeroCommand::class,
+    ] : [],
 
 ];

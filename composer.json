@@ -1,6 +1,6 @@
 {
     "name": "webhubworks/overtimely",
-    "description": "CLI tool to quickly and easily answer a simple question: What's my overtime balance?",
+    "description": "A simple CLI tool that interacts with the Timely API to fetch the relevant data and calculate your overtime balance from it.",
     "keywords": ["framework", "laravel", "laravel zero", "console", "cli","timely","overtime"],
     "homepage": "https://webhub.de",
     "type": "project",
@@ -22,6 +22,7 @@
         "illuminate/http": "^12.17",
         "intonate/tinker-zero": "^1.2",
         "laravel-zero/framework": "^12.0.2",
+        "laravel-zero/phar-updater": "^1.4",
         "laravel/pint": "^1.25.1",
         "mockery/mockery": "^1.6.12",
         "pestphp/pest": "^3.8.4|^4.1.2",
