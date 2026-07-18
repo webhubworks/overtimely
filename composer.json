@@ -1,5 +1,5 @@
 {
-    "name": "wehhubworks/overtimely",
+    "name": "webhubworks/overtimely",
     "description": "CLI tool to quickly and easily answer a simple question: What's my overtime balance?",
     "keywords": ["framework", "laravel", "laravel zero", "console", "cli","timely","overtime"],
     "homepage": "https://webhub.de",
@@ -16,16 +16,16 @@
         }
     ],
     "require": {
-        "php": "^8.5",
-        "illuminate/http": "^12.17",
-        "laravel-zero/framework": "^12.0.2",
-        "spatie/laravel-data": "^4.23"
+        "php": "^8.5"
     },
     "require-dev": {
+        "illuminate/http": "^12.17",
         "intonate/tinker-zero": "^1.2",
+        "laravel-zero/framework": "^12.0.2",
         "laravel/pint": "^1.25.1",
         "mockery/mockery": "^1.6.12",
-        "pestphp/pest": "^3.8.4|^4.1.2"
+        "pestphp/pest": "^3.8.4|^4.1.2",
+        "spatie/laravel-data": "^4.23"
     },
     "autoload": {
         "psr-4": {
@@ -49,5 +49,5 @@
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
-    "bin": ["overtimely"]
+    "bin": ["builds/overtimely"]
 }

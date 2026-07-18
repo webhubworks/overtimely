@@ -4,8 +4,10 @@ use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
-use LaravelZero\Framework\Commands\StubPublishCommand;
+use Intonate\TinkerZero\Console\TinkerZeroCommand;
 use NunoMaduro\LaravelConsoleSummary\SummaryCommand;
+use Spatie\LaravelData\Commands\DataMakeCommand;
+use Spatie\LaravelData\Commands\DataStructuresCacheCommand;
 use Symfony\Component\Console\Command\DumpCompletionCommand;
 use Symfony\Component\Console\Command\HelpCommand;
 
@@ -63,16 +65,12 @@ return [
     |
     */
 
-    'hidden' => [
+    'hidden' => Phar::running() ? [
         SummaryCommand::class,
-        DumpCompletionCommand::class,
         HelpCommand::class,
-        ScheduleRunCommand::class,
-        ScheduleListCommand::class,
-        ScheduleFinishCommand::class,
-        VendorPublishCommand::class,
-        StubPublishCommand::class,
-    ],
+        DumpCompletionCommand::class,
+        DataMakeCommand::class,
+    ] : [],
 
     /*
     |--------------------------------------------------------------------------
@@ -85,8 +83,13 @@ return [
     |
     */
 
-    'remove' => [
-        //
-    ],
+    'remove' => Phar::running() ? [
+            VendorPublishCommand::class,
+            ScheduleRunCommand::class,
+            ScheduleListCommand::class,
+            ScheduleFinishCommand::class,
+            DataStructuresCacheCommand::class,
+            TinkerZeroCommand::class,
+        ] : [],
 
 ];
