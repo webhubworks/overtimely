@@ -62,6 +62,8 @@ class GetMonths extends Command
             return self::FAILURE;
         }
 
+        $this->info("Fetching data for period from $period.");
+
         $this->info('Fetching your capacities ...');
         $capacity = CapacityCalculationService::fromCapacities($this->timely->getCapacities());
 
@@ -125,7 +127,9 @@ class GetMonths extends Command
         return [
             ...(filled($yearCell) ? [$yearCell] : []),
             $month->month->since->format('F'),
-            ...$this->balanceCells($month->balance),
+            $month->balance->logged->tabular(),
+            $month->balance->expected->tabular(),
+            $month->balance->balance->tabular(true),
         ];
     }
 
@@ -139,15 +143,6 @@ class GetMonths extends Command
             "$total->logged",
             "$total->expected",
             $total->balance->readable(true),
-        ];
-    }
-
-    private function balanceCells(BalanceData $balance): array
-    {
-        return [
-            $balance->logged->tabular(),
-            $balance->expected->tabular(),
-            $balance->balance->tabular(true),
         ];
     }
 }
