@@ -13,9 +13,9 @@ ifndef VERSION
 endif
 	php overtimely app:build overtimely --build-version=$(VERSION)
 	git add builds/overtimely
-	git commit -m "builds v$(VERSION)"
-	git tag v$(VERSION)
+	git commit -m "builds $(VERSION)"
+	git tag $(VERSION)
 	git push
-	git push origin v$(VERSION)
+	git push origin $(VERSION)
 	@echo ""
-	@echo "Released and pushed v$(VERSION)."
+	@echo "Released and pushed $(VERSION)."
