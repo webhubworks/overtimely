@@ -24,7 +24,7 @@ final class PeriodData extends Data
 
     public function __toString(): string
     {
-        return "{$this->since->format('jS \o\f F Y')} to {$this->until->format('jS \o\f F Y')}";
+        return "{$this->since->format('Y-m-d')} to {$this->until->format('Y-m-d')}";
     }
 
     /**

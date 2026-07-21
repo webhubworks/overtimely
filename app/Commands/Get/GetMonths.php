@@ -62,7 +62,7 @@ class GetMonths extends Command
             return self::FAILURE;
         }
 
-        $this->info("Fetching data for period from $period.");
+        $this->info("Fetching data for period: $period");
 
         $this->info('Fetching your capacities ...');
         $capacity = CapacityCalculationService::fromCapacities($this->timely->getCapacities());

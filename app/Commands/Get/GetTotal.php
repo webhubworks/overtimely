@@ -51,7 +51,7 @@ class GetTotal extends Command
             return self::FAILURE;
         }
 
-        $this->info("Fetching data for period from $period.");
+        $this->info("Fetching data for period: $period");
 
         $this->info('Fetching and calculating your total capacity ...');
         $totalCapacity = CapacityCalculationService::fromCapacities($this->timely->getCapacities())
