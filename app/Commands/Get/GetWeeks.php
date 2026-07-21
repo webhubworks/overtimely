@@ -46,7 +46,7 @@ class GetWeeks extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         if (! $this->isAppConfigured()) {
             return self::FAILURE;
@@ -65,7 +65,7 @@ class GetWeeks extends Command
         $this->info('Fetching your capacities ...');
         $capacity = CapacityCalculationService::fromCapacities($this->timely->getCapacities());
 
-        $this->info('Fetching your logged hours per month ...');
+        $this->info('Fetching your logged hours per week ...');
         $this->weeks = $period->weeks()
             ->map(fn (PeriodData $week): PeriodBalanceData => new PeriodBalanceData(
                 period: $week,
@@ -73,8 +73,9 @@ class GetWeeks extends Command
                     $this->timely->getTotalLoggedHoursForPeriod($week),
                     $capacity->forPeriod($week),
                 ),
-            ),
-            );
+            ))
+            ->filter(fn (PeriodBalanceData $week): bool => $week->balance->balance->totalSeconds !== 0)
+            ->values();
 
         $rightAlignment = (new TableStyle)->setPadType(STR_PAD_LEFT);
 
@@ -82,7 +83,6 @@ class GetWeeks extends Command
         $this->table(
             [
                 'Year',
-                'Month',
                 'Week',
                 'Logged Hours',
                 'Expected Hours',
@@ -94,7 +94,6 @@ class GetWeeks extends Command
                 2 => $rightAlignment,
                 3 => $rightAlignment,
                 4 => $rightAlignment,
-                5 => $rightAlignment,
             ],
         );
 
@@ -104,10 +103,10 @@ class GetWeeks extends Command
     private function buildWeekRows(): array
     {
         return $this->weeks
-            ->groupBy(fn (PeriodBalanceData $week): string => $week->period->since->format('Y'))
+            ->groupBy(fn (PeriodBalanceData $week): string => $week->period->until->format('Y'))
             ->map(fn (Collection $yearGroup, string $year): array => $yearGroup->values()
-                ->map(fn (PeriodBalanceData $month, int $index): array => $this->monthRow(
-                    $month,
+                ->map(fn (PeriodBalanceData $week, int $index): array => $this->weekRow(
+                    $week,
                     // Only the first row of a year carries the spanning year cell.
                     yearCell: $index === 0 ? new TableCell($year, ['rowspan' => $yearGroup->count()]) : null,
                 ))
@@ -118,12 +117,11 @@ class GetWeeks extends Command
             ->all();
     }
 
-    private function weekRow(PeriodBalanceData $periodBalance, ?TableCell $yearCell, ?TableCell $monthCell): array
+    private function weekRow(PeriodBalanceData $periodBalance, ?TableCell $yearCell): array
     {
         return [
             ...(filled($yearCell) ? [$yearCell] : []),
-            ...(filled($monthCell) ? [$monthCell] : []),
-            $periodBalance->period->since->format("W")."($periodBalance->period)",
+            $periodBalance->period->since->format("W")." ($periodBalance->period)",
             $periodBalance->balance->logged->tabular(),
             $periodBalance->balance->expected->tabular(),
             $periodBalance->balance->balance->tabular(true),
@@ -136,8 +134,7 @@ class GetWeeks extends Command
 
         return [
             'Total',
-            '',
-            '',
+            $this->weeks->count().' weeks',
             "$total->logged",
             "$total->expected",
             $total->balance->readable(true),
