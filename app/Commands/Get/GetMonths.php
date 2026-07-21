@@ -34,7 +34,7 @@ class GetMonths extends Command
      */
     protected $signature = 'get:months
     {--s|since= : Start of the fetched report period. Defaults to the date your Timely account was created. Persistent custom default can be set via set:since. (Format: YYYY-MM-DD)}
-    {--s|until= : End of the fetched report period. Defaults to yesterday if omitted. (Format: YYYY-MM-DD)}';
+    {--u|until= : End of the fetched report period. Defaults to yesterday if omitted. (Format: YYYY-MM-DD)}';
 
     /**
      * The console command description.
