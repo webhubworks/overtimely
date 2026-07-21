@@ -30,7 +30,7 @@ final readonly class CapacityCalculationService
     ): DurationData {
         $totalCapacity = 0.0;
 
-        foreach (CarbonPeriodImmutable::create($period->since, $period->until) as $day) {
+        foreach (CarbonPeriodImmutable::create($period->since->startOfDay(), $period->until->startOfDay()) as $day) {
             $totalCapacity += $this->getCapacityOfDay($day);
         }
 

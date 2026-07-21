@@ -8,7 +8,7 @@ it('sums the expected working hours over the period', function () {
     $service = new CapacityCalculationService(makeCapacity());
 
     // Mon 2025-07-07 ... Fri 2025-07-11 = 5 workdays x 8h = 40h expected
-    $expected = $service->forPeriod(PeriodData::fromDates(
+    $expected = $service->forPeriod(PeriodData::fromBoundaries(
         CarbonImmutable::parse('2025-07-07'),
         CarbonImmutable::parse('2025-07-11'),
     ));
@@ -20,7 +20,7 @@ it('ignores days outside the capacity work days', function () {
     $service = CapacityCalculationService::fromCapacities(makeCapacity());
 
     // Fri ... Mon = 2 workdays (Sat/Sun excluded) => 16h expected
-    $expected = $service->forPeriod(PeriodData::fromDates(
+    $expected = $service->forPeriod(PeriodData::fromBoundaries(
         CarbonImmutable::parse('2025-07-11'), // Fri
         CarbonImmutable::parse('2025-07-14'), // Mon
     ));
@@ -35,7 +35,7 @@ it('uses the latest-starting capacity that covers the day', function () {
     ]));
 
     // Mon,Tue @ 8h + Wed,Thu,Fri @ 6h = 16 + 18 = 34h
-    $expected = $service->forPeriod(PeriodData::fromDates(
+    $expected = $service->forPeriod(PeriodData::fromBoundaries(
         CarbonImmutable::parse('2025-07-07'),
         CarbonImmutable::parse('2025-07-11'),
     ));
@@ -47,7 +47,7 @@ it('counts a single work day', function () {
     $service = CapacityCalculationService::fromCapacities(makeCapacity());
 
     // since == until, Monday
-    $expected = $service->forPeriod(PeriodData::fromDates(
+    $expected = $service->forPeriod(PeriodData::fromBoundaries(
         CarbonImmutable::parse('2025-07-07'),
         CarbonImmutable::parse('2025-07-07'),
     ));

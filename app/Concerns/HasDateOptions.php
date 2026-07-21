@@ -13,7 +13,7 @@ trait HasDateOptions
      */
     private function parsePeriodOptions(): PeriodData
     {
-        return PeriodData::fromDates(
+        return PeriodData::fromBoundaries(
             $this->parseDateOption(
                 'since',
                 $this->option('since')

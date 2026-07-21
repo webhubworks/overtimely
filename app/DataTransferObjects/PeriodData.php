@@ -14,9 +14,12 @@ final class PeriodData extends Data
         public ?CarbonImmutable $until,
     ) {}
 
-    public static function fromDates(?CarbonImmutable $since, ?CarbonImmutable $until): self
+    /**
+     * Returns a period for the interval [`since`, `until`].
+     */
+    public static function fromBoundaries(?CarbonImmutable $since, ?CarbonImmutable $until): self
     {
-        return new self($since, $until);
+        return new self($since->startOfDay(), $until->startOfDay());
     }
 
     public function __toString(): string
@@ -25,18 +28,34 @@ final class PeriodData extends Data
     }
 
     /**
-     * Split [`from`, `to`] into one entry per calendar month.
-     * The first and last entries are clamped to the range,
-     * so partial months are kept as the slice that falls inside the range.
+     * Splits this period into one period per calendar month.
+     * The first and last periods are clamped to this period's boundaries,
+     * so partial months are kept as the slice that falls inside the boundaries.
      *
      * @return Collection<int, self>
      */
-    public static function months(CarbonImmutable $from, CarbonImmutable $to): Collection
+    public function months(): Collection
     {
-        return collect(CarbonPeriodImmutable::create($from->startOfMonth(), '1 month', $to))
+        return collect(CarbonPeriodImmutable::create($this->since, '1 month', $this->until))
             ->map(fn (CarbonImmutable $monthStart): self => new self(
-                since: $monthStart->startOfDay()->max($from),
-                until: $monthStart->endOfMonth()->startOfDay()->min($to),
+                since: $monthStart->startOfMonth()->max($this->since),
+                until: $monthStart->endOfMonth()->startOfDay()->min($this->until),
+            ));
+    }
+
+    /**
+     * Splits this period into one period per calendar week.
+     * The first and last periods are clamped to this period's boundaries,
+     * so partial weeks are kept as the slice that falls inside the boundaries.
+     *
+     * @return Collection<int, self>
+     */
+    public function weeks(): Collection
+    {
+        return collect(CarbonPeriodImmutable::create($this->since, '1 week', $this->until))
+            ->map(fn (CarbonImmutable $weekStart): self => new self(
+                since: $weekStart->startOfWeek()->max($this->since),
+                until: $weekStart->endOfWeek()->startOfDay()->min($this->until),
             ));
     }
 }

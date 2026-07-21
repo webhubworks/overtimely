@@ -5,7 +5,7 @@ namespace App\Commands\Get;
 use App\Concerns\EnsuresAppConfiguration;
 use App\Concerns\HasDateOptions;
 use App\DataTransferObjects\BalanceData;
-use App\DataTransferObjects\MonthlyBalanceData;
+use App\DataTransferObjects\PeriodBalanceData;
 use App\DataTransferObjects\PeriodData;
 use App\Services\CapacityCalculationService;
 use App\Services\TimelyDataService;
@@ -21,7 +21,7 @@ class GetMonths extends Command
     use EnsuresAppConfiguration, HasDateOptions;
 
     /**
-     * @var Collection<int, MonthlyBalanceData>
+     * @var Collection<int, PeriodBalanceData>
      */
     private Collection $months;
 
@@ -68,17 +68,17 @@ class GetMonths extends Command
         $capacity = CapacityCalculationService::fromCapacities($this->timely->getCapacities());
 
         $this->info('Fetching your logged hours per month ...');
-        $this->months = PeriodData::months($period->since, $period->until)->map(
-            fn (PeriodData $month): MonthlyBalanceData => new MonthlyBalanceData(
-                month: $month,
+        $this->months = $period->months()
+            ->map(fn (PeriodData $month): PeriodBalanceData => new PeriodBalanceData(
+                period: $month,
                 balance: BalanceData::fromOperands(
                     $this->timely->getTotalLoggedHoursForPeriod($month),
                     $capacity->forPeriod($month),
                 ),
             ),
-        );
+            );
 
-        $rightAligned = (new TableStyle)->setPadType(STR_PAD_LEFT);
+        $rightAlignment = (new TableStyle)->setPadType(STR_PAD_LEFT);
 
         $this->newLine();
         $this->table(
@@ -91,22 +91,26 @@ class GetMonths extends Command
             ],
             $this->buildMonthRows(),
             config('display.table_style'),
-            [2 => $rightAligned, 3 => $rightAligned, 4 => $rightAligned], // right-aligned duration columns
+            [
+                2 => $rightAlignment,
+                3 => $rightAlignment,
+                4 => $rightAlignment,
+            ],
         );
 
         return self::SUCCESS;
     }
 
     /**
-     * Rows grouped by year (the year cell spans its months), a rule between
-     * year groups, and a grand total set off by a final rule.
+     * Rows grouped by year (the year cell spans its months),
+     * a rule between year groups, and a grand total set off by a final rule.
      */
     private function buildMonthRows(): array
     {
         return $this->months
-            ->groupBy(fn (MonthlyBalanceData $month): string => $month->month->since->format('Y'))
+            ->groupBy(fn (PeriodBalanceData $month): string => $month->period->since->format('Y'))
             ->map(fn (Collection $group, string $year): array => $group->values()
-                ->map(fn (MonthlyBalanceData $month, int $index): array => $this->monthRow(
+                ->map(fn (PeriodBalanceData $month, int $index): array => $this->monthRow(
                     $month,
                     // Only the first row of a year carries the spanning year cell.
                     yearCell: $index === 0 ? new TableCell($year, ['rowspan' => $group->count()]) : null,
@@ -121,12 +125,12 @@ class GetMonths extends Command
     /**
      * The rows a year cell covers omit the column entirely; only the first row of the group prepends it.
      */
-    private function monthRow(MonthlyBalanceData $month, ?TableCell $yearCell): array
+    private function monthRow(PeriodBalanceData $month, ?TableCell $yearCell): array
     {
 
         return [
             ...(filled($yearCell) ? [$yearCell] : []),
-            $month->month->since->format('F'),
+            $month->period->since->format('F'),
             $month->balance->logged->tabular(),
             $month->balance->expected->tabular(),
             $month->balance->balance->tabular(true),
@@ -135,7 +139,7 @@ class GetMonths extends Command
 
     private function totalsRow(): array
     {
-        $total = BalanceData::aggregate($this->months->map(fn (MonthlyBalanceData $month): BalanceData => $month->balance));
+        $total = BalanceData::aggregate($this->months->map(fn (PeriodBalanceData $month): BalanceData => $month->balance));
 
         return [
             'Total',

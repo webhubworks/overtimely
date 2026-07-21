@@ -4,10 +4,10 @@ namespace App\DataTransferObjects;
 
 use Spatie\LaravelData\Data;
 
-final class MonthlyBalanceData extends Data
+final class PeriodBalanceData extends Data
 {
     public function __construct(
-        public PeriodData $month,
+        public PeriodData $period,
         public BalanceData $balance,
     ) {}
 }
