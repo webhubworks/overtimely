@@ -41,7 +41,7 @@ class GetMonths extends Command
      *
      * @var string
      */
-    protected $description = 'Lists all months in the given period with their individual logged hours, expected hours and overtime balance.';
+    protected $description = 'Lists all calendar months in the given period with their individual logged hours, expected hours and overtime balance.';
 
     /**
      * Execute the console command.
@@ -127,7 +127,6 @@ class GetMonths extends Command
      */
     private function monthRow(PeriodBalanceData $month, ?TableCell $yearCell): array
     {
-
         return [
             ...(filled($yearCell) ? [$yearCell] : []),
             $month->period->since->format('F'),
