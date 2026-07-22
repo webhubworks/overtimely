@@ -5,7 +5,7 @@ namespace App\Commands\Get;
 use App\DataTransferObjects\BalanceData;
 use Illuminate\Http\Client\ConnectionException;
 
-class GetTotalCommand extends GetBaseCommand
+class GetTotalCommand extends BaseGetCommand
 {
     /**
      * The name and signature of the console command.

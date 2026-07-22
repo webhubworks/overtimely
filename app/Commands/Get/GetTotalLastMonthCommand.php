@@ -4,21 +4,21 @@ namespace App\Commands\Get;
 
 use LaravelZero\Framework\Commands\Command;
 
-class GetLastMonthCommand extends Command
+class GetTotalLastMonthCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'get:last-month';
+    protected $signature = 'get:total:last-month';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Runs get:total with SINCE and UNTIL set to the start and end of the last month respectively.';
+    protected $description = 'A wrapper command for get:total. Sets SINCE and UNTIL to the start and end of the previous calendar month respectively.';
 
     /**
      * Execute the console command.

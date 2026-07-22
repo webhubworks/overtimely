@@ -1,6 +1,6 @@
 <?php
 
-use App\Commands\Get\GetBaseCommand;
+use App\Commands\Get\BaseGetCommand;
 use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
@@ -67,9 +67,9 @@ return [
     */
 
     'hidden' => Phar::running() ? [
+        BaseGetCommand::class,
         DataMakeCommand::class,
         DumpCompletionCommand::class,
-        GetBaseCommand::class,
         HelpCommand::class,
         SummaryCommand::class,
     ] : [],
@@ -86,8 +86,8 @@ return [
     */
 
     'remove' => Phar::running() ? [
+        BaseGetCommand::class,
         DataStructuresCacheCommand::class,
-        GetBaseCommand::class,
         ScheduleFinishCommand::class,
         ScheduleListCommand::class,
         ScheduleRunCommand::class,

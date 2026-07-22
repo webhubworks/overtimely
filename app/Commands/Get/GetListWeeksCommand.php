@@ -11,14 +11,14 @@ use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Helper\TableStyle;
 
-class GetWeeksCommand extends GetBaseCommand
+class GetListWeeksCommand extends BaseGetCommand
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'get:weeks
+    protected $signature = 'get:list:weeks
     {--s|since= : Start of the fetched report period. Defaults to the date your Timely account was created. Persistent custom default can be set via set:since. (Format: YYYY-MM-DD)}
     {--u|until= : End of the fetched report period. Defaults to yesterday if omitted. (Format: YYYY-MM-DD)}';
 
@@ -27,7 +27,7 @@ class GetWeeksCommand extends GetBaseCommand
      *
      * @var string
      */
-    protected $description = 'Lists all calendar weeks with a non-zero overtime balance in the given period with their individual logged hours, expected hours and overtime balance.';
+    protected $description = 'Lists all calendar weeks with a non-zero overtime balance in the given period with their individual logged hours, expected hours and overtime balance. Please note that this might take a while as it does one API-call per week.';
 
     /**
      * @var Collection<int, PeriodBalanceData>

@@ -10,7 +10,7 @@ use App\Services\TimelyDataService;
 use Illuminate\Http\Client\ConnectionException;
 use LaravelZero\Framework\Commands\Command;
 
-class GetBaseCommand extends Command
+class BaseGetCommand extends Command
 {
     use EnsuresAppConfiguration, HasDateOptions;
 
