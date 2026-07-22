@@ -32,11 +32,11 @@ class GetTotalCommand extends GetBaseCommand
     {
         parent::handle();
 
-        $this->info('Calculating your total capacity ...');
-        $totalCapacity = $this->capacity->forPeriod($this->period);
-
         $this->info('Fetching your total logged hours ...');
         $totalLoggedHours = $this->timely->getTotalLoggedHoursForPeriod($this->period);
+
+        $this->info('Calculating your total capacity ...');
+        $totalCapacity = $this->capacity->forPeriod($this->period);
 
         $balance = BalanceData::fromOperands($totalLoggedHours, $totalCapacity);
 
