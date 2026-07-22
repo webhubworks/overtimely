@@ -1,11 +1,11 @@
 <?php
 
 use App\DataTransferObjects\PeriodData;
-use App\Services\CapacityCalculationService;
+use App\Services\CapacityService;
 use Carbon\CarbonImmutable;
 
 it('sums the expected working hours over the period', function () {
-    $service = new CapacityCalculationService(makeCapacity());
+    $service = new CapacityService(makeCapacity());
 
     // Mon 2025-07-07 ... Fri 2025-07-11 = 5 workdays x 8h = 40h expected
     $expected = $service->forPeriod(PeriodData::fromBoundaries(
@@ -17,7 +17,7 @@ it('sums the expected working hours over the period', function () {
 });
 
 it('ignores days outside the capacity work days', function () {
-    $service = CapacityCalculationService::fromCapacities(makeCapacity());
+    $service = CapacityService::fromCapacities(makeCapacity());
 
     // Fri ... Mon = 2 workdays (Sat/Sun excluded) => 16h expected
     $expected = $service->forPeriod(PeriodData::fromBoundaries(
@@ -29,7 +29,7 @@ it('ignores days outside the capacity work days', function () {
 });
 
 it('uses the latest-starting capacity that covers the day', function () {
-    $service = CapacityCalculationService::fromCapacities(collect([
+    $service = CapacityService::fromCapacities(collect([
         makeCapacity(),                                             // open-ended default
         makeCapacity(dailyCapacity: 6.0, startDate: '2025-07-09'),  // takes over from Wed
     ]));
@@ -44,7 +44,7 @@ it('uses the latest-starting capacity that covers the day', function () {
 });
 
 it('counts a single work day', function () {
-    $service = CapacityCalculationService::fromCapacities(makeCapacity());
+    $service = CapacityService::fromCapacities(makeCapacity());
 
     // since == until, Monday
     $expected = $service->forPeriod(PeriodData::fromBoundaries(

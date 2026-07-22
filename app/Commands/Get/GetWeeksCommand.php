@@ -2,31 +2,17 @@
 
 namespace App\Commands\Get;
 
-use App\Concerns\EnsuresAppConfiguration;
-use App\Concerns\HasDateOptions;
 use App\DataTransferObjects\BalanceData;
 use App\DataTransferObjects\PeriodBalanceData;
 use App\DataTransferObjects\PeriodData;
-use App\Services\CapacityCalculationService;
-use App\Services\TimelyDataService;
-use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
-use LaravelZero\Framework\Commands\Command;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Helper\TableStyle;
 
-class GetWeeks extends Command
+class GetWeeksCommand extends GetBaseCommand
 {
-    use EnsuresAppConfiguration, HasDateOptions;
-
-    /**
-     * @var Collection<int, PeriodBalanceData>
-     */
-    private Collection $weeks;
-
-    private TimelyDataService $timely;
-
     /**
      * The name and signature of the console command.
      *
@@ -44,34 +30,26 @@ class GetWeeks extends Command
     protected $description = 'Lists all calendar weeks with a non-zero overtime balance in the given period with their individual logged hours, expected hours and overtime balance.';
 
     /**
+     * @var Collection<int, PeriodBalanceData>
+     */
+    private Collection $weeks;
+
+    /**
      * Execute the console command.
+     *
+     * @throws ConnectionException
      */
     public function handle(): int
     {
-        if (! $this->isAppConfigured()) {
-            return self::FAILURE;
-        }
-
-        $this->timely = app(TimelyDataService::class);
-
-        $period = $this->parsePeriodOptions();
-
-        if ($period->since === null || $period->until === null) {
-            return self::FAILURE;
-        }
-
-        $this->info("Fetching data for period: $period");
-
-        $this->info('Fetching your capacities ...');
-        $capacity = CapacityCalculationService::fromCapacities($this->timely->getCapacities());
+        parent::handle();
 
         $this->info('Fetching your logged hours per week ...');
-        $this->weeks = $period->weeks()
+        $this->weeks = $this->period->weeks()
             ->map(fn (PeriodData $week): PeriodBalanceData => new PeriodBalanceData(
                 period: $week,
                 balance: BalanceData::fromOperands(
                     $this->timely->getTotalLoggedHoursForPeriod($week),
-                    $capacity->forPeriod($week),
+                    $this->capacity->forPeriod($week),
                 ),
             ))
             ->filter(fn (PeriodBalanceData $week): bool => $week->balance->balance->totalSeconds !== 0)
@@ -121,7 +99,7 @@ class GetWeeks extends Command
     {
         return [
             ...(filled($yearCell) ? [$yearCell] : []),
-            $periodBalance->period->since->format("W")." ($periodBalance->period)",
+            $periodBalance->period->since->format('W')." ($periodBalance->period)",
             $periodBalance->balance->logged->tabular(),
             $periodBalance->balance->expected->tabular(),
             $periodBalance->balance->balance->tabular(true),

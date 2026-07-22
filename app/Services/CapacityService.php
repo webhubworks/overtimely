@@ -9,7 +9,7 @@ use Carbon\CarbonImmutable;
 use Carbon\CarbonPeriodImmutable;
 use Illuminate\Support\Collection;
 
-final readonly class CapacityCalculationService
+final readonly class CapacityService
 {
     private Collection $capacities;
 

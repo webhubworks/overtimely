@@ -2,20 +2,11 @@
 
 namespace App\Commands\Get;
 
-use App\Concerns\EnsuresAppConfiguration;
-use App\Concerns\HasDateOptions;
 use App\DataTransferObjects\BalanceData;
-use App\Services\CapacityCalculationService;
-use App\Services\TimelyDataService;
 use Illuminate\Http\Client\ConnectionException;
-use LaravelZero\Framework\Commands\Command;
 
-class GetTotal extends Command
+class GetTotalCommand extends GetBaseCommand
 {
-    use EnsuresAppConfiguration, HasDateOptions;
-
-    private TimelyDataService $timely;
-
     /**
      * The name and signature of the console command.
      *
@@ -39,26 +30,13 @@ class GetTotal extends Command
      */
     public function handle(): int
     {
-        if (! $this->isAppConfigured()) {
-            return self::FAILURE;
-        }
+        parent::handle();
 
-        $this->timely = app(TimelyDataService::class);
-
-        $period = $this->parsePeriodOptions();
-
-        if ($period->since === null || $period->until === null) {
-            return self::FAILURE;
-        }
-
-        $this->info("Fetching data for period: $period");
-
-        $this->info('Fetching and calculating your total capacity ...');
-        $totalCapacity = CapacityCalculationService::fromCapacities($this->timely->getCapacities())
-            ->forPeriod($period);
+        $this->info('Calculating your total capacity ...');
+        $totalCapacity = $this->capacity->forPeriod($this->period);
 
         $this->info('Fetching your total logged hours ...');
-        $totalLoggedHours = $this->timely->getTotalLoggedHoursForPeriod($period);
+        $totalLoggedHours = $this->timely->getTotalLoggedHoursForPeriod($this->period);
 
         $balance = BalanceData::fromOperands($totalLoggedHours, $totalCapacity);
 

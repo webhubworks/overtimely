@@ -2,31 +2,17 @@
 
 namespace App\Commands\Get;
 
-use App\Concerns\EnsuresAppConfiguration;
-use App\Concerns\HasDateOptions;
 use App\DataTransferObjects\BalanceData;
 use App\DataTransferObjects\PeriodBalanceData;
 use App\DataTransferObjects\PeriodData;
-use App\Services\CapacityCalculationService;
-use App\Services\TimelyDataService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
-use LaravelZero\Framework\Commands\Command;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Helper\TableStyle;
 
-class GetMonths extends Command
+class GetMonthsCommand extends GetBaseCommand
 {
-    use EnsuresAppConfiguration, HasDateOptions;
-
-    /**
-     * @var Collection<int, PeriodBalanceData>
-     */
-    private Collection $months;
-
-    private TimelyDataService $timely;
-
     /**
      * The name and signature of the console command.
      *
@@ -44,36 +30,26 @@ class GetMonths extends Command
     protected $description = 'Lists all calendar months in the given period with their individual logged hours, expected hours and overtime balance.';
 
     /**
+     * @var Collection<int, PeriodBalanceData>
+     */
+    private Collection $months;
+
+    /**
      * Execute the console command.
      *
      * @throws ConnectionException
      */
     public function handle(): int
     {
-        if (! $this->isAppConfigured()) {
-            return self::FAILURE;
-        }
-
-        $this->timely = app(TimelyDataService::class);
-
-        $period = $this->parsePeriodOptions();
-
-        if ($period->since === null || $period->until === null) {
-            return self::FAILURE;
-        }
-
-        $this->info("Fetching data for period: $period");
-
-        $this->info('Fetching your capacities ...');
-        $capacity = CapacityCalculationService::fromCapacities($this->timely->getCapacities());
+        parent::handle();
 
         $this->info('Fetching your logged hours per month ...');
-        $this->months = $period->months()
+        $this->months = $this->period->months()
             ->map(fn (PeriodData $month): PeriodBalanceData => new PeriodBalanceData(
                 period: $month,
                 balance: BalanceData::fromOperands(
                     $this->timely->getTotalLoggedHoursForPeriod($month),
-                    $capacity->forPeriod($month),
+                    $this->capacity->forPeriod($month),
                 ),
             ),
             );
