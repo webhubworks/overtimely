@@ -10,14 +10,14 @@ use Spatie\LaravelData\Data;
 final class PeriodData extends Data
 {
     public function __construct(
-        public ?CarbonImmutable $since,
-        public ?CarbonImmutable $until,
+        public CarbonImmutable $since,
+        public CarbonImmutable $until,
     ) {}
 
     /**
      * Returns a period for the interval [`since`, `until`].
      */
-    public static function fromBoundaries(?CarbonImmutable $since, ?CarbonImmutable $until): self
+    public static function fromBoundaries(CarbonImmutable $since, CarbonImmutable $until): self
     {
         return new self($since->startOfDay(), $until->startOfDay());
     }

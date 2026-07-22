@@ -11,20 +11,26 @@ trait HasDateOptions
     /**
      * @throws ConnectionException
      */
-    private function parsePeriodOptions(): PeriodData
+    private function parsePeriodOptions(): ?PeriodData
     {
-        return PeriodData::fromBoundaries(
-            $this->parseDateOption(
-                'since',
-                $this->option('since')
+        $since = $this->parseDateOption(
+            option: 'since',
+            value: $this->option('since')
                 ?? config('timely.since')
                 ?? $this->timely->getCreationDate()
-            ),
-            $this->parseDateOption(
-                'until',
-                $this->option('until')
+        );
+
+        $until = $this->parseDateOption(
+            option: 'until',
+            value: $this->option('until')
                 ?? CarbonImmutable::yesterday()
-            ));
+        );
+
+        if ($since === null || $until === null) {
+            return null;
+        }
+
+        return PeriodData::fromBoundaries($since, $until);
     }
 
     private function parseDateOption(string $option, string|CarbonImmutable $value): ?CarbonImmutable
