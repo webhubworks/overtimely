@@ -41,7 +41,7 @@ class GetWeeks extends Command
      *
      * @var string
      */
-    protected $description = 'Lists all calendar weeks in the given period with their individual logged hours, expected hours and overtime balance.';
+    protected $description = 'Lists all calendar weeks with a non-zero overtime balance in the given period with their individual logged hours, expected hours and overtime balance.';
 
     /**
      * Execute the console command.
