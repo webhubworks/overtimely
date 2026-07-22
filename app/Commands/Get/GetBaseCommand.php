@@ -56,9 +56,9 @@ class GetBaseCommand extends Command
             return self::FAILURE;
         }
 
-        $this->info("Fetching your data for the period of $this->period");
+        $this->line("Fetching your data for the period of $this->period");
 
-        $this->info('Fetching your capacities ...');
+        $this->line('Fetching your capacities ...');
 
         $capacities = $this->timely->getCapacities();
 

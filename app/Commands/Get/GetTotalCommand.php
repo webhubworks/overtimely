@@ -21,7 +21,7 @@ class GetTotalCommand extends GetBaseCommand
      *
      * @var string
      */
-    protected $description = 'Fetches your capacities and total logged hours for the period of SINCE to UNTIL and calculates the total overtime balance.';
+    protected $description = 'Fetches your capacities and logged hours for the period of SINCE to UNTIL and calculates the total overtime balance.';
 
     /**
      * Execute the console command.
@@ -32,20 +32,29 @@ class GetTotalCommand extends GetBaseCommand
     {
         parent::handle();
 
-        $this->info('Fetching your total logged hours ...');
+        $this->line('Fetching your total logged hours ...');
         $totalLoggedHours = $this->timely->getTotalLoggedHoursForPeriod($this->period);
 
-        $this->info('Calculating your total capacity ...');
+        $this->line('Calculating your total capacity ...');
         $totalCapacity = $this->capacity->forPeriod($this->period);
 
         $balance = BalanceData::fromOperands($totalLoggedHours, $totalCapacity);
 
         $this->newLine();
 
+        if ($balance->balance->totalSeconds > 0) {
+            $this->alert('You are on overtime!');
+        } elseif ($balance->balance->totalSeconds < 0) {
+            $this->alert('You have minus hours!');
+        } else {
+            $this->info('You are on time!');
+            $this->newLine();
+        }
+
         $this->table(
             [
-                'Total Logged Hours',
-                'Total Expected Hours',
+                'Logged Hours',
+                'Expected Hours',
                 'Overtime Balance',
             ],
             [

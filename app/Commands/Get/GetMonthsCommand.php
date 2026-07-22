@@ -43,7 +43,7 @@ class GetMonthsCommand extends GetBaseCommand
     {
         parent::handle();
 
-        $this->info('Fetching your logged hours per month ...');
+        $this->line('Fetching your logged hours per month ...');
         $this->months = $this->period->months()
             ->map(fn (PeriodData $month): PeriodBalanceData => new PeriodBalanceData(
                 period: $month,

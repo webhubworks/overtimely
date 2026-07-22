@@ -43,7 +43,7 @@ class GetWeeksCommand extends GetBaseCommand
     {
         parent::handle();
 
-        $this->info('Fetching your logged hours per week ...');
+        $this->line('Fetching your logged hours per week ...');
         $this->weeks = $this->period->weeks()
             ->map(fn (PeriodData $week): PeriodBalanceData => new PeriodBalanceData(
                 period: $week,
