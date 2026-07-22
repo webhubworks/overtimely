@@ -5,10 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.2.0 - 2026-07-22
+
+### Added
+- Added the `get:total:this-month` command. Run `overtimely help get:total:this-month` for more information.
+- Added the `get:total:this-week` command. Run `overtimely help get:total:this-week` for more information.
+
+### Changed
+- Changed multiple command signatures to establish a more consistent naming scheme:
+  - `get:last-month` => `get:total:last-month`
+  - `get:last-week` => `get:total:last-week`
+  - `get:months` => `get:list:months`
+  - `get:weeks` => `get:list:weeks`
+- Changed multiple command descriptions to be more verbose.
+- Restyled multiple command outputs.
+- Added an alert banner to the `get:total` command's output when you are on overtime or have minus hours.
+
 ## 1.1.1 - 2026-07-22
 
 ### Fixed
-- Fixed unintended build export exclusion.
+- Fixed the unintended export-exclusion of the app build.
 
 ## 1.1.0 - 2026-07-22
 
