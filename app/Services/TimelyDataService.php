@@ -38,6 +38,27 @@ final readonly class TimelyDataService
     }
 
     /**
+     * @return Collection<string, DurationData>
+     *
+     * @throws ConnectionException
+     */
+    public function getDailyLoggedHoursForPeriod(PeriodData $period): Collection
+    {
+        return DurationData::collect(
+            $this->client
+                ->get("{$this->accountId}/reports/filter", [
+                    'scope' => 'totals',
+                    'group_by' => 'days',
+                    'user_ids' => 'self',
+                    'since' => $period->since?->format('Y-m-d'),
+                    'until' => $period->until?->format('Y-m-d'),
+                ])
+                ->collect('days')
+                ->mapWithKeys(fn (array $day): array => [$day['day'] => $day['duration']])
+        );
+    }
+
+    /**
      * @throws ConnectionException
      */
     public function getCurrentUser(): CurrentUserData
