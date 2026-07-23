@@ -28,7 +28,7 @@ class GetListWeeksCommand extends BaseGetCommand
      *
      * @var string
      */
-    protected $description = 'Lists all calendar weeks with a non-zero overtime balance in the given period with their individual logged hours, expected hours and overtime balance. Please note that this might take a while as it does one API-call per week.';
+    protected $description = 'Lists all calendar weeks with a non-zero overtime balance in the given period with their individual logged hours, expected hours and overtime balance.';
 
     /**
      * @var Collection<int, PeriodBalanceData>
