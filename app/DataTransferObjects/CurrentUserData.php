@@ -17,12 +17,4 @@ final class CurrentUserData extends Data
         #[WithCast(DateTimeInterfaceCast::class, format: 'U')]
         public CarbonImmutable $createdAt,
     ) {}
-
-    public static function fromApi(array $data): self
-    {
-        return new self(
-            id: (int) $data['id'],
-            createdAt: CarbonImmutable::createFromTimestamp($data['created_at']),
-        );
-    }
 }
