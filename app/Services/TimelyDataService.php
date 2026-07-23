@@ -41,7 +41,7 @@ final readonly class TimelyDataService
     }
 
     /**
-     * @return Collection<string, DurationData>
+     * @return Collection<int, DailyDurationData>
      *
      * @throws ConnectionException
      */

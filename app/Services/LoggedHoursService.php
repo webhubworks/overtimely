@@ -12,15 +12,14 @@ use Illuminate\Support\Collection;
 final readonly class LoggedHoursService
 {
     /**
-     * @var Collection<int, DailyDurationData>
+     * @var Collection<string, DailyDurationData>
      */
     private Collection $dailyDurations;
 
     public function __construct(DailyDurationData|Collection $dailyDurations)
     {
         $this->dailyDurations = Collection::wrap($dailyDurations)
-            ->sortBy(fn (DailyDurationData $duration): int => $duration->day->getTimestamp())
-            ->values();
+            ->keyBy(fn (DailyDurationData $dailyDuration): string => $dailyDuration->day->format('Y-m-d'));
     }
 
     public static function fromDailyDurations(DailyDurationData|Collection $dailyDurations): self
@@ -44,8 +43,7 @@ final readonly class LoggedHoursService
      */
     private function getDurationOfDay(CarbonImmutable $day): int
     {
-        $applicableDailyDuration = $this->dailyDurations
-            ->first(fn (DailyDurationData $dailyDuration) => $dailyDuration->day->equalTo($day));
+        $applicableDailyDuration = $this->dailyDurations->get($day->format('Y-m-d'));
 
         return $applicableDailyDuration?->duration?->totalSeconds ?: 0;
     }

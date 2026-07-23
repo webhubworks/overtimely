@@ -74,7 +74,7 @@ function makeCapacity(
  * as returned by TimelyDataService::getDailyLoggedHoursForPeriod().
  *
  * @param  array<string, float>  $hoursByDay
- * @return Collection<int, DurationData>
+ * @return Collection<string, DailyDurationData>
  */
 function makeDailyLoggedHours(array $hoursByDay): Collection
 {
