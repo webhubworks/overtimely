@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\DataTransferObjects\CapacityData;
 use App\DataTransferObjects\CurrentUserData;
+use App\DataTransferObjects\DailyDurationData;
 use App\DataTransferObjects\DurationData;
 use App\DataTransferObjects\PeriodData;
 use Carbon\CarbonImmutable;
@@ -46,7 +47,7 @@ final readonly class TimelyDataService
      */
     public function getDailyLoggedHoursForPeriod(PeriodData $period): Collection
     {
-        return DurationData::collect(
+        return DailyDurationData::collect(
             $this->client
                 ->get("{$this->accountId}/reports/filter", [
                     'scope' => 'totals',
@@ -56,7 +57,6 @@ final readonly class TimelyDataService
                     'until' => $period->until?->format('Y-m-d'),
                 ])
                 ->collect('days')
-                ->mapWithKeys(fn (array $day): array => [$day['day'] => $day['duration']])
         );
     }
 

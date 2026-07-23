@@ -9,8 +9,6 @@ use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 #[MapInputName(SnakeCaseMapper::class)]
 final class DurationData extends Data
 {
-    public bool $isNegative;
-
     public function __construct(
         public int $hours,
         public int $minutes,

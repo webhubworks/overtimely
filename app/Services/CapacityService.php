@@ -48,6 +48,6 @@ final readonly class CapacityService
         $applicableCapacity = $this->capacities
             ->first(fn (CapacityData $capacity): bool => $capacity->hasDay($day));
 
-        return $applicableCapacity->dailyCapacity ?: 0.0;
+        return $applicableCapacity?->dailyCapacity ?: 0.0;
     }
 }
