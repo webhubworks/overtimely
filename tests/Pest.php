@@ -1,7 +1,9 @@
 <?php
 
 use App\DataTransferObjects\CapacityData;
+use App\DataTransferObjects\DurationData;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Collection;
 use Tests\TestCase;
 
 /*
@@ -64,4 +66,17 @@ function makeCapacity(
         startDate: CarbonImmutable::createFromFormat('!Y-m-d', $startDate),
         endDate: $endDate ? CarbonImmutable::createFromFormat('!Y-m-d', $endDate) : null,
     );
+}
+
+/**
+ * Builds a daily-logged-hours collection keyed by day (Y-m-d),
+ * as returned by TimelyDataService::getDailyLoggedHoursForPeriod().
+ *
+ * @param  array<string, float>  $hoursByDay
+ * @return Collection<string, DurationData>
+ */
+function makeDailyLoggedHours(array $hoursByDay): Collection
+{
+    return collect($hoursByDay)
+        ->map(fn (float $hours): DurationData => DurationData::fromTotalHours($hours));
 }
