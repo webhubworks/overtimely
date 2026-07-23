@@ -11,6 +11,9 @@ use Illuminate\Support\Collection;
 
 final readonly class CapacityService
 {
+    /**
+     * @var Collection<int, CapacityData>
+     */
     private Collection $capacities;
 
     public function __construct(CapacityData|Collection $capacities)
@@ -25,9 +28,8 @@ final readonly class CapacityService
         return new self($capacities);
     }
 
-    public function forPeriod(
-        PeriodData $period,
-    ): DurationData {
+    public function forPeriod(PeriodData $period): DurationData
+    {
         $totalCapacity = 0.0;
 
         foreach (CarbonPeriodImmutable::create($period->since->startOfDay(), $period->until->startOfDay()) as $day) {
@@ -37,30 +39,15 @@ final readonly class CapacityService
         return DurationData::fromTotalHours($totalCapacity);
     }
 
+    /**
+     * Returns the capacity for a given day in hours.
+     * Capacities are sorted by start date in descending order so the "latest" capacity wins.
+     */
     private function getCapacityOfDay(CarbonImmutable $day): float
     {
-        $capacityForDay = $this->determineCapacityForDay($day);
+        $applicableCapacity = $this->capacities
+            ->first(fn (CapacityData $capacity): bool => $capacity->hasDay($day));
 
-        $isWorkDay = $this->isWorkDayOfCapacity($capacityForDay, $day);
-
-        return $isWorkDay
-            ? $capacityForDay->dailyCapacity
-            : 0.0;
-    }
-
-    /**
-     * The applicable capacity for a given day:
-     * Capacities are sorted by start date so the "latest" capacity wins.
-     */
-    private function determineCapacityForDay(CarbonImmutable $day): ?CapacityData
-    {
-        return $this->capacities
-            ->first(fn (CapacityData $capacity): bool => $day->greaterThanOrEqualTo($capacity->startDate));
-    }
-
-    private function isWorkDayOfCapacity(CapacityData $capacity, CarbonImmutable $day): bool
-    {
-        return $capacity->workDays
-            ->contains(strtoupper($day->format('D')));
+        return $applicableCapacity->dailyCapacity ?: 0.0;
     }
 }

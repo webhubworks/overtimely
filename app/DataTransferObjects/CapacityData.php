@@ -33,4 +33,19 @@ final class CapacityData extends Data
         #[WithCast(DateTimeInterfaceCast::class, format: '!Y-m-d')]
         public ?CarbonImmutable $endDate,                           // ISO8601 end date. Null for open-ended capacities
     ) {}
+
+    public function hasDay(CarbonImmutable $day): bool
+    {
+        return $this->hasDayInRange($day) && $this->hasDayAsWorkDay($day);
+    }
+
+    private function hasDayInRange(CarbonImmutable $day): bool
+    {
+        return $day->isBetween($this->startDate, $this->endDate ?? now()->startOfDay());
+    }
+
+    private function hasDayAsWorkDay(CarbonImmutable $day): bool
+    {
+        return $this->workDays->contains(strtoupper($day->format('D')));
+    }
 }
