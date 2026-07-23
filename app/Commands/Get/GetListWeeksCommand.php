@@ -5,6 +5,7 @@ namespace App\Commands\Get;
 use App\DataTransferObjects\BalanceData;
 use App\DataTransferObjects\PeriodBalanceData;
 use App\DataTransferObjects\PeriodData;
+use App\Services\LoggedHoursService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Helper\TableCell;
@@ -43,12 +44,16 @@ class GetListWeeksCommand extends BaseGetCommand
     {
         parent::handle();
 
-        $this->line('Fetching your logged hours per week ...');
+        $this->line('Fetching your logged hours ...');
+        $loggedHours = LoggedHoursService::fromDailyDurations(
+            $this->timely->getDailyLoggedHoursForPeriod($this->period),
+        );
+
         $this->weeks = $this->period->weeks()
             ->map(fn (PeriodData $week): PeriodBalanceData => new PeriodBalanceData(
                 period: $week,
                 balance: BalanceData::fromOperands(
-                    $this->timely->getTotalLoggedHoursForPeriod($week),
+                    $loggedHours->forPeriod($week),
                     $this->capacity->forPeriod($week),
                 ),
             ))

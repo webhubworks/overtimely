@@ -21,6 +21,8 @@ final readonly class TimelyDataService
     ) {}
 
     /**
+     * The totals are always unaffected by the grouping and come with every scope=totals report. The group_by option produces additional output we don't need here.
+     *
      * @throws ConnectionException
      */
     public function getTotalLoggedHoursForPeriod(PeriodData $period): DurationData
@@ -29,8 +31,8 @@ final readonly class TimelyDataService
             $this->client
                 ->get("{$this->accountId}/reports/filter", [
                     'scope' => 'totals',
-                    'group_by' => 'users',
                     'user_ids' => 'self',
+                    'group_by' => '',
                     'since' => $period->since?->format('Y-m-d'),
                     'until' => $period->until?->format('Y-m-d'),
                 ])->json('totals.duration')
@@ -48,8 +50,8 @@ final readonly class TimelyDataService
             $this->client
                 ->get("{$this->accountId}/reports/filter", [
                     'scope' => 'totals',
-                    'group_by' => 'days',
                     'user_ids' => 'self',
+                    'group_by' => 'days',
                     'since' => $period->since?->format('Y-m-d'),
                     'until' => $period->until?->format('Y-m-d'),
                 ])

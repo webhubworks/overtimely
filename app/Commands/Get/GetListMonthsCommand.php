@@ -5,6 +5,7 @@ namespace App\Commands\Get;
 use App\DataTransferObjects\BalanceData;
 use App\DataTransferObjects\PeriodBalanceData;
 use App\DataTransferObjects\PeriodData;
+use App\Services\LoggedHoursService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Helper\TableCell;
@@ -43,12 +44,16 @@ class GetListMonthsCommand extends BaseGetCommand
     {
         parent::handle();
 
-        $this->line('Fetching your logged hours per month ...');
+        $this->line('Fetching your logged hours ...');
+        $loggedHours = LoggedHoursService::fromDailyDurations(
+            $this->timely->getDailyLoggedHoursForPeriod($this->period),
+        );
+
         $this->months = $this->period->months()
             ->map(fn (PeriodData $month): PeriodBalanceData => new PeriodBalanceData(
                 period: $month,
                 balance: BalanceData::fromOperands(
-                    $this->timely->getTotalLoggedHoursForPeriod($month),
+                    $loggedHours->forPeriod($month),
                     $this->capacity->forPeriod($month),
                 ),
             ),
