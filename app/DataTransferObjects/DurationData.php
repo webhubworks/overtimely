@@ -18,9 +18,7 @@ final class DurationData extends Data
         public float $totalHours,
         public int $totalMinutes,
         public int $totalSeconds,
-    ) {
-        $this->isNegative = $this->totalSeconds < 0;
-    }
+    ) {}
 
     public static function fromTotalHours(float $totalHours): self
     {
@@ -72,37 +70,25 @@ final class DurationData extends Data
             ->map(fn (int $value, string $unit): string => "{$value}{$unit}")
             ->implode($glue);
 
-        $sign = $this->isNegative ? '-' : ($prefixPositive ? '+' : '');
+        $sign = $this->totalSeconds < 0 ? '-' : ($prefixPositive ? '+' : '');
 
         return "{$sign}{$components}";
     }
 
     /**
      * Returns a table-friendly string representation of the duration, e.g. `01h 30m`, `08h 00m` or `00h 24m`.
+     *
+     * @param  bool  $prefixPositive  Prefix positive durations with a `+` sign.
      */
     public function tabular(bool $prefixPositive = false): string
-    {
-        $plus = $prefixPositive ? '+' : '';
-
-        return $this->format("%{$plus}02dh %02dm");
-    }
-
-    /**
-     * Takes a `sprintf` format and injects 2 digits for hours and minutes as its values.
-     */
-    public function format(string $format): string
     {
         if ($this->totalSeconds === 0) {
             return '—';
         }
 
-        /**
-         * Hours derived from the total hours here instead of the existing hours component
-         * because they carry the duration's sign, which is needed if the passed format
-         * contains the `+` flag, which prefixes positive numbers with a `+` sign.
-         */
-        $hours = (int) $this->totalHours;
+        $plus = $prefixPositive ? '+' : '';
+        $hours = $this->totalSeconds < 0 ? $this->hours * -1 : $this->hours;
 
-        return sprintf($format, $hours, $this->minutes);
+        return sprintf("%{$plus}02dh %02dm", $hours, $this->minutes);
     }
 }

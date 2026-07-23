@@ -123,7 +123,7 @@ class GetListMonthsCommand extends BaseGetCommand
 
         return [
             'Total',
-            '',
+            $this->months->count().' months',
             "$total->logged",
             "$total->expected",
             $total->balance->readable(true),
