@@ -39,13 +39,13 @@ Run `overtimely` to get a list of the available commands and use the `--help` op
 ## Development
 
 ### Local development
-To run the app locally, you have to prefix it with PHP:
+To run the app locally, you have to prefix it with PHP while in the project directory:
 
 ```shell
 php overtimely
 ```
 
-You can also use an `.env` file to set/override the user configuration values which are set by the `app:setup` and `set:*` commands. Have a look at the `.env.example` file to see the available environment variables.
+You can use an `.env` file to set/override the user configuration values which are set by the `app:setup` and `set:*` commands. Have a look at the `.env.example` file to see the available environment variables.
 
 ### Releasing a build
 
@@ -59,4 +59,4 @@ make release VERSION=<build_version>
 
 This will **build**, **commit**, **tag** and **push** a new PHAR all in one go.
 
-For deciding on the correct `build_version` to use: This project follows the [Semantic Versioning](https://semver.org) format.
+For deciding on the correct `build_version` to use: This project adheres to [Semantic Versioning](https://semver.org).
