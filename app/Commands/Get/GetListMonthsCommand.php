@@ -42,8 +42,6 @@ class GetListMonthsCommand extends BaseGetCommand
      */
     public function handle(): int
     {
-        parent::handle();
-
         $this->line('Fetching your logged hours ...');
         $loggedHours = LoggedHoursService::fromDailyDurations(
             $this->timely->getDailyLoggedHoursForPeriod($this->period),

@@ -42,7 +42,7 @@ class GetListWeeksCommand extends BaseGetCommand
      */
     public function handle(): int
     {
-        parent::handle();
+        parent::configure();
 
         $this->line('Fetching your logged hours ...');
         $loggedHours = LoggedHoursService::fromDailyDurations(

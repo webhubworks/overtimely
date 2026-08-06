@@ -9,9 +9,9 @@ use App\Support\UserConfig;
  * .env or the user config file), it drops the user into `app:setup` instead of
  * letting the command fail.
  */
-trait EnsuresAppConfiguration
+trait EnsuresAuthentication
 {
-    protected function isAppConfigured(): bool
+    protected function isAuthenticated(): bool
     {
         if ($this->hasCredentials()) {
             return true;
@@ -23,7 +23,7 @@ trait EnsuresAppConfiguration
             return false;
         }
 
-        $this->warn('overtimely is not yet configured. Running app:setup first ...');
+        $this->warn('overtimely is not yet authenticated. Running app:setup first ...');
         $this->call('app:setup');
 
         if (! UserConfig::isConfigured()) {

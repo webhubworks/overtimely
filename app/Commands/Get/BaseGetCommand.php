@@ -2,37 +2,21 @@
 
 namespace App\Commands\Get;
 
-use App\Concerns\EnsuresAppConfiguration;
-use App\Concerns\HasDateOptions;
+use App\Concerns\EnsuresAuthentication;
+use App\Concerns\HasPeriod;
 use App\DataTransferObjects\PeriodData;
 use App\Services\CapacityService;
 use App\Services\TimelyDataService;
 use Illuminate\Http\Client\ConnectionException;
 use LaravelZero\Framework\Commands\Command;
 
-class BaseGetCommand extends Command
+abstract class BaseGetCommand extends Command
 {
-    use EnsuresAppConfiguration, HasDateOptions;
-
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'get:base';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'This is a base command class meant for the get:* commands to extend. It is not intended to be run at all and only visible in local development.';
+    use EnsuresAuthentication, HasPeriod;
 
     protected TimelyDataService $timely;
 
     protected CapacityService $capacity;
-
-    protected ?PeriodData $period;
 
     /**
      * Execute the console command.
@@ -41,13 +25,13 @@ class BaseGetCommand extends Command
      */
     public function handle()
     {
-        if (! $this->isAppConfigured()) {
+        if (! $this->isAuthenticated()) {
             return self::FAILURE;
         }
 
         $this->timely = app(TimelyDataService::class);
 
-        $this->period = $this->parsePeriodOptions();
+        $this->period = $this->parsePeriod();
 
         if ($this->period === null) {
             $this->newLine();
