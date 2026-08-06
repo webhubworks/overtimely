@@ -59,6 +59,9 @@ abstract class BaseGetCommand extends Command
         return $this->get();
     }
 
+    /**
+     * Called by `handle()` for actual child-specific command execution.
+     */
     abstract protected function get(): int;
 
     /**

@@ -34,7 +34,7 @@ class GetListWeeksCommand extends BaseGetCommand
     }
 
     /**
-     * Execute the console command.
+     * {@inheritDoc}
      *
      * @throws ConnectionException
      */

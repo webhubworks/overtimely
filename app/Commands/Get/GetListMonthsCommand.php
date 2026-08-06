@@ -34,7 +34,7 @@ class GetListMonthsCommand extends BaseGetCommand
     }
 
     /**
-     * Execute the console command.
+     * {@inheritDoc}
      *
      * @throws ConnectionException
      */
