@@ -14,27 +14,27 @@ namespace App\Support;
  */
 final class UserConfig
 {
-    public const ACCOUNT_ID = 'account_id';
+    public const string ACCOUNT_ID = 'account_id';
 
-    public const USER_ID = 'user_id';
+    public const string USER_ID = 'user_id';
 
-    public const SINCE = 'since';
+    public const string SINCE = 'since';
 
-    public const TABLE_STYLE = 'table_style';
+    public const string TABLE_STYLE = 'table_style';
 
-    public const ACCESS_TOKEN = 'access_token';
+    public const string ACCESS_TOKEN = 'access_token';
 
-    public const REFRESH_TOKEN = 'refresh_token';
+    public const string REFRESH_TOKEN = 'refresh_token';
 
-    public const TOKEN_EXPIRES_AT = 'token_expires_at';
+    public const string TOKEN_EXPIRES_AT = 'token_expires_at';
 
-    public const CLIENT_ID = 'client_id';
+    public const string CLIENT_ID = 'client_id';
 
-    public const CLIENT_SECRET = 'client_secret';
+    public const string CLIENT_SECRET = 'client_secret';
 
-    public const REDIRECT_URI = 'redirect_uri';
+    public const string REDIRECT_URI = 'redirect_uri';
 
-    public const CREATED_AT = 'created_at';
+    public const string CREATED_AT = 'created_at';
 
     private const array KEYS = [
         self::ACCESS_TOKEN,
@@ -48,6 +48,15 @@ final class UserConfig
         self::CREATED_AT,
         self::SINCE,
         self::TABLE_STYLE,
+    ];
+
+    /**
+     * The keys required to reach the Timely API, mapped to the config entry each one is merged into.
+     */
+    private const array CREDENTIALS = [
+        self::REFRESH_TOKEN => 'timely.refresh_token',
+        self::ACCOUNT_ID => 'timely.account_id',
+        self::USER_ID => 'timely.user_id',
     ];
 
     public static function path(): string
@@ -131,11 +140,21 @@ final class UserConfig
         self::save($data);
     }
 
+    /**
+     * Whether the user config file holds a complete set of credentials.
+     */
     public static function isConfigured(): bool
     {
-        return self::get(self::REFRESH_TOKEN) !== null
-            && self::get(self::ACCOUNT_ID) !== null
-            && self::get(self::USER_ID) !== null;
+        return array_all(array_keys(self::CREDENTIALS), fn($key) => self::get($key) !== null);
+    }
+
+    /**
+     * Whether the necessary credentials are present in the effective configuration,
+     * regardless of whether they come from the environment or from the user config file.
+     */
+    public static function hasCredentials(): bool
+    {
+        return array_all(self::CREDENTIALS, fn($configKey) => !blank(config($configKey)));
     }
 
     private static function assertKnown(string $key): void

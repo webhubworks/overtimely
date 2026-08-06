@@ -5,15 +5,14 @@ namespace App\Concerns;
 use App\Support\UserConfig;
 
 /**
- * Guards commands that need Timely credentials. On first use (nothing set via
- * .env or the user config file), it drops the user into `app:setup` instead of
- * letting the command fail.
+ * Guards commands that need Timely credentials.
+ * On command use when nothing is set via .env or the user config file, it drops the user into `app:setup`.
  */
 trait EnsuresAuthentication
 {
     protected function isAuthenticated(): bool
     {
-        if ($this->hasCredentials()) {
+        if (UserConfig::hasCredentials()) {
             return true;
         }
 
@@ -26,19 +25,12 @@ trait EnsuresAuthentication
         $this->warn('overtimely is not yet authenticated. Running app:setup first ...');
         $this->call('app:setup');
 
-        if (! UserConfig::isConfigured()) {
+        if (! UserConfig::isConfigured() || ! UserConfig::hasCredentials()) {
             $this->error("Command execution aborted because the setup wasn't successful. Please run app:setup again.");
 
             return false;
         }
 
         return true;
-    }
-
-    private function hasCredentials(): bool
-    {
-        return filled(config('timely.refresh_token'))
-            && filled(config('timely.account_id'))
-            && filled(config('timely.user_id'));
     }
 }
