@@ -40,7 +40,7 @@ class GetListMonthsCommand extends BaseGetCommand
      *
      * @throws ConnectionException
      */
-    public function handle(): int
+    public function get(): int
     {
         $this->line('Fetching your logged hours ...');
         $loggedHours = LoggedHoursService::fromDailyDurations(

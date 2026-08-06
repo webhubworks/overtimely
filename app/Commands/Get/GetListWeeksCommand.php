@@ -40,10 +40,8 @@ class GetListWeeksCommand extends BaseGetCommand
      *
      * @throws ConnectionException
      */
-    public function handle(): int
+    public function get(): int
     {
-        parent::configure();
-
         $this->line('Fetching your logged hours ...');
         $loggedHours = LoggedHoursService::fromDailyDurations(
             $this->timely->getDailyLoggedHoursForPeriod($this->period),

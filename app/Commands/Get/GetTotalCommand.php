@@ -28,10 +28,8 @@ class GetTotalCommand extends BaseGetCommand
      *
      * @throws ConnectionException
      */
-    public function handle(): int
+    public function get(): int
     {
-        parent::handle();
-
         $this->line('Fetching your total logged hours ...');
         $totalLoggedHours = $this->timely->getTotalLoggedHoursForPeriod($this->period);
 

@@ -23,7 +23,7 @@ abstract class BaseGetCommand extends Command
      *
      * @throws ConnectionException
      */
-    public function handle()
+    final public function handle(): int
     {
         if (! $this->isAuthenticated()) {
             return self::FAILURE;
@@ -47,5 +47,9 @@ abstract class BaseGetCommand extends Command
         $capacities = $this->timely->getCapacities();
 
         $this->capacity = CapacityService::fromCapacities($capacities);
+
+        return $this->get();
     }
+
+    abstract protected function get(): int;
 }
