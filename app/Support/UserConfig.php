@@ -130,6 +130,10 @@ final class UserConfig
         foreach ($values as $key => $value) {
             self::assertKnown($key);
 
+            if (is_string($value)) {
+                $value = trim($value);
+            }
+
             if ($value === null || $value === '') {
                 unset($data[$key]);
             } else {
@@ -145,7 +149,7 @@ final class UserConfig
      */
     public static function isConfigured(): bool
     {
-        return array_all(array_keys(self::CREDENTIALS), fn($key) => self::get($key) !== null);
+        return array_all(array_keys(self::CREDENTIALS), fn ($key) => filled(self::get($key)));
     }
 
     /**
@@ -154,7 +158,7 @@ final class UserConfig
      */
     public static function hasCredentials(): bool
     {
-        return array_all(self::CREDENTIALS, fn($configKey) => !blank(config($configKey)));
+        return array_all(self::CREDENTIALS, fn ($configKey) => filled(config($configKey)));
     }
 
     private static function assertKnown(string $key): void
