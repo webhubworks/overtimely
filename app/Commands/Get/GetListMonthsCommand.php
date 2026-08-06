@@ -15,15 +15,6 @@ use Symfony\Component\Console\Helper\TableStyle;
 class GetListMonthsCommand extends BaseGetCommand
 {
     /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'get:list:months
-    {--s|since= : Start of the fetched report period. Defaults to the date your Timely account was created. Persistent custom default can be set via set:since. (Format: YYYY-MM-DD)}
-    {--u|until= : End of the fetched report period. Defaults to yesterday if omitted. (Format: YYYY-MM-DD)}';
-
-    /**
      * The console command description.
      *
      * @var string
@@ -35,12 +26,19 @@ class GetListMonthsCommand extends BaseGetCommand
      */
     private Collection $months;
 
+    public function __construct()
+    {
+        $this->signature = 'get:list:months '.implode(' ', $this->periodOptions);
+
+        parent::__construct();
+    }
+
     /**
      * Execute the console command.
      *
      * @throws ConnectionException
      */
-    public function get(): int
+    protected function get(): int
     {
         $this->line('Fetching your logged hours ...');
         $loggedHours = LoggedHoursService::fromDailyDurations(
