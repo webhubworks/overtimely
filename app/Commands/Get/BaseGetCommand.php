@@ -16,8 +16,8 @@ abstract class BaseGetCommand extends Command
     use EnsuresAuthentication;
 
     protected array $periodOptions = [
-        '--s|since' => '{--s|since= : Start of the fetched report period. Defaults to the date your Timely account was created. A persistent custom default can be set using the set:since command.}',
-        '--u|until' => '{--u|until= : End of the fetched report period. Defaults to yesterday if omitted.}',
+        'since' => '{--s|since= : Start of the fetched report period. Defaults to the date your Timely account was created. A persistent custom default can be set using the set:since command.}',
+        'until' => '{--u|until= : End of the fetched report period. Defaults to yesterday if omitted.}',
     ];
 
     protected CapacityService $capacity;
