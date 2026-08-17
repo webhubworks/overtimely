@@ -22,7 +22,7 @@ class AppSetup extends Command
      *
      * @var string
      */
-    protected $description = 'Interactively configure overtimely by running every set:* command in turn.';
+    protected $description = 'Interactively configure this app by running every set:* command in turn.';
 
     /**
      * The set commands to run, in order.
@@ -43,7 +43,7 @@ class AppSetup extends Command
     public function handle(): int
     {
         if (UserConfig::isConfigured()) {
-            info('overtimely is already fully configured. Update the values below or press enter to keep them.');
+            info('The app is already fully configured. Update the values below or press enter to keep them.');
         } else {
             info('Running setup:');
         }

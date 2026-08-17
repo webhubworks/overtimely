@@ -28,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      *
-     * Merges the user-level config file (~/.config/overtimely/config.json) into Laravel's config repository.
+     * Merges the user-level config file (~/.config/<app.name>/config.json) into Laravel's config repository.
      * Precedence:
      *   env() -> user config file -> config default
      */

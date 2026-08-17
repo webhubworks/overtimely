@@ -2,15 +2,17 @@
 
 namespace App\Support;
 
+use Illuminate\Support\Str;
+
 /**
  * Persists user-level settings (Timely credentials + display preferences) to a
  * single JSON file outside the package install dir, so the values survive
  * `composer global update`/reinstall and work regardless of where the user
  * installed the tool.
  *
- * Location follows the XDG Base Directory spec:
- *   $XDG_CONFIG_HOME/overtimely/config.json
- *   (falls back to ~/.config/overtimely/config.json)
+ * Location follows the XDG Base Directory spec, using the app name as the directory:
+ *   $XDG_CONFIG_HOME/<app.name>/config.json
+ *   (falls back to ~/.config/<app.name>/config.json)
  */
 final class UserConfig
 {
@@ -62,12 +64,14 @@ final class UserConfig
     public static function path(): string
     {
         $configHome = getenv('XDG_CONFIG_HOME');
+        $appName = Str::slug(config('app.name'));
+
         if (! is_string($configHome) || trim($configHome) === '') {
             $home = $_SERVER['HOME'] ?? getenv('HOME') ?: sys_get_temp_dir();
-            $configHome = rtrim((string) $home, '/').'/.config';
+            $configHome = rtrim((string) $home, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'.config';
         }
 
-        return rtrim($configHome, '/').'/overtimely/config.json';
+        return rtrim($configHome, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$appName.DIRECTORY_SEPARATOR.'config.json';
     }
 
     public static function exists(): bool

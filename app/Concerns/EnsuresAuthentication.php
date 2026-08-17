@@ -17,12 +17,12 @@ trait EnsuresAuthentication
         }
 
         if (! $this->input->isInteractive()) {
-            $this->error('overtimely is not yet configured. Please run app:setup or set the corresponding environment variables.');
+            $this->error('The app is not yet configured. Please run app:setup or set the corresponding environment variables.');
 
             return false;
         }
 
-        $this->warn('overtimely is not yet authenticated. Running app:setup first ...');
+        $this->warn('The app is not yet configured. Running app:setup first ...');
         $this->call('app:setup');
 
         if (! UserConfig::isConfigured() || ! UserConfig::hasCredentials()) {

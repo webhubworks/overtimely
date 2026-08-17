@@ -16,7 +16,7 @@ class AuthLogin extends Command
 {
     protected $signature = 'auth:login {code? : Authorization code from Timely. [non-interactive]}';
 
-    protected $description = 'Authorizes overtimely with your Timely account via OAuth.';
+    protected $description = 'Authorizes the app with your Timely account via OAuth.';
 
     public function handle(TimelyAuthService $auth): int
     {
@@ -29,7 +29,7 @@ class AuthLogin extends Command
         if ($code === null) {
             $url = $auth->authorizeUrl();
 
-            note('Open this URL in your browser, authorize overtimely, then copy the code Timely shows you:');
+            note('Open this URL in your browser, authorize the app, then copy the code Timely shows you:');
             $this->line($url);
             $this->openInBrowser($url);
 
