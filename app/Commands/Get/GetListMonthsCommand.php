@@ -85,7 +85,7 @@ class GetListMonthsCommand extends BaseGetCommand
     private function buildMonthRows(): array
     {
         return $this->months
-            ->groupBy(fn (PeriodBalanceData $month): string => $month->period->since->format('Y'))
+            ->groupBy(fn (PeriodBalanceData $month): string => $month->period->until->format('Y'))
             ->map(fn (Collection $group, string $year): array => $group->values()
                 ->map(fn (PeriodBalanceData $month, int $index): array => $this->monthRow(
                     $month,
