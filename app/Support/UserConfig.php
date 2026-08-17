@@ -3,6 +3,8 @@
 namespace App\Support;
 
 use Illuminate\Support\Str;
+use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * Persists user-level settings (Timely credentials + display preferences) to a
@@ -94,25 +96,32 @@ final class UserConfig
         return is_array($data) ? $data : [];
     }
 
-    /** @param array<string, mixed> $data */
+    /**
+     * @param  array<string, mixed>  $data
+     *
+     * @throws RuntimeException
+     */
     public static function save(array $data): void
     {
         $path = self::path();
         $dir = dirname($path);
         if (! is_dir($dir) && ! @mkdir($dir, 0700, true) && ! is_dir($dir)) {
-            throw new \RuntimeException("Could not create config directory: {$dir}");
+            throw new RuntimeException("Could not create config directory: {$dir}");
         }
         $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         if ($json === false) {
-            throw new \RuntimeException('Could not encode config JSON.');
+            throw new RuntimeException('Could not encode config JSON.');
         }
         if (@file_put_contents($path, $json."\n") === false) {
-            throw new \RuntimeException("Could not write config file: {$path}");
+            throw new RuntimeException("Could not write config file: {$path}");
         }
         // The file may hold the API token, so keep it owner-only.
         @chmod($path, 0600);
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public static function get(string $key): mixed
     {
         self::assertKnown($key);
@@ -122,11 +131,19 @@ final class UserConfig
         return $value === '' ? null : $value;
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public static function set(string $key, mixed $value): void
     {
         self::setMany([$key => $value]);
     }
 
+    /**
+     * @param  array<string, mixed>  $values
+     *
+     * @throws InvalidArgumentException
+     */
     public static function setMany(array $values): void
     {
         $data = self::load();
@@ -165,10 +182,13 @@ final class UserConfig
         return array_all(self::CREDENTIALS, fn ($configKey) => filled(config($configKey)));
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     private static function assertKnown(string $key): void
     {
         if (! in_array($key, self::KEYS, true)) {
-            throw new \InvalidArgumentException("Unknown config key: {$key}");
+            throw new InvalidArgumentException("Unknown config key: {$key}");
         }
     }
 }

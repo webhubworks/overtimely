@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\DataTransferObjects\OAuthTokenData;
 use App\Support\UserConfig;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
@@ -21,6 +23,10 @@ final readonly class TimelyAuthService
         ]);
     }
 
+    /**
+     * @throws RequestException
+     * @throws ConnectionException
+     */
     public function exchangeCode(string $code): OAuthTokenData
     {
         return $this->requestToken([
@@ -30,6 +36,10 @@ final readonly class TimelyAuthService
         ]);
     }
 
+    /**
+     * @throws RequestException
+     * @throws ConnectionException
+     */
     public function refresh(string $refreshToken): OAuthTokenData
     {
         return $this->requestToken([
@@ -52,6 +62,11 @@ final readonly class TimelyAuthService
         UserConfig::setMany($values);
     }
 
+    /**
+     * @throws RequestException
+     * @throws ConnectionException
+     * @throws RuntimeException
+     */
     public function validAccessToken(): string
     {
         $accessToken = config('timely.access_token');
@@ -78,6 +93,12 @@ final readonly class TimelyAuthService
         return $token->accessToken;
     }
 
+    /**
+     * @param  array<string, string>  $payload
+     *
+     * @throws RequestException
+     * @throws ConnectionException
+     */
     private function requestToken(array $payload): OAuthTokenData
     {
         $oauth = config('timely.oauth');
