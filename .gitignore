@@ -6,3 +6,5 @@
 .env
 .claude
 .DS_Store
+docs/*
+!docs/timely-api-v1.yaml
