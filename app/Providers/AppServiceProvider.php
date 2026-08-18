@@ -8,6 +8,7 @@ use App\Support\UserConfig;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ServiceProvider;
+use RuntimeException;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -65,12 +66,32 @@ class AppServiceProvider extends ServiceProvider
 
             return new TimelyDataService(
                 $client,
-                $config['account_id'],
-                filled($config['user_id']) ? $config['user_id'] : null,
+                $this->requireNumericId(
+                    $config['account_id'],
+                    'No valid Timely account ID set. Run set:account-id first.'
+                ),
+                filled($config['user_id'])
+                    ? $this->requireNumericId(
+                        $config['user_id'],
+                        'No valid Timely user ID set. Run set:identity first.'
+                    )
+                    : null,
                 filled($config['created_at'])
                     ? CarbonImmutable::createFromFormat('!Y-m-d', $config['created_at'])
                     : null,
             );
         });
+    }
+
+    /**
+     * @throws RuntimeException
+     */
+    private function requireNumericId(mixed $value, string $message): int
+    {
+        if (! ctype_digit((string) $value)) {
+            throw new RuntimeException($message);
+        }
+
+        return (int) $value;
     }
 }

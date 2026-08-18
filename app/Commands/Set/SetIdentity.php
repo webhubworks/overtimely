@@ -41,11 +41,11 @@ class SetIdentity extends Command
         $createdAt = $user->createdAt->format('Y-m-d');
 
         UserConfig::setMany([
-            UserConfig::USER_ID => (string) $user->id,
+            UserConfig::USER_ID => $user->id,
             UserConfig::CREATED_AT => $createdAt,
         ]);
 
-        config()->set('timely.user_id', (string) $user->id);
+        config()->set('timely.user_id', $user->id);
         config()->set('timely.created_at', $createdAt);
 
         info("Identified as Timely user {$user->id} (account created {$createdAt}).");

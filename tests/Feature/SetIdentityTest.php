@@ -40,7 +40,7 @@ it('fetches and stores the user id and account creation date', function () {
 
     $this->artisan('set:identity')->assertSuccessful();
 
-    expect(UserConfig::get(UserConfig::USER_ID))->toBe('42')
+    expect(UserConfig::get(UserConfig::USER_ID))->toBe(42)
         ->and(UserConfig::get(UserConfig::CREATED_AT))
         ->toBe(CarbonImmutable::createFromTimestamp(1704067200)->format('Y-m-d'));
 });

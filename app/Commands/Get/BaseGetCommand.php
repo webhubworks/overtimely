@@ -10,6 +10,7 @@ use Carbon\CarbonImmutable;
 use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Http\Client\ConnectionException;
 use LaravelZero\Framework\Commands\Command;
+use RuntimeException;
 
 abstract class BaseGetCommand extends Command
 {
@@ -37,7 +38,14 @@ abstract class BaseGetCommand extends Command
             return self::FAILURE;
         }
 
-        $this->timely = app(TimelyDataService::class);
+        try {
+            $this->timely = app(TimelyDataService::class);
+        } catch (RuntimeException $e) {
+            $this->newLine();
+            $this->error($e->getMessage());
+
+            return self::FAILURE;
+        }
 
         $this->period = $this->parsePeriod();
 

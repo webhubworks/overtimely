@@ -45,10 +45,12 @@ class SetAccountId extends Command
             return self::FAILURE;
         }
 
-        UserConfig::set(UserConfig::ACCOUNT_ID, $id);
-        config()->set('timely.account_id', $id);
+        $accountId = (int) $id;
 
-        info("Account ID set to {$id}.");
+        UserConfig::set(UserConfig::ACCOUNT_ID, $accountId);
+        config()->set('timely.account_id', $accountId);
+
+        info("Account ID set to {$accountId}.");
         note('Config file: '.UserConfig::path());
 
         return self::SUCCESS;
