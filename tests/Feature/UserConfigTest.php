@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ConfigKey;
 use App\Support\UserConfig;
 
 beforeEach(function () {
@@ -26,52 +27,72 @@ afterEach(function () {
 });
 
 it('round-trips a value through set and get', function () {
-    UserConfig::set(UserConfig::ACCOUNT_ID, '123');
+    UserConfig::set(ConfigKey::AccountId, '123');
 
-    expect(UserConfig::get(UserConfig::ACCOUNT_ID))->toBe('123');
+    expect(UserConfig::get(ConfigKey::AccountId))->toBe('123');
 });
 
 it('returns null for an unset key', function () {
-    expect(UserConfig::get(UserConfig::SINCE))->toBeNull();
+    expect(UserConfig::get(ConfigKey::Since))->toBeNull();
 });
 
 it('treats an empty string as null', function () {
-    UserConfig::set(UserConfig::SINCE, '');
+    UserConfig::set(ConfigKey::Since, '');
 
-    expect(UserConfig::get(UserConfig::SINCE))->toBeNull();
+    expect(UserConfig::get(ConfigKey::Since))->toBeNull();
 });
 
 it('unsets a key when set to null', function () {
-    UserConfig::set(UserConfig::USER_ID, '42');
-    UserConfig::set(UserConfig::USER_ID, null);
+    UserConfig::set(ConfigKey::UserId, '42');
+    UserConfig::set(ConfigKey::UserId, null);
 
-    expect(UserConfig::get(UserConfig::USER_ID))->toBeNull();
+    expect(UserConfig::get(ConfigKey::UserId))->toBeNull();
 });
 
 it('writes many keys in a single call', function () {
     UserConfig::setMany([
-        UserConfig::REFRESH_TOKEN => 'tok',
-        UserConfig::ACCOUNT_ID => '1',
-        UserConfig::USER_ID => '2',
+        [ConfigKey::RefreshToken, 'tok'],
+        [ConfigKey::AccountId, '1'],
+        [ConfigKey::UserId, '2'],
     ]);
 
-    expect(UserConfig::get(UserConfig::REFRESH_TOKEN))->toBe('tok')
-        ->and(UserConfig::get(UserConfig::ACCOUNT_ID))->toBe('1')
-        ->and(UserConfig::get(UserConfig::USER_ID))->toBe('2');
+    expect(UserConfig::get(ConfigKey::RefreshToken))->toBe('tok')
+        ->and(UserConfig::get(ConfigKey::AccountId))->toBe('1')
+        ->and(UserConfig::get(ConfigKey::UserId))->toBe('2');
 });
-
-it('throws on an unknown key', function () {
-    UserConfig::get('nope');
-})->throws(InvalidArgumentException::class);
 
 it('is configured only when refresh token, account and user are set', function () {
     expect(UserConfig::isConfigured())->toBeFalse();
 
     UserConfig::setMany([
-        UserConfig::REFRESH_TOKEN => 'tok',
-        UserConfig::ACCOUNT_ID => '1',
-        UserConfig::USER_ID => '2',
+        [ConfigKey::RefreshToken, 'tok'],
+        [ConfigKey::AccountId, '1'],
+        [ConfigKey::UserId, '2'],
     ]);
 
     expect(UserConfig::isConfigured())->toBeTrue();
+});
+
+it('mirrors the config repository structure on disk', function () {
+    UserConfig::setMany([
+        [ConfigKey::ClientId, 'abc'],
+        [ConfigKey::TableStyle, 'box'],
+    ]);
+
+    expect(json_decode(file_get_contents(UserConfig::path()), true))->toBe([
+        'timely' => ['oauth' => ['client_id' => 'abc']],
+        'display' => ['table_style' => 'box'],
+    ]);
+});
+
+it('drops settings left behind by an older key layout', function () {
+    UserConfig::save(['account_id' => '999', 'timely' => ['account_id' => '1']]);
+
+    expect(UserConfig::load())->toBe(['timely' => ['account_id' => '1']]);
+});
+
+it('maps every config key to a real config entry', function () {
+    foreach (ConfigKey::cases() as $key) {
+        expect(config()->has($key->value))->toBeTrue("missing config entry for {$key->name}");
+    }
 });

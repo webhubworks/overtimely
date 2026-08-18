@@ -2,8 +2,9 @@
 
 namespace App\Support;
 
+use App\Enums\ConfigKey;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use InvalidArgumentException;
 use RuntimeException;
 
 /**
@@ -12,57 +13,15 @@ use RuntimeException;
  * `composer global update`/reinstall and work regardless of where the user
  * installed the tool.
  *
+ * The file mirrors the structure of Laravel's config repository, so the key
+ * timely.oauth.client_id is stored as {"timely": {"oauth": {"client_id": ...}}}.
+ *
  * Location follows the XDG Base Directory spec, using the app name as the directory:
  *   $XDG_CONFIG_HOME/<app.name>/config.json
  *   (falls back to ~/.config/<app.name>/config.json)
  */
 final class UserConfig
 {
-    public const string ACCOUNT_ID = 'account_id';
-
-    public const string USER_ID = 'user_id';
-
-    public const string SINCE = 'since';
-
-    public const string TABLE_STYLE = 'table_style';
-
-    public const string ACCESS_TOKEN = 'access_token';
-
-    public const string REFRESH_TOKEN = 'refresh_token';
-
-    public const string TOKEN_EXPIRES_AT = 'token_expires_at';
-
-    public const string CLIENT_ID = 'client_id';
-
-    public const string CLIENT_SECRET = 'client_secret';
-
-    public const string REDIRECT_URI = 'redirect_uri';
-
-    public const string CREATED_AT = 'created_at';
-
-    private const array KEYS = [
-        self::ACCESS_TOKEN,
-        self::REFRESH_TOKEN,
-        self::TOKEN_EXPIRES_AT,
-        self::CLIENT_ID,
-        self::CLIENT_SECRET,
-        self::REDIRECT_URI,
-        self::ACCOUNT_ID,
-        self::USER_ID,
-        self::CREATED_AT,
-        self::SINCE,
-        self::TABLE_STYLE,
-    ];
-
-    /**
-     * The keys required to reach the Timely API, mapped to the config entry each one is merged into.
-     */
-    private const array CREDENTIALS = [
-        self::REFRESH_TOKEN => 'timely.refresh_token',
-        self::ACCOUNT_ID => 'timely.account_id',
-        self::USER_ID => 'timely.user_id',
-    ];
-
     public static function path(): string
     {
         $configHome = getenv('XDG_CONFIG_HOME');
@@ -93,7 +52,7 @@ final class UserConfig
         }
         $data = json_decode($content, true);
 
-        return is_array($data) ? $data : [];
+        return is_array($data) ? Arr::only($data, self::sections()) : [];
     }
 
     /**
@@ -119,46 +78,39 @@ final class UserConfig
         @chmod($path, 0600);
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
-    public static function get(string $key): mixed
+    public static function get(ConfigKey $key): mixed
     {
-        self::assertKnown($key);
-
-        $value = self::load()[$key] ?? null;
+        $value = data_get(self::load(), $key->value);
 
         return $value === '' ? null : $value;
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @throws RuntimeException
      */
-    public static function set(string $key, mixed $value): void
+    public static function set(ConfigKey $key, mixed $value): void
     {
-        self::setMany([$key => $value]);
+        self::setMany([[$key, $value]]);
     }
 
     /**
-     * @param  array<string, mixed>  $values
+     * @param  list<array{ConfigKey, mixed}>  $values
      *
-     * @throws InvalidArgumentException
+     * @throws RuntimeException
      */
     public static function setMany(array $values): void
     {
         $data = self::load();
 
-        foreach ($values as $key => $value) {
-            self::assertKnown($key);
-
+        foreach ($values as [$key, $value]) {
             if (is_string($value)) {
                 $value = trim($value);
             }
 
             if ($value === null || $value === '') {
-                unset($data[$key]);
+                Arr::forget($data, $key->value);
             } else {
-                $data[$key] = $value;
+                data_set($data, $key->value, $value);
             }
         }
 
@@ -170,7 +122,7 @@ final class UserConfig
      */
     public static function isConfigured(): bool
     {
-        return array_all(array_keys(self::CREDENTIALS), fn ($key) => filled(self::get($key)));
+        return array_all(ConfigKey::credentials(), fn (ConfigKey $key) => filled(self::get($key)));
     }
 
     /**
@@ -179,16 +131,20 @@ final class UserConfig
      */
     public static function hasCredentials(): bool
     {
-        return array_all(self::CREDENTIALS, fn ($configKey) => filled(config($configKey)));
+        return array_all(ConfigKey::credentials(), fn (ConfigKey $key) => filled(config($key->value)));
     }
 
     /**
-     * @throws InvalidArgumentException
+     * The top-level sections the file may contain. Anything else is dropped on load,
+     * which clears settings left behind by an older key layout.
+     *
+     * @return array<string>
      */
-    private static function assertKnown(string $key): void
+    private static function sections(): array
     {
-        if (! in_array($key, self::KEYS, true)) {
-            throw new InvalidArgumentException("Unknown config key: {$key}");
-        }
+        return array_values(array_unique(array_map(
+            fn (ConfigKey $key): string => Str::before($key->value, '.'),
+            ConfigKey::cases()
+        )));
     }
 }

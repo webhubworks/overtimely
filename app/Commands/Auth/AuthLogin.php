@@ -2,6 +2,7 @@
 
 namespace App\Commands\Auth;
 
+use App\Enums\ConfigKey;
 use App\Services\TimelyAuthService;
 use App\Support\UserConfig;
 use LaravelZero\Framework\Commands\Command;
@@ -85,9 +86,9 @@ class AuthLogin extends Command
         }
 
         UserConfig::setMany([
-            UserConfig::CLIENT_ID => $clientId,
-            UserConfig::CLIENT_SECRET => $clientSecret,
-            UserConfig::REDIRECT_URI => $redirectUri,
+            [ConfigKey::ClientId, $clientId],
+            [ConfigKey::ClientSecret, $clientSecret],
+            [ConfigKey::RedirectUri, $redirectUri],
         ]);
 
         config()->set('timely.oauth.client_id', $clientId);

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ConfigKey;
 use App\Support\UserConfig;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Http;
@@ -40,8 +41,8 @@ it('fetches and stores the user id and account creation date', function () {
 
     $this->artisan('set:identity')->assertSuccessful();
 
-    expect(UserConfig::get(UserConfig::USER_ID))->toBe(42)
-        ->and(UserConfig::get(UserConfig::CREATED_AT))
+    expect(UserConfig::get(ConfigKey::UserId))->toBe(42)
+        ->and(UserConfig::get(ConfigKey::CreatedAt))
         ->toBe(CarbonImmutable::createFromTimestamp(1704067200)->format('Y-m-d'));
 });
 

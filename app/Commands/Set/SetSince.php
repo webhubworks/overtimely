@@ -2,6 +2,7 @@
 
 namespace App\Commands\Set;
 
+use App\Enums\ConfigKey;
 use App\Support\UserConfig;
 use Carbon\CarbonImmutable;
 use LaravelZero\Framework\Commands\Command;
@@ -46,7 +47,7 @@ class SetSince extends Command
             return self::FAILURE;
         }
 
-        UserConfig::set(UserConfig::SINCE, $date);
+        UserConfig::set(ConfigKey::Since, $date);
         config()->set('timely.since', $date);
 
         info("Default report start date set to {$date}.");

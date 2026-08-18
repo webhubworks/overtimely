@@ -2,6 +2,7 @@
 
 namespace App\Commands\Set;
 
+use App\Enums\ConfigKey;
 use App\Support\UserConfig;
 use LaravelZero\Framework\Commands\Command;
 
@@ -50,7 +51,7 @@ class SetTableStyle extends Command
 
         $style = $styleArg ?? select('Select a table style', self::STYLES);
 
-        UserConfig::set(UserConfig::TABLE_STYLE, $style);
+        UserConfig::set(ConfigKey::TableStyle, $style);
         config()->set('display.table_style', $style);
 
         info("Table style set to '{$style}'.");

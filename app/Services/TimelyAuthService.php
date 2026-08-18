@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\DataTransferObjects\OAuthTokenData;
+use App\Enums\ConfigKey;
 use App\Support\UserConfig;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
@@ -51,12 +52,12 @@ final readonly class TimelyAuthService
     public function persist(OAuthTokenData $token): void
     {
         $values = [
-            UserConfig::ACCESS_TOKEN => $token->accessToken,
-            UserConfig::TOKEN_EXPIRES_AT => $token->expiresAt(),
+            [ConfigKey::AccessToken, $token->accessToken],
+            [ConfigKey::TokenExpiresAt, $token->expiresAt()],
         ];
 
         if ($token->refreshToken !== null) {
-            $values[UserConfig::REFRESH_TOKEN] = $token->refreshToken;
+            $values[] = [ConfigKey::RefreshToken, $token->refreshToken];
         }
 
         UserConfig::setMany($values);
@@ -73,13 +74,13 @@ final readonly class TimelyAuthService
         $refreshToken = config('timely.refresh_token');
         $expiresAt = config('timely.token_expires_at');
 
-        $expired = $expiresAt !== null && now()->timestamp >= (int) $expiresAt - 60;
+        $expired = filled($expiresAt) && now()->timestamp >= (int) $expiresAt - 60;
 
-        if ($accessToken !== null && ! $expired) {
+        if (filled($accessToken) && ! $expired) {
             return $accessToken;
         }
 
-        if ($refreshToken === null) {
+        if (blank($refreshToken)) {
             throw new RuntimeException('Not authenticated with Timely. Run auth:login first.');
         }
 
