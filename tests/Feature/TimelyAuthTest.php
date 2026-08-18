@@ -147,3 +147,23 @@ it('returns the stored token when it never expires', function () {
 it('throws when no tokens are present', function () {
     app(TimelyAuthService::class)->validAccessToken();
 })->throws(RuntimeException::class);
+
+it('does not treat an empty expiry as an expired token', function () {
+    config()->set('timely.access_token', 'good');
+    config()->set('timely.refresh_token', 'rt');
+    config()->set('timely.token_expires_at', '');
+
+    Http::fake();
+
+    expect(app(TimelyAuthService::class)->validAccessToken())->toBe('good');
+
+    Http::assertNothingSent();
+});
+
+it('treats empty credentials as no tokens at all', function () {
+    config()->set('timely.access_token', '');
+    config()->set('timely.refresh_token', '');
+    config()->set('timely.token_expires_at', '');
+
+    app(TimelyAuthService::class)->validAccessToken();
+})->throws(RuntimeException::class, 'Not authenticated with Timely. Run auth:login first.');

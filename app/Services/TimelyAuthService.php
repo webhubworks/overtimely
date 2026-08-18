@@ -73,13 +73,13 @@ final readonly class TimelyAuthService
         $refreshToken = config('timely.refresh_token');
         $expiresAt = config('timely.token_expires_at');
 
-        $expired = $expiresAt !== null && now()->timestamp >= (int) $expiresAt - 60;
+        $expired = filled($expiresAt) && now()->timestamp >= (int) $expiresAt - 60;
 
-        if ($accessToken !== null && ! $expired) {
+        if (filled($accessToken) && ! $expired) {
             return $accessToken;
         }
 
-        if ($refreshToken === null) {
+        if (blank($refreshToken)) {
             throw new RuntimeException('Not authenticated with Timely. Run auth:login first.');
         }
 
