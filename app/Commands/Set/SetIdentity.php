@@ -2,6 +2,7 @@
 
 namespace App\Commands\Set;
 
+use App\Enums\ConfigKey;
 use App\Services\TimelyDataService;
 use App\Support\UserConfig;
 use LaravelZero\Framework\Commands\Command;
@@ -41,8 +42,8 @@ class SetIdentity extends Command
         $createdAt = $user->createdAt->format('Y-m-d');
 
         UserConfig::setMany([
-            UserConfig::USER_ID => $user->id,
-            UserConfig::CREATED_AT => $createdAt,
+            [ConfigKey::UserId, $user->id],
+            [ConfigKey::CreatedAt, $createdAt],
         ]);
 
         config()->set('timely.user_id', $user->id);

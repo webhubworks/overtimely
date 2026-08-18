@@ -2,6 +2,7 @@
 
 namespace App\Commands\Set;
 
+use App\Enums\ConfigKey;
 use App\Support\UserConfig;
 use LaravelZero\Framework\Commands\Command;
 
@@ -47,7 +48,7 @@ class SetAccountId extends Command
 
         $accountId = (int) $id;
 
-        UserConfig::set(UserConfig::ACCOUNT_ID, $accountId);
+        UserConfig::set(ConfigKey::AccountId, $accountId);
         config()->set('timely.account_id', $accountId);
 
         info("Account ID set to {$accountId}.");

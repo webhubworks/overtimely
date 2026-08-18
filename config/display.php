@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'table_style' => env('TABLE_STYLE', 'default'),
+    'table_style' => env('DISPLAY_TABLE_STYLE', 'default'),
 ];

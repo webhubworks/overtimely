@@ -1,6 +1,7 @@
 <?php
 
 use App\DataTransferObjects\OAuthTokenData;
+use App\Enums\ConfigKey;
 use App\Services\TimelyAuthService;
 use App\Support\UserConfig;
 use Illuminate\Support\Facades\Http;
@@ -79,7 +80,7 @@ it('exchanges an authorization code for tokens', function () {
 });
 
 it('persists tokens, keeping the existing refresh token when not rotated', function () {
-    UserConfig::set(UserConfig::REFRESH_TOKEN, 'old-refresh');
+    UserConfig::set(ConfigKey::RefreshToken, 'old-refresh');
 
     app(TimelyAuthService::class)->persist(new OAuthTokenData(
         accessToken: 'new-access',
@@ -90,9 +91,9 @@ it('persists tokens, keeping the existing refresh token when not rotated', funct
         tokenType: 'Bearer',
     ));
 
-    expect(UserConfig::get(UserConfig::ACCESS_TOKEN))->toBe('new-access')
-        ->and(UserConfig::get(UserConfig::REFRESH_TOKEN))->toBe('old-refresh')
-        ->and((int) UserConfig::get(UserConfig::TOKEN_EXPIRES_AT))->toBe(9200);
+    expect(UserConfig::get(ConfigKey::AccessToken))->toBe('new-access')
+        ->and(UserConfig::get(ConfigKey::RefreshToken))->toBe('old-refresh')
+        ->and((int) UserConfig::get(ConfigKey::TokenExpiresAt))->toBe(9200);
 });
 
 it('refreshes an expired access token and persists the result', function () {
@@ -115,8 +116,8 @@ it('refreshes an expired access token and persists the result', function () {
 
     expect($token)->toBe('fresh')
         ->and(config('timely.access_token'))->toBe('fresh')
-        ->and(UserConfig::get(UserConfig::ACCESS_TOKEN))->toBe('fresh')
-        ->and(UserConfig::get(UserConfig::REFRESH_TOKEN))->toBe('rt2');
+        ->and(UserConfig::get(ConfigKey::AccessToken))->toBe('fresh')
+        ->and(UserConfig::get(ConfigKey::RefreshToken))->toBe('rt2');
 
     Http::assertSent(fn ($request) => $request['grant_type'] === 'refresh_token' && $request['refresh_token'] === 'rt');
 });

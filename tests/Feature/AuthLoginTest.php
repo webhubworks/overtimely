@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ConfigKey;
 use App\Support\UserConfig;
 use Illuminate\Support\Facades\Http;
 
@@ -49,9 +50,9 @@ it('exchanges a pasted code and stores the tokens', function () {
 
     $this->artisan('auth:login', ['code' => 'code123'])->assertSuccessful();
 
-    expect(UserConfig::get(UserConfig::ACCESS_TOKEN))->toBe('at')
-        ->and(UserConfig::get(UserConfig::REFRESH_TOKEN))->toBe('rt')
-        ->and((int) UserConfig::get(UserConfig::TOKEN_EXPIRES_AT))->toBe(4600);
+    expect(UserConfig::get(ConfigKey::AccessToken))->toBe('at')
+        ->and(UserConfig::get(ConfigKey::RefreshToken))->toBe('rt')
+        ->and((int) UserConfig::get(ConfigKey::TokenExpiresAt))->toBe(4600);
 });
 
 it('fails non-interactively when the oauth app is not configured', function () {
