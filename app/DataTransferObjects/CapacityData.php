@@ -41,7 +41,11 @@ final class CapacityData extends Data
 
     private function hasDayInRange(CarbonImmutable $day): bool
     {
-        return $day->isBetween($this->startDate, $this->endDate ?? now()->startOfDay());
+        if ($day->lessThan($this->startDate)) {
+            return false;
+        }
+
+        return $this->endDate === null || $day->lessThanOrEqualTo($this->endDate);
     }
 
     private function hasDayAsWorkDay(CarbonImmutable $day): bool
