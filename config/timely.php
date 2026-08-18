@@ -13,9 +13,9 @@ return [
         'scope' => 'manage',
     ],
 
-    'access_token' => null,
-    'refresh_token' => null,
-    'token_expires_at' => null,
+    'access_token' => env('TIMELY_ACCESS_TOKEN'),
+    'refresh_token' => env('TIMELY_REFRESH_TOKEN'),
+    'token_expires_at' => env('TIMELY_TOKEN_EXPIRES_AT'),
 
     'account_id' => env('TIMELY_ACCOUNT_ID'),
     'user_id' => env('TIMELY_USER_ID'),
