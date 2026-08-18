@@ -12,6 +12,9 @@
             <directory>./tests/Unit</directory>
         </testsuite>
     </testsuites>
+    <php>
+        <env name="XDG_CONFIG_HOME" value="/tmp/overtimely-testing-config"/>
+    </php>
     <source>
         <include>
             <directory>./app</directory>

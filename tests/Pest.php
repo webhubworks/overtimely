@@ -5,6 +5,7 @@ use App\DataTransferObjects\DailyDurationData;
 use App\DataTransferObjects\DurationData;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 /*
@@ -19,6 +20,10 @@ use Tests\TestCase;
 */
 
 uses(TestCase::class)->in('Feature');
+
+beforeEach(function () {
+    Http::preventStrayRequests();
+})->in('Feature');
 
 /*
 |--------------------------------------------------------------------------
