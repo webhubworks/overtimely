@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Http;
 beforeEach(function () {
     putenv('XDG_CONFIG_HOME='.sys_get_temp_dir().'/overtimely-test-'.uniqid('', true));
 
-    config()->set('timely.account_id', '123');
-    config()->set('timely.access_token', 'at');
+    ConfigKey::AccountId->setConfigValue('123');
+    ConfigKey::AccessToken->setConfigValue('at');
 });
 
 afterEach(function () {
@@ -47,14 +47,14 @@ it('fetches and stores the user id and account creation date', function () {
 });
 
 it('fails when no account id is set', function () {
-    config()->set('timely.account_id', null);
+    ConfigKey::AccountId->setConfigValue(null);
 
     $this->artisan('set:identity')->assertFailed();
 });
 
 it('fails when not authenticated', function () {
-    config()->set('timely.access_token', null);
-    config()->set('timely.refresh_token', null);
+    ConfigKey::AccessToken->setConfigValue(null);
+    ConfigKey::RefreshToken->setConfigValue(null);
 
     $this->artisan('set:identity')->assertFailed();
 });

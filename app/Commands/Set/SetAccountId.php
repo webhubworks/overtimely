@@ -33,7 +33,7 @@ class SetAccountId extends Command
     {
         $id = $this->argument('id') ?? text(
             label: 'Timely account ID',
-            default: (string) config('timely.account_id'),
+            default: (string) ConfigKey::AccountId->getConfigValue(),
             required: true,
             validate: fn (string $value): ?string => ctype_digit($value)
                 ? null
@@ -49,7 +49,7 @@ class SetAccountId extends Command
         $accountId = (int) $id;
 
         UserConfig::set(ConfigKey::AccountId, $accountId);
-        config()->set('timely.account_id', $accountId);
+        ConfigKey::AccountId->setConfigValue($accountId);
 
         info("Account ID set to {$accountId}.");
         note('Config file: '.UserConfig::path());

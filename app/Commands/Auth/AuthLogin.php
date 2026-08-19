@@ -47,9 +47,9 @@ class AuthLogin extends Command
 
         $auth->persist($token);
 
-        config()->set('timely.access_token', $token->accessToken);
-        config()->set('timely.refresh_token', $token->refreshToken);
-        config()->set('timely.token_expires_at', $token->expiresAt());
+        ConfigKey::AccessToken->setConfigValue($token->accessToken);
+        ConfigKey::RefreshToken->setConfigValue($token->refreshToken);
+        ConfigKey::TokenExpiresAt->setConfigValue($token->expiresAt());
 
         info('Logged in to Timely.');
         note('Config file: '.UserConfig::path());
@@ -59,9 +59,9 @@ class AuthLogin extends Command
 
     private function ensureOAuthApp(): bool
     {
-        $clientId = config('timely.oauth.client_id');
-        $clientSecret = config('timely.oauth.client_secret');
-        $redirectUri = config('timely.oauth.redirect_uri');
+        $clientId = ConfigKey::OAuthClientId->getConfigValue();
+        $clientSecret = ConfigKey::OAuthClientSecret->getConfigValue();
+        $redirectUri = ConfigKey::OAuthRedirectUri->getConfigValue();
 
         if (blank($clientId) || blank($clientSecret) || blank($redirectUri)) {
             if (! $this->input->isInteractive()) {
@@ -84,14 +84,14 @@ class AuthLogin extends Command
         }
 
         UserConfig::setMany([
-            [ConfigKey::ClientId, $clientId],
-            [ConfigKey::ClientSecret, $clientSecret],
-            [ConfigKey::RedirectUri, $redirectUri],
+            [ConfigKey::OAuthClientId, $clientId],
+            [ConfigKey::OAuthClientSecret, $clientSecret],
+            [ConfigKey::OAuthRedirectUri, $redirectUri],
         ]);
 
-        config()->set('timely.oauth.client_id', $clientId);
-        config()->set('timely.oauth.client_secret', $clientSecret);
-        config()->set('timely.oauth.redirect_uri', $redirectUri);
+        ConfigKey::OAuthClientId->setConfigValue($clientId);
+        ConfigKey::OAuthClientSecret->setConfigValue($clientSecret);
+        ConfigKey::OAuthRedirectUri->setConfigValue($redirectUri);
 
         return true;
     }

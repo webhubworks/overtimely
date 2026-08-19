@@ -35,7 +35,7 @@ class SetSince extends Command
         $date = $this->argument('date') ?? text(
             label: 'Default report start date (Format: YYYY-MM-DD)',
             placeholder: now()->subYear()->format('Y-m-d'),
-            default: (string) config('timely.since'),
+            default: (string) ConfigKey::Since->getConfigValue(),
             validate: fn (string $value): ?string => CarbonImmutable::hasFormat($value, 'Y-m-d')
                 ? null
                 : 'Your input has the wrong date format. Please use YYYY-MM-DD.',
@@ -48,7 +48,7 @@ class SetSince extends Command
         }
 
         UserConfig::set(ConfigKey::Since, $date);
-        config()->set('timely.since', $date);
+        ConfigKey::Since->setConfigValue($date);
 
         info("Default report start date set to {$date}.");
         note('Config file: '.UserConfig::path());

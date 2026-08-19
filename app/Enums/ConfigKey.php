@@ -10,25 +10,25 @@ namespace App\Enums;
  */
 enum ConfigKey: string
 {
-    case AccessToken = 'timely.access_token';
+    case AccessToken = 'timely.tokens.access';
 
-    case RefreshToken = 'timely.refresh_token';
+    case RefreshToken = 'timely.tokens.refresh';
 
-    case TokenExpiresAt = 'timely.token_expires_at';
+    case TokenExpiresAt = 'timely.tokens.expires_at';
 
-    case ClientId = 'timely.oauth.client_id';
+    case OAuthClientId = 'timely.oauth.client_id';
 
-    case ClientSecret = 'timely.oauth.client_secret';
+    case OAuthClientSecret = 'timely.oauth.client_secret';
 
-    case RedirectUri = 'timely.oauth.redirect_uri';
+    case OAuthRedirectUri = 'timely.oauth.redirect_uri';
 
-    case AccountId = 'timely.account_id';
+    case AccountId = 'timely.account.id';
 
-    case UserId = 'timely.user_id';
+    case UserId = 'timely.user.id';
 
-    case CreatedAt = 'timely.created_at';
+    case CreatedAt = 'timely.user.created_at';
 
-    case Since = 'timely.since';
+    case Since = 'timely.report.since';
 
     case TableStyle = 'display.table_style';
 
@@ -38,6 +38,30 @@ enum ConfigKey: string
     public function envKey(): string
     {
         return strtoupper(str_replace('.', '_', $this->value));
+    }
+
+    /**
+     * The value of the environment variable that overrides this key.
+     */
+    public function envValue(mixed $default = null): mixed
+    {
+        return env($this->envKey(), $default);
+    }
+
+    /**
+     * The value this key currently holds in the config repository.
+     */
+    public function getConfigValue(mixed $default = null): mixed
+    {
+        return config($this->value, $default);
+    }
+
+    /**
+     * Overrides this key in the config repository for the rest of the run.
+     */
+    public function setConfigValue(mixed $value): void
+    {
+        config()->set($this->value, $value);
     }
 
     /**
@@ -51,8 +75,8 @@ enum ConfigKey: string
             self::RefreshToken,
             self::AccountId,
             self::UserId,
-            self::ClientId,
-            self::ClientSecret,
+            self::OAuthClientId,
+            self::OAuthClientSecret,
         ];
     }
 }

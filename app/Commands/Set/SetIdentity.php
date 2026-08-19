@@ -19,13 +19,13 @@ class SetIdentity extends Command
 
     public function handle(): int
     {
-        if (blank(config('timely.account_id'))) {
+        if (blank(ConfigKey::AccountId->getConfigValue())) {
             $this->error('No Timely account ID set. Run set:account-id first.');
 
             return self::FAILURE;
         }
 
-        if (blank(config('timely.access_token')) && blank(config('timely.refresh_token'))) {
+        if (blank(ConfigKey::AccessToken->getConfigValue()) && blank(ConfigKey::RefreshToken->getConfigValue())) {
             $this->error('Not authenticated with Timely. Run auth:login first.');
 
             return self::FAILURE;
@@ -46,8 +46,8 @@ class SetIdentity extends Command
             [ConfigKey::CreatedAt, $createdAt],
         ]);
 
-        config()->set('timely.user_id', $user->id);
-        config()->set('timely.created_at', $createdAt);
+        ConfigKey::UserId->setConfigValue($user->id);
+        ConfigKey::CreatedAt->setConfigValue($createdAt);
 
         info("Identified as Timely user {$user->id} (account created {$createdAt}).");
         note('Config file: '.UserConfig::path());

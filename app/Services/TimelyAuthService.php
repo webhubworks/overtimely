@@ -33,7 +33,7 @@ final readonly class TimelyAuthService
         return $this->requestToken([
             'grant_type' => 'authorization_code',
             'code' => $code,
-            'redirect_uri' => config('timely.oauth.redirect_uri'),
+            'redirect_uri' => ConfigKey::OAuthRedirectUri->getConfigValue(),
         ]);
     }
 
@@ -70,9 +70,9 @@ final readonly class TimelyAuthService
      */
     public function validAccessToken(): string
     {
-        $accessToken = config('timely.access_token');
-        $refreshToken = config('timely.refresh_token');
-        $expiresAt = config('timely.token_expires_at');
+        $accessToken = ConfigKey::AccessToken->getConfigValue();
+        $refreshToken = ConfigKey::RefreshToken->getConfigValue();
+        $expiresAt = ConfigKey::TokenExpiresAt->getConfigValue();
 
         $expired = filled($expiresAt) && now()->timestamp >= (int) $expiresAt - 60;
 
@@ -87,9 +87,9 @@ final readonly class TimelyAuthService
         $token = $this->refresh($refreshToken);
         $this->persist($token);
 
-        config()->set('timely.access_token', $token->accessToken);
-        config()->set('timely.refresh_token', $token->refreshToken ?? $refreshToken);
-        config()->set('timely.token_expires_at', $token->expiresAt());
+        ConfigKey::AccessToken->setConfigValue($token->accessToken);
+        ConfigKey::RefreshToken->setConfigValue($token->refreshToken ?? $refreshToken);
+        ConfigKey::TokenExpiresAt->setConfigValue($token->expiresAt());
 
         return $token->accessToken;
     }

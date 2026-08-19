@@ -4,6 +4,7 @@ namespace App\Commands\Get;
 
 use App\Concerns\EnsuresAuthentication;
 use App\DataTransferObjects\PeriodData;
+use App\Enums\ConfigKey;
 use App\Services\CapacityService;
 use App\Services\TimelyDataService;
 use Carbon\CarbonImmutable;
@@ -82,7 +83,7 @@ abstract class BaseGetCommand extends Command
         $since = $this->parsePeriodOption(
             $sinceOption,
             $this->option($sinceOption)
-                ?? config('timely.since')
+                ?? ConfigKey::Since->getConfigValue()
                 ?? $this->timely->getCreationDate()
         );
 

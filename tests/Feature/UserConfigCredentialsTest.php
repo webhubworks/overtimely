@@ -1,39 +1,32 @@
 <?php
 
+use App\Enums\ConfigKey;
 use App\Support\UserConfig;
 
 beforeEach(function () {
-    config()->set('timely.refresh_token', 'token');
-    config()->set('timely.account_id', 1);
-    config()->set('timely.user_id', 1);
-    config()->set('timely.oauth.client_id', 1);
-    config()->set('timely.oauth.client_secret', 'secret');
+    ConfigKey::RefreshToken->setConfigValue('token');
+    ConfigKey::AccountId->setConfigValue(1);
+    ConfigKey::UserId->setConfigValue(1);
+    ConfigKey::OAuthClientId->setConfigValue(1);
+    ConfigKey::OAuthClientSecret->setConfigValue('secret');
 });
+
+dataset('credentials', fn () => collect(ConfigKey::credentials())
+    ->mapWithKeys(fn (ConfigKey $key): array => [$key->name => $key])
+    ->all());
 
 it('detects required credentials', function () {
     expect(UserConfig::hasCredentials())->toBeTrue();
 });
 
-it('detects missing required credentials', function (string $missing) {
-    config()->set($missing, null);
+it('detects missing required credentials', function (ConfigKey $missing) {
+    $missing->setConfigValue(null);
 
     expect(UserConfig::hasCredentials())->toBeFalse();
-})->with([
-    'timely.refresh_token',
-    'timely.account_id',
-    'timely.user_id',
-    'timely.oauth.client_id',
-    'timely.oauth.client_secret',
-]);
+})->with('credentials');
 
-it('has no credentials when a value is an empty string', function (string $empty) {
-    config()->set($empty, null);
+it('has no credentials when a value is an empty string', function (ConfigKey $empty) {
+    $empty->setConfigValue('');
 
     expect(UserConfig::hasCredentials())->toBeFalse();
-})->with([
-    'timely.refresh_token',
-    'timely.account_id',
-    'timely.user_id',
-    'timely.oauth.client_id',
-    'timely.oauth.client_secret',
-]);
+})->with('credentials');

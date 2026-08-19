@@ -56,9 +56,9 @@ it('exchanges a pasted code and stores the tokens', function () {
 });
 
 it('fails non-interactively when the oauth app is not configured', function () {
-    config()->set('timely.oauth.client_id', null);
-    config()->set('timely.oauth.client_secret', null);
-    config()->set('timely.oauth.redirect_uri', null);
+    ConfigKey::OAuthClientId->setConfigValue(null);
+    ConfigKey::OAuthClientSecret->setConfigValue(null);
+    ConfigKey::OAuthRedirectUri->setConfigValue(null);
 
     $this->artisan('auth:login', ['code' => 'code123', '--no-interaction' => true])->assertFailed();
 });
@@ -77,7 +77,7 @@ it('persists the oauth application even when it came from the environment', func
 
     $this->artisan('auth:login', ['code' => 'code123'])->assertSuccessful();
 
-    expect(UserConfig::get(ConfigKey::ClientId))->toBe('cid')
-        ->and(UserConfig::get(ConfigKey::ClientSecret))->toBe('secret')
-        ->and(UserConfig::get(ConfigKey::RedirectUri))->toBe('urn:ietf:wg:oauth:2.0:oob');
+    expect(UserConfig::get(ConfigKey::OAuthClientId))->toBe('cid')
+        ->and(UserConfig::get(ConfigKey::OAuthClientSecret))->toBe('secret')
+        ->and(UserConfig::get(ConfigKey::OAuthRedirectUri))->toBe('urn:ietf:wg:oauth:2.0:oob');
 });

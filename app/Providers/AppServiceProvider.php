@@ -24,13 +24,13 @@ class AppServiceProvider extends ServiceProvider
     {
         foreach (ConfigKey::cases() as $key) {
             // An explicit environment variable should always win. So we let the config.php take precedence.
-            if (filled(env($key->envKey()))) {
+            if (filled($key->envValue())) {
                 continue;
             }
 
             $userConfigValue = UserConfig::get($key);
             if (filled($userConfigValue)) {
-                config()->set($key->value, $userConfigValue);
+                $key->setConfigValue($userConfigValue);
             }
         }
     }
@@ -41,29 +41,27 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(TimelyDataService::class, function () {
-            $config = config('timely');
-
-            $client = Http::baseUrl($config['base_url'])
+            $client = Http::baseUrl(config('timely.base_url'))
                 ->withToken(app(TimelyAuthService::class)->validAccessToken())
                 ->acceptJson()
-                ->timeout($config['timeout'])
+                ->timeout(config('timely.timeout'))
                 ->retry(3, 200)
                 ->throw();
 
             return new TimelyDataService(
                 $client,
                 $this->requireNumericId(
-                    $config['account_id'],
+                    ConfigKey::AccountId->getConfigValue(),
                     'No valid Timely account ID set. Run set:account-id first.'
                 ),
-                filled($config['user_id'])
+                filled(ConfigKey::UserId->getConfigValue())
                     ? $this->requireNumericId(
-                        $config['user_id'],
+                        ConfigKey::UserId->getConfigValue(),
                         'No valid Timely user ID set. Run set:identity first.'
                     )
                     : null,
-                filled($config['created_at'])
-                    ? CarbonImmutable::createFromFormat('!Y-m-d', $config['created_at'])
+                filled(ConfigKey::CreatedAt->getConfigValue())
+                    ? CarbonImmutable::createFromFormat('!Y-m-d', ConfigKey::CreatedAt->getConfigValue())
                     : null,
             );
         });

@@ -17,9 +17,9 @@ beforeEach(function () {
         'scope' => 'manage',
         'redirect_uri' => 'urn:ietf:wg:oauth:2.0:oob',
     ]);
-    config()->set('timely.access_token', null);
-    config()->set('timely.refresh_token', null);
-    config()->set('timely.token_expires_at', null);
+    ConfigKey::AccessToken->setConfigValue(null);
+    ConfigKey::RefreshToken->setConfigValue(null);
+    ConfigKey::TokenExpiresAt->setConfigValue(null);
 });
 
 afterEach(function () {
@@ -97,9 +97,9 @@ it('persists tokens, keeping the existing refresh token when not rotated', funct
 });
 
 it('refreshes an expired access token and persists the result', function () {
-    config()->set('timely.access_token', 'stale');
-    config()->set('timely.refresh_token', 'rt');
-    config()->set('timely.token_expires_at', 100);
+    ConfigKey::AccessToken->setConfigValue('stale');
+    ConfigKey::RefreshToken->setConfigValue('rt');
+    ConfigKey::TokenExpiresAt->setConfigValue(100);
 
     Http::fake([
         '*/oauth/token' => Http::response([
@@ -115,7 +115,7 @@ it('refreshes an expired access token and persists the result', function () {
     $token = app(TimelyAuthService::class)->validAccessToken();
 
     expect($token)->toBe('fresh')
-        ->and(config('timely.access_token'))->toBe('fresh')
+        ->and(ConfigKey::AccessToken->getConfigValue())->toBe('fresh')
         ->and(UserConfig::get(ConfigKey::AccessToken))->toBe('fresh')
         ->and(UserConfig::get(ConfigKey::RefreshToken))->toBe('rt2');
 
@@ -123,9 +123,9 @@ it('refreshes an expired access token and persists the result', function () {
 });
 
 it('returns the stored token while it is still valid', function () {
-    config()->set('timely.access_token', 'good');
-    config()->set('timely.refresh_token', 'rt');
-    config()->set('timely.token_expires_at', now()->timestamp + 100000);
+    ConfigKey::AccessToken->setConfigValue('good');
+    ConfigKey::RefreshToken->setConfigValue('rt');
+    ConfigKey::TokenExpiresAt->setConfigValue(now()->timestamp + 100000);
 
     Http::fake();
 
@@ -135,8 +135,8 @@ it('returns the stored token while it is still valid', function () {
 });
 
 it('returns the stored token when it never expires', function () {
-    config()->set('timely.access_token', 'forever');
-    config()->set('timely.token_expires_at', null);
+    ConfigKey::AccessToken->setConfigValue('forever');
+    ConfigKey::TokenExpiresAt->setConfigValue(null);
 
     Http::fake();
 
@@ -150,9 +150,9 @@ it('throws when no tokens are present', function () {
 })->throws(RuntimeException::class);
 
 it('does not treat an empty expiry as an expired token', function () {
-    config()->set('timely.access_token', 'good');
-    config()->set('timely.refresh_token', 'rt');
-    config()->set('timely.token_expires_at', '');
+    ConfigKey::AccessToken->setConfigValue('good');
+    ConfigKey::RefreshToken->setConfigValue('rt');
+    ConfigKey::TokenExpiresAt->setConfigValue('');
 
     Http::fake();
 
@@ -162,9 +162,9 @@ it('does not treat an empty expiry as an expired token', function () {
 });
 
 it('treats empty credentials as no tokens at all', function () {
-    config()->set('timely.access_token', '');
-    config()->set('timely.refresh_token', '');
-    config()->set('timely.token_expires_at', '');
+    ConfigKey::AccessToken->setConfigValue('');
+    ConfigKey::RefreshToken->setConfigValue('');
+    ConfigKey::TokenExpiresAt->setConfigValue('');
 
     app(TimelyAuthService::class)->validAccessToken();
 })->throws(RuntimeException::class, 'Not authenticated with Timely. Run auth:login first.');

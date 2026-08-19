@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\ConfigKey;
+
 return [
-    'table_style' => env('DISPLAY_TABLE_STYLE', 'default'),
+    'table_style' => ConfigKey::TableStyle->envValue('default'),
 ];

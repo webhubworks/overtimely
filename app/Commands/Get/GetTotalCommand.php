@@ -3,6 +3,7 @@
 namespace App\Commands\Get;
 
 use App\DataTransferObjects\BalanceData;
+use App\Enums\ConfigKey;
 use Illuminate\Http\Client\ConnectionException;
 
 class GetTotalCommand extends BaseGetCommand
@@ -60,7 +61,7 @@ class GetTotalCommand extends BaseGetCommand
                     $balance->balance->readable(true),
                 ],
             ],
-            config('display.table_style'),
+            ConfigKey::TableStyle->getConfigValue(),
         );
 
         return self::SUCCESS;

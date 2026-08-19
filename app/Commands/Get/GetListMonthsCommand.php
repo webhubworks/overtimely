@@ -5,6 +5,7 @@ namespace App\Commands\Get;
 use App\DataTransferObjects\BalanceData;
 use App\DataTransferObjects\PeriodBalanceData;
 use App\DataTransferObjects\PeriodData;
+use App\Enums\ConfigKey;
 use App\Services\LoggedHoursService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
@@ -67,7 +68,7 @@ class GetListMonthsCommand extends BaseGetCommand
                 'Overtime Balance',
             ],
             $this->buildMonthRows(),
-            config('display.table_style'),
+            ConfigKey::TableStyle->getConfigValue(),
             [
                 2 => $rightAlignment,
                 3 => $rightAlignment,

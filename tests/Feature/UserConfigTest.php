@@ -73,8 +73,8 @@ it('is configured only when every credential is present in the file', function (
     expect(UserConfig::isConfigured())->toBeFalse();
 
     UserConfig::setMany([
-        [ConfigKey::ClientId, 'cid'],
-        [ConfigKey::ClientSecret, 'secret'],
+        [ConfigKey::OAuthClientId, 'cid'],
+        [ConfigKey::OAuthClientSecret, 'secret'],
     ]);
 
     expect(UserConfig::isConfigured())->toBeTrue();
@@ -82,7 +82,7 @@ it('is configured only when every credential is present in the file', function (
 
 it('mirrors the config repository structure on disk', function () {
     UserConfig::setMany([
-        [ConfigKey::ClientId, 'abc'],
+        [ConfigKey::OAuthClientId, 'abc'],
         [ConfigKey::TableStyle, 'box'],
     ]);
 
