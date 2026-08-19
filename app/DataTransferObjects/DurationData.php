@@ -84,9 +84,8 @@ final class DurationData extends Data
             return '—';
         }
 
-        $plus = $prefixPositive ? '+' : '';
-        $hours = $this->totalSeconds < 0 ? $this->hours * -1 : $this->hours;
+        $sign = $this->totalSeconds < 0 ? '-' : ($prefixPositive ? '+' : '');
 
-        return sprintf("%{$plus}02dh %02dm", $hours, $this->minutes);
+        return $sign.sprintf('%02dh %02dm', $this->hours, $this->minutes);
     }
 }

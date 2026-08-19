@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `set:table-style` now pre-selects the table style currently in use.
 
 ### Fixed
+- Fixed negative durations below one hour being displayed as positive in table cells.
 - Fixed the previous calendar month being reported as the current one when the command ran on the 29th, 30th or 31st of a month (the former `get:total:last-month`). The same overflow affected year boundaries on leap days.
 
 ## 1.2.3 - 2026-08-18

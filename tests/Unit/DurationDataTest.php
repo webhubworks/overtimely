@@ -28,3 +28,27 @@ it('carries the sign for negative balances', function () {
         ->and($duration->totalSeconds)->toBe(-9000) // Sign in the totals
         ->and($duration->readable())->toBe('-2h 30m');
 });
+
+it('pads both components in the tabular format', function () {
+    expect(DurationData::fromTotalHours(8)->tabular())->toBe('08h 00m')
+        ->and(DurationData::fromTotalHours(0.4)->tabular())->toBe('00h 24m')
+        ->and(DurationData::fromTotalHours(145.7)->tabular())->toBe('145h 42m');
+});
+
+it('keeps the minus sign on sub-hour negative durations in the tabular format', function () {
+    $duration = DurationData::fromTotalHours(-32 / 60);
+
+    expect($duration->tabular())->toBe('-00h 32m')
+        ->and($duration->tabular(true))->toBe('-00h 32m');
+});
+
+it('signs the tabular format from the total, not from the hour component', function () {
+    expect(DurationData::fromTotalHours(-1.5)->tabular(true))->toBe('-01h 30m')
+        ->and(DurationData::fromTotalHours(8.75)->tabular(true))->toBe('+08h 45m')
+        ->and(DurationData::fromTotalHours(8.75)->tabular())->toBe('08h 45m');
+});
+
+it('renders a zero duration as a dash in both formats', function () {
+    expect(DurationData::fromTotalHours(0)->tabular(true))->toBe('—')
+        ->and(DurationData::fromTotalHours(0)->readable(true))->toBe('—');
+});
