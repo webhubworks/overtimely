@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `get:total:last-week` => `balance:total --period=last-week`
   - `get:total:this-month` => `balance:total --period=this-month`
   - `get:total:last-month` => `balance:total --period=last-month`
+- **BREAKING:** Renamed `set:identity` to `auth:whoami`.
 - **BREAKING:** Changed the structure of the config file. After the upgrade to `2.0.0` your existing config file cannot be understood by the app anymore. **Please make a copy of your current settings in the file** and delete the file. **After that you will need to run `app:setup` again** and enter your recorded settings accordingly so the config file gets recreated with the new structure.
 - `set:table-style` now pre-selects the table style currently in use.
 

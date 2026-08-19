@@ -57,7 +57,7 @@ class AppServiceProvider extends ServiceProvider
                 filled(ConfigKey::UserId->getConfigValue())
                     ? $this->requireNumericId(
                         ConfigKey::UserId->getConfigValue(),
-                        'No valid Timely user ID set. Run set:identity first.'
+                        'No valid Timely user ID set. Run auth:whoami first.'
                     )
                     : null,
                 filled(ConfigKey::CreatedAt->getConfigValue())

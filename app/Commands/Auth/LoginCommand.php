@@ -14,7 +14,7 @@ use function Laravel\Prompts\note;
 use function Laravel\Prompts\password;
 use function Laravel\Prompts\text;
 
-class AuthLogin extends Command
+class LoginCommand extends Command
 {
     use OpensExternally;
 

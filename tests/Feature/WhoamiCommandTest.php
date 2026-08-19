@@ -39,7 +39,7 @@ it('fetches and stores the user id and account creation date', function () {
         ]),
     ]);
 
-    $this->artisan('set:identity')->assertSuccessful();
+    $this->artisan('auth:whoami')->assertSuccessful();
 
     expect(UserConfig::get(ConfigKey::UserId))->toBe(42)
         ->and(UserConfig::get(ConfigKey::CreatedAt))
@@ -49,12 +49,12 @@ it('fetches and stores the user id and account creation date', function () {
 it('fails when no account id is set', function () {
     ConfigKey::AccountId->setConfigValue(null);
 
-    $this->artisan('set:identity')->assertFailed();
+    $this->artisan('auth:whoami')->assertFailed();
 });
 
 it('fails when not authenticated', function () {
     ConfigKey::AccessToken->setConfigValue(null);
     ConfigKey::RefreshToken->setConfigValue(null);
 
-    $this->artisan('set:identity')->assertFailed();
+    $this->artisan('auth:whoami')->assertFailed();
 });

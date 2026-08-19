@@ -22,17 +22,17 @@ class AppSetup extends Command
      *
      * @var string
      */
-    protected $description = 'Interactively configure this app by running every set:* command in turn.';
+    protected $description = 'Interactively configure this app by running each setup step in turn.';
 
     /**
-     * The set commands to run, in order.
+     * The setup steps to run, in order.
      *
      * @var list<string>
      */
     private const array SETUP_COMMANDS = [
         'auth:login',
         'set:account-id',
-        'set:identity',
+        'auth:whoami',
         'set:since',
         'set:table-style',
     ];

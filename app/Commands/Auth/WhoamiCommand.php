@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Commands\Set;
+namespace App\Commands\Auth;
 
 use App\Enums\ConfigKey;
 use App\Services\TimelyDataService;
@@ -11,9 +11,9 @@ use Throwable;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\note;
 
-class SetIdentity extends Command
+class WhoamiCommand extends Command
 {
-    protected $signature = 'set:identity';
+    protected $signature = 'auth:whoami';
 
     protected $description = 'Fetches and stores your Timely user ID and account creation date.';
 
