@@ -2,6 +2,7 @@
 
 namespace App\Commands\Auth;
 
+use App\Concerns\OpensExternally;
 use App\Enums\ConfigKey;
 use App\Services\TimelyAuthService;
 use App\Support\UserConfig;
@@ -15,6 +16,8 @@ use function Laravel\Prompts\text;
 
 class AuthLogin extends Command
 {
+    use OpensExternally;
+
     protected $signature = 'auth:login {code? : Authorization code from Timely. [non-interactive]}';
 
     protected $description = 'Authorizes the app with your Timely account via OAuth.';
@@ -32,7 +35,7 @@ class AuthLogin extends Command
 
             note('Open this URL in your browser, authorize the app, then copy the code Timely shows you:');
             $this->line($url);
-            $this->openInBrowser($url);
+            $this->openExternally($url);
 
             $code = text(label: 'Authorization code', required: true);
         }
@@ -94,16 +97,5 @@ class AuthLogin extends Command
         ConfigKey::OAuthRedirectUri->setConfigValue($redirectUri);
 
         return true;
-    }
-
-    private function openInBrowser(string $url): void
-    {
-        $command = match (PHP_OS_FAMILY) {
-            'Darwin' => 'open',
-            'Windows' => 'start ""',
-            default => 'xdg-open',
-        };
-
-        exec($command.' '.escapeshellarg($url).' > /dev/null 2>&1 &');
     }
 }
