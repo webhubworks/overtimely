@@ -63,26 +63,24 @@ class AuthLogin extends Command
         $clientSecret = config('timely.oauth.client_secret');
         $redirectUri = config('timely.oauth.redirect_uri');
 
-        if (filled($clientId) && filled($clientSecret) && filled($redirectUri)) {
-            return true;
-        }
+        if (blank($clientId) || blank($clientSecret) || blank($redirectUri)) {
+            if (! $this->input->isInteractive()) {
+                $this->error('OAuth application is not configured. Set TIMELY_OAUTH_CLIENT_ID, TIMELY_OAUTH_CLIENT_SECRET and TIMELY_OAUTH_REDIRECT_URI.');
 
-        if (! $this->input->isInteractive()) {
-            $this->error('OAuth application is not configured. Set TIMELY_OAUTH_CLIENT_ID, TIMELY_OAUTH_CLIENT_SECRET and TIMELY_OAUTH_REDIRECT_URI.');
+                return false;
+            }
 
-            return false;
-        }
+            if (blank($clientId)) {
+                $clientId = text(label: 'Timely OAuth client ID', required: true);
+            }
 
-        if (blank($clientId)) {
-            $clientId = text(label: 'Timely OAuth client ID', required: true);
-        }
+            if (blank($clientSecret)) {
+                $clientSecret = password(label: 'Timely OAuth client secret', required: true);
+            }
 
-        if (blank($clientSecret)) {
-            $clientSecret = password(label: 'Timely OAuth client secret', required: true);
-        }
-
-        if (blank($redirectUri)) {
-            $redirectUri = text(label: 'OAuth redirect URI', default: 'urn:ietf:wg:oauth:2.0:oob', required: true);
+            if (blank($redirectUri)) {
+                $redirectUri = text(label: 'OAuth redirect URI', default: 'urn:ietf:wg:oauth:2.0:oob', required: true);
+            }
         }
 
         UserConfig::setMany([

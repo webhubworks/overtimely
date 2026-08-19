@@ -62,3 +62,22 @@ it('fails non-interactively when the oauth app is not configured', function () {
 
     $this->artisan('auth:login', ['code' => 'code123', '--no-interaction' => true])->assertFailed();
 });
+
+it('persists the oauth application even when it came from the environment', function () {
+    Http::fake([
+        '*/oauth/token' => Http::response([
+            'access_token' => 'at',
+            'refresh_token' => 'rt',
+            'expires_in' => 3600,
+            'created_at' => 1000,
+            'scope' => 'manage',
+            'token_type' => 'Bearer',
+        ]),
+    ]);
+
+    $this->artisan('auth:login', ['code' => 'code123'])->assertSuccessful();
+
+    expect(UserConfig::get(ConfigKey::ClientId))->toBe('cid')
+        ->and(UserConfig::get(ConfigKey::ClientSecret))->toBe('secret')
+        ->and(UserConfig::get(ConfigKey::RedirectUri))->toBe('urn:ietf:wg:oauth:2.0:oob');
+});

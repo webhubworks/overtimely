@@ -61,13 +61,20 @@ it('writes many keys in a single call', function () {
         ->and(UserConfig::get(ConfigKey::UserId))->toBe('2');
 });
 
-it('is configured only when refresh token, account and user are set', function () {
+it('is configured only when every credential is present in the file', function () {
     expect(UserConfig::isConfigured())->toBeFalse();
 
     UserConfig::setMany([
         [ConfigKey::RefreshToken, 'tok'],
         [ConfigKey::AccountId, '1'],
         [ConfigKey::UserId, '2'],
+    ]);
+
+    expect(UserConfig::isConfigured())->toBeFalse();
+
+    UserConfig::setMany([
+        [ConfigKey::ClientId, 'cid'],
+        [ConfigKey::ClientSecret, 'secret'],
     ]);
 
     expect(UserConfig::isConfigured())->toBeTrue();

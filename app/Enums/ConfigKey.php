@@ -51,6 +51,8 @@ enum ConfigKey: string
             self::RefreshToken,
             self::AccountId,
             self::UserId,
+            self::ClientId,
+            self::ClientSecret,
         ];
     }
 }
