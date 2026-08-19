@@ -61,33 +61,27 @@ it('writes many keys in a single call', function () {
         ->and(UserConfig::get(ConfigKey::UserId))->toBe('2');
 });
 
-it('is configured only when every credential is present in the file', function () {
-    expect(UserConfig::isConfigured())->toBeFalse();
-
-    UserConfig::setMany([
-        [ConfigKey::RefreshToken, 'tok'],
-        [ConfigKey::AccountId, '1'],
-        [ConfigKey::UserId, '2'],
-    ]);
-
-    expect(UserConfig::isConfigured())->toBeFalse();
-
-    UserConfig::setMany([
-        [ConfigKey::OAuthClientId, 'cid'],
-        [ConfigKey::OAuthClientSecret, 'secret'],
-    ]);
-
-    expect(UserConfig::isConfigured())->toBeTrue();
-});
-
 it('mirrors the config repository structure on disk', function () {
     UserConfig::setMany([
         [ConfigKey::OAuthClientId, 'abc'],
+        [ConfigKey::AccessToken, 'at'],
+        [ConfigKey::RefreshToken, 'rt'],
+        [ConfigKey::TokenExpiresAt, 4600],
+        [ConfigKey::AccountId, 123],
+        [ConfigKey::UserId, 42],
+        [ConfigKey::CreatedAt, '2024-01-01'],
+        [ConfigKey::Since, '2025-01-01'],
         [ConfigKey::TableStyle, 'box'],
     ]);
 
     expect(json_decode(file_get_contents(UserConfig::path()), true))->toBe([
-        'timely' => ['oauth' => ['client_id' => 'abc']],
+        'timely' => [
+            'oauth' => ['client_id' => 'abc'],
+            'tokens' => ['access' => 'at', 'refresh' => 'rt', 'expires_at' => 4600],
+            'account' => ['id' => 123],
+            'user' => ['id' => 42, 'created_at' => '2024-01-01'],
+            'report' => ['since' => '2025-01-01'],
+        ],
         'display' => ['table_style' => 'box'],
     ]);
 });
