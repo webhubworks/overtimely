@@ -7,8 +7,6 @@ use App\Support\UserConfig;
 use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
-    putenv('XDG_CONFIG_HOME='.sys_get_temp_dir().'/overtimely-test-'.uniqid('', true));
-
     config()->set('timely.oauth', [
         'authorize_url' => 'https://timely.test/oauth/authorize',
         'token_url' => 'https://timely.test/oauth/token',
@@ -20,25 +18,6 @@ beforeEach(function () {
     ConfigKey::AccessToken->setConfigValue(null);
     ConfigKey::RefreshToken->setConfigValue(null);
     ConfigKey::TokenExpiresAt->setConfigValue(null);
-});
-
-afterEach(function () {
-    $file = UserConfig::path();
-    if (is_file($file)) {
-        unlink($file);
-    }
-
-    $dir = dirname($file);
-    if (is_dir($dir)) {
-        rmdir($dir);
-    }
-
-    $home = getenv('XDG_CONFIG_HOME');
-    if (is_string($home) && is_dir($home)) {
-        rmdir($home);
-    }
-
-    putenv('XDG_CONFIG_HOME');
 });
 
 it('builds the authorize url from config', function () {

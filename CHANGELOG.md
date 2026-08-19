@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 2.0.0 - 2026-08-20
 ### Added
 - Added the `-p|--period` option to every `balance:*` command. It takes one of `this-week`, `last-week`, `this-month`, `last-month`, `this-year`, `last-year` and cannot be combined with `--since`/`--until`. Presets are now available on the list commands as well, so `balance:weekly --period=last-month` works.
+- Added the `config:list` command. It lists every setting with its current value and whether that value comes from the environment, the config file or a built-in default. Secrets are masked.
+- Added the `config:get <setting>` command, which prints a single value.
 
 ### Changed
 - **BREAKING:** Renamed the report commands to a consistent `<subject>:<action>` scheme:
@@ -20,8 +22,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `get:total:this-month` => `balance:total --period=this-month`
   - `get:total:last-month` => `balance:total --period=last-month`
 - **BREAKING:** Renamed `set:identity` to `auth:whoami`.
-- **BREAKING:** Changed the structure of the config file. After the upgrade to `2.0.0` your existing config file cannot be understood by the app anymore. **Please make a copy of your current settings in the file** and delete the file. **After that you will need to run `app:setup` again** and enter your recorded settings accordingly so the config file gets recreated with the new structure.
-- `set:table-style` now pre-selects the table style currently in use.
+- **BREAKING:** Renamed `app:setup` to `config:setup`.
+- **BREAKING:** Replaced the three `set:*` commands with a single `config:set <setting> [value]`:
+  - `set:account-id 123` => `config:set account-id 123`
+  - `set:since 2025-01-01` => `config:set since 2025-01-01`
+  - `set:table-style box` => `config:set table-style box`
+
+  Run `config:set` without arguments to pick a setting from a list. The setting names are the ones `config:list` prints.
+- **BREAKING:** Changed the structure of the config file. After the upgrade to `2.0.0` your existing config file cannot be understood by the app anymore. **Please make a copy of your current settings in the file** and delete the file. **After that you will need to run `config:setup` again** and enter your recorded settings accordingly so the config file gets recreated with the new structure.
+- `config:set table-style` now pre-selects the table style currently in use.
 
 ### Fixed
 - Fixed negative durations below one hour being displayed as positive in table cells.

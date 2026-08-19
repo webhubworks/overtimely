@@ -2,6 +2,8 @@
 
 namespace App\Enums;
 
+use Illuminate\Support\Str;
+
 /**
  * Every setting this app persists, named by the entry it occupies in Laravel's config repository.
  *
@@ -16,21 +18,67 @@ enum ConfigKey: string
 
     case TokenExpiresAt = 'timely.tokens.expires_at';
 
-    case OAuthClientId = 'timely.oauth.client_id';
+    case ClientId = 'timely.oauth.client_id';
 
-    case OAuthClientSecret = 'timely.oauth.client_secret';
+    case ClientSecret = 'timely.oauth.client_secret';
 
-    case OAuthRedirectUri = 'timely.oauth.redirect_uri';
+    case RedirectUri = 'timely.oauth.redirect_uri';
 
     case AccountId = 'timely.account.id';
 
     case UserId = 'timely.user.id';
 
-    case CreatedAt = 'timely.user.created_at';
+    case UserCreatedAt = 'timely.user.created_at';
 
     case Since = 'timely.report.since';
 
     case TableStyle = 'display.table_style';
+
+    /**
+     * The name this key goes by on the command line, e.g. `config:set account-id`.
+     */
+    public function settingName(): string
+    {
+        return Str::kebab($this->name);
+    }
+
+    /**
+     * The human-readable name used in prompts and confirmations.
+     */
+    public function label(): string
+    {
+        return match ($this) {
+            self::AccessToken => 'Access token',
+            self::RefreshToken => 'Refresh token',
+            self::TokenExpiresAt => 'Token expiry',
+            self::ClientId => 'Timely OAuth client ID',
+            self::ClientSecret => 'Timely OAuth client secret',
+            self::RedirectUri => 'OAuth redirect URI',
+            self::AccountId => 'Timely account ID',
+            self::UserId => 'Timely user ID',
+            self::UserCreatedAt => 'Timely account creation date',
+            self::Since => 'Default report start date',
+            self::TableStyle => 'Table style',
+        };
+    }
+
+    /**
+     * Whether the value must be masked when it is listed.
+     */
+    public function isSecret(): bool
+    {
+        return in_array($this, self::secrets(), true);
+    }
+
+    public function isSettable(): bool
+    {
+        return in_array($this, self::settable(), true);
+    }
+
+    public static function fromSettingName(string $name): ?self
+    {
+        return array_find(self::cases(), fn (self $key): bool => $key->settingName() === $name);
+    }
 
     /**
      * The name of the environment variable that overrides the user config value.
@@ -75,8 +123,31 @@ enum ConfigKey: string
             self::RefreshToken,
             self::AccountId,
             self::UserId,
-            self::OAuthClientId,
-            self::OAuthClientSecret,
+            self::ClientId,
+            self::ClientSecret,
+        ];
+    }
+
+    /**
+     * The keys a user sets by hand. Everything else is written by the app itself.
+     *
+     * @return array<self>
+     */
+    public static function settable(): array
+    {
+        return [
+            self::AccountId,
+            self::Since,
+            self::TableStyle,
+        ];
+    }
+
+    public static function secrets(): array
+    {
+        return [
+            self::AccessToken,
+            self::RefreshToken,
+            self::ClientSecret,
         ];
     }
 }

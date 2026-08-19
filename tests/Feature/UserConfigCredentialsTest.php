@@ -7,8 +7,8 @@ beforeEach(function () {
     ConfigKey::RefreshToken->setConfigValue('token');
     ConfigKey::AccountId->setConfigValue(1);
     ConfigKey::UserId->setConfigValue(1);
-    ConfigKey::OAuthClientId->setConfigValue(1);
-    ConfigKey::OAuthClientSecret->setConfigValue('secret');
+    ConfigKey::ClientId->setConfigValue(1);
+    ConfigKey::ClientSecret->setConfigValue('secret');
 });
 
 dataset('credentials', fn () => collect(ConfigKey::credentials())

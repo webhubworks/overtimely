@@ -33,7 +33,7 @@ final readonly class TimelyAuthService
         return $this->requestToken([
             'grant_type' => 'authorization_code',
             'code' => $code,
-            'redirect_uri' => ConfigKey::OAuthRedirectUri->getConfigValue(),
+            'redirect_uri' => ConfigKey::RedirectUri->getConfigValue(),
         ]);
     }
 

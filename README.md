@@ -29,7 +29,7 @@ You'll need the following from them to use this tool:
 
 Once you've received these details, run the following command and follow the instructions:
 ```shell
-overtimely app:setup
+overtimely config:setup
 ```
 
 ## Usage
@@ -45,7 +45,7 @@ To run the app locally, you have to prefix it with PHP while in the project dire
 php overtimely
 ```
 
-You can use an `.env` file to set/override the user configuration values which are set by the `app:setup` and `set:*` commands. Have a look at the `.env.example` file to see the available environment variables.
+You can use an `.env` file to set/override the user configuration values which are set by the `config:setup` and `config:set` commands. Have a look at the `.env.example` file to see the available environment variables.
 
 ### Releasing a build
 

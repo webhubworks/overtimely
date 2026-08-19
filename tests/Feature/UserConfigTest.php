@@ -3,29 +3,6 @@
 use App\Enums\ConfigKey;
 use App\Support\UserConfig;
 
-beforeEach(function () {
-    putenv('XDG_CONFIG_HOME='.sys_get_temp_dir().'/overtimely-test-'.uniqid('', true));
-});
-
-afterEach(function () {
-    $file = UserConfig::path();
-    if (is_file($file)) {
-        unlink($file);
-    }
-
-    $dir = dirname($file);
-    if (is_dir($dir)) {
-        rmdir($dir);
-    }
-
-    $home = getenv('XDG_CONFIG_HOME');
-    if (is_string($home) && is_dir($home)) {
-        rmdir($home);
-    }
-
-    putenv('XDG_CONFIG_HOME');
-});
-
 it('round-trips a value through set and get', function () {
     UserConfig::set(ConfigKey::AccountId, '123');
 
@@ -63,13 +40,13 @@ it('writes many keys in a single call', function () {
 
 it('mirrors the config repository structure on disk', function () {
     UserConfig::setMany([
-        [ConfigKey::OAuthClientId, 'abc'],
+        [ConfigKey::ClientId, 'abc'],
         [ConfigKey::AccessToken, 'at'],
         [ConfigKey::RefreshToken, 'rt'],
         [ConfigKey::TokenExpiresAt, 4600],
         [ConfigKey::AccountId, 123],
         [ConfigKey::UserId, 42],
-        [ConfigKey::CreatedAt, '2024-01-01'],
+        [ConfigKey::UserCreatedAt, '2024-01-01'],
         [ConfigKey::Since, '2025-01-01'],
         [ConfigKey::TableStyle, 'box'],
     ]);

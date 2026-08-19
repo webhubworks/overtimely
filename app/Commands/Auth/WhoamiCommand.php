@@ -20,7 +20,7 @@ class WhoamiCommand extends Command
     public function handle(): int
     {
         if (blank(ConfigKey::AccountId->getConfigValue())) {
-            $this->error('No Timely account ID set. Run set:account-id first.');
+            $this->error('No Timely account ID set. Run config:set account-id first.');
 
             return self::FAILURE;
         }
@@ -43,11 +43,11 @@ class WhoamiCommand extends Command
 
         UserConfig::setMany([
             [ConfigKey::UserId, $user->id],
-            [ConfigKey::CreatedAt, $createdAt],
+            [ConfigKey::UserCreatedAt, $createdAt],
         ]);
 
         ConfigKey::UserId->setConfigValue($user->id);
-        ConfigKey::CreatedAt->setConfigValue($createdAt);
+        ConfigKey::UserCreatedAt->setConfigValue($createdAt);
 
         info("Identified as Timely user {$user->id} (account created {$createdAt}).");
         note('Config file: '.UserConfig::path());

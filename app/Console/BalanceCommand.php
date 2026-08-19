@@ -72,7 +72,7 @@ abstract class BalanceCommand extends Command
         $presets = implode(', ', ReportPeriod::values());
 
         return implode(' ', [
-            '{--s|since= : Start of the fetched report period. Defaults to the date your Timely account was created. A persistent custom default can be set using the set:since command.}',
+            '{--s|since= : Start of the fetched report period. Defaults to the date your Timely account was created. A persistent custom default can be set with config:set since.}',
             '{--u|until= : End of the fetched report period. Defaults to yesterday if omitted.}',
             "{--p|period= : A preset report period, used instead of --since and --until. One of $presets. The this-* presets run up to today, so hours you have not logged yet count towards minus hours.}",
         ]);

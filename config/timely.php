@@ -9,9 +9,9 @@ return [
     'oauth' => [
         'authorize_url' => env('TIMELY_OAUTH_AUTHORIZE_URL', 'https://api.timelyapp.com/1.1/oauth/authorize'),
         'token_url' => env('TIMELY_OAUTH_TOKEN_URL', 'https://api.timelyapp.com/1.1/oauth/token'),
-        'client_id' => ConfigKey::OAuthClientId->envValue(),
-        'client_secret' => ConfigKey::OAuthClientSecret->envValue(),
-        'redirect_uri' => ConfigKey::OAuthRedirectUri->envValue('urn:ietf:wg:oauth:2.0:oob'),
+        'client_id' => ConfigKey::ClientId->envValue(),
+        'client_secret' => ConfigKey::ClientSecret->envValue(),
+        'redirect_uri' => ConfigKey::RedirectUri->envValue('urn:ietf:wg:oauth:2.0:oob'),
         'scope' => 'manage',
     ],
 
@@ -27,7 +27,7 @@ return [
 
     'user' => [
         'id' => ConfigKey::UserId->envValue(),
-        'created_at' => ConfigKey::CreatedAt->envValue(),
+        'created_at' => ConfigKey::UserCreatedAt->envValue(),
     ],
 
     'report' => [

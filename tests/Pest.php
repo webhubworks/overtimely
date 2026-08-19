@@ -3,6 +3,8 @@
 use App\DataTransferObjects\CapacityData;
 use App\DataTransferObjects\DailyDurationData;
 use App\DataTransferObjects\DurationData;
+use App\Enums\ConfigKey;
+use App\Support\UserConfig;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
@@ -19,11 +21,34 @@ use Tests\TestCase;
 |
 */
 
-uses(TestCase::class)->in('Feature');
+uses(TestCase::class)
+    ->beforeEach(function () {
+        Http::preventStrayRequests();
 
-beforeEach(function () {
-    Http::preventStrayRequests();
-})->in('Feature');
+        putenv('XDG_CONFIG_HOME='.sys_get_temp_dir().'/overtimely-test-'.uniqid('', true));
+    })
+    ->afterEach(function () {
+        $file = UserConfig::path();
+
+        if (is_file($file)) {
+            unlink($file);
+        }
+
+        $dir = dirname($file);
+
+        if (is_dir($dir)) {
+            rmdir($dir);
+        }
+
+        $home = getenv('XDG_CONFIG_HOME');
+
+        if (is_string($home) && is_dir($home)) {
+            rmdir($home);
+        }
+
+        putenv('XDG_CONFIG_HOME');
+    })
+    ->in('Feature');
 
 /*
 |--------------------------------------------------------------------------
@@ -90,4 +115,18 @@ function makeDailyLoggedHours(array $hoursByDay): Collection
                 duration: DurationData::fromTotalHours($hours),
             );
         });
+}
+
+/**
+ * Drops a setting's environment variable and its already-booted config value, so a test
+ * can assert on what the user config file holds instead of on the developer's own .env.
+ */
+function forgetSetting(ConfigKey ...$keys): void
+{
+    foreach ($keys as $key) {
+        putenv($key->envKey());
+        unset($_ENV[$key->envKey()], $_SERVER[$key->envKey()]);
+
+        $key->setConfigValue(null);
+    }
 }

@@ -62,9 +62,9 @@ class LoginCommand extends Command
 
     private function ensureOAuthApp(): bool
     {
-        $clientId = ConfigKey::OAuthClientId->getConfigValue();
-        $clientSecret = ConfigKey::OAuthClientSecret->getConfigValue();
-        $redirectUri = ConfigKey::OAuthRedirectUri->getConfigValue();
+        $clientId = ConfigKey::ClientId->getConfigValue();
+        $clientSecret = ConfigKey::ClientSecret->getConfigValue();
+        $redirectUri = ConfigKey::RedirectUri->getConfigValue();
 
         if (blank($clientId) || blank($clientSecret) || blank($redirectUri)) {
             if (! $this->input->isInteractive()) {
@@ -87,14 +87,14 @@ class LoginCommand extends Command
         }
 
         UserConfig::setMany([
-            [ConfigKey::OAuthClientId, $clientId],
-            [ConfigKey::OAuthClientSecret, $clientSecret],
-            [ConfigKey::OAuthRedirectUri, $redirectUri],
+            [ConfigKey::ClientId, $clientId],
+            [ConfigKey::ClientSecret, $clientSecret],
+            [ConfigKey::RedirectUri, $redirectUri],
         ]);
 
-        ConfigKey::OAuthClientId->setConfigValue($clientId);
-        ConfigKey::OAuthClientSecret->setConfigValue($clientSecret);
-        ConfigKey::OAuthRedirectUri->setConfigValue($redirectUri);
+        ConfigKey::ClientId->setConfigValue($clientId);
+        ConfigKey::ClientSecret->setConfigValue($clientSecret);
+        ConfigKey::RedirectUri->setConfigValue($redirectUri);
 
         return true;
     }

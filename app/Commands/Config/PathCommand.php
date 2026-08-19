@@ -1,32 +1,19 @@
 <?php
 
-namespace App\Commands;
+namespace App\Commands\Config;
 
 use App\Concerns\OpensExternally;
 use App\Support\UserConfig;
 use LaravelZero\Framework\Commands\Command;
 
-class ConfigPath extends Command
+class PathCommand extends Command
 {
     use OpensExternally;
 
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'config:path {--o|open : Open the file with your default application.}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Prints the path to your user config file.';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): int
     {
         $path = UserConfig::path();
@@ -35,7 +22,7 @@ class ConfigPath extends Command
 
         if (! UserConfig::exists()) {
             $this->newLine();
-            $this->warn('That file does not exist yet. Run app:setup to create it.');
+            $this->warn('That file does not exist yet. Run config:setup to create it.');
 
             return self::SUCCESS;
         }

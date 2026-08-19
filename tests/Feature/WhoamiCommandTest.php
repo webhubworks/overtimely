@@ -6,29 +6,8 @@ use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
-    putenv('XDG_CONFIG_HOME='.sys_get_temp_dir().'/overtimely-test-'.uniqid('', true));
-
     ConfigKey::AccountId->setConfigValue('123');
     ConfigKey::AccessToken->setConfigValue('at');
-});
-
-afterEach(function () {
-    $file = UserConfig::path();
-    if (is_file($file)) {
-        unlink($file);
-    }
-
-    $dir = dirname($file);
-    if (is_dir($dir)) {
-        rmdir($dir);
-    }
-
-    $home = getenv('XDG_CONFIG_HOME');
-    if (is_string($home) && is_dir($home)) {
-        rmdir($home);
-    }
-
-    putenv('XDG_CONFIG_HOME');
 });
 
 it('fetches and stores the user id and account creation date', function () {
@@ -42,7 +21,7 @@ it('fetches and stores the user id and account creation date', function () {
     $this->artisan('auth:whoami')->assertSuccessful();
 
     expect(UserConfig::get(ConfigKey::UserId))->toBe(42)
-        ->and(UserConfig::get(ConfigKey::CreatedAt))
+        ->and(UserConfig::get(ConfigKey::UserCreatedAt))
         ->toBe(CarbonImmutable::createFromTimestamp(1704067200)->format('Y-m-d'));
 });
 

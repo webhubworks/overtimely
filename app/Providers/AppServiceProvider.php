@@ -52,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
                 $client,
                 $this->requireNumericId(
                     ConfigKey::AccountId->getConfigValue(),
-                    'No valid Timely account ID set. Run set:account-id first.'
+                    'No valid Timely account ID set. Run config:set account-id first.'
                 ),
                 filled(ConfigKey::UserId->getConfigValue())
                     ? $this->requireNumericId(
@@ -60,8 +60,8 @@ class AppServiceProvider extends ServiceProvider
                         'No valid Timely user ID set. Run auth:whoami first.'
                     )
                     : null,
-                filled(ConfigKey::CreatedAt->getConfigValue())
-                    ? CarbonImmutable::createFromFormat('!Y-m-d', ConfigKey::CreatedAt->getConfigValue())
+                filled(ConfigKey::UserCreatedAt->getConfigValue())
+                    ? CarbonImmutable::createFromFormat('!Y-m-d', ConfigKey::UserCreatedAt->getConfigValue())
                     : null,
             );
         });
