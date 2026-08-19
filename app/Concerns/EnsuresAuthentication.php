@@ -12,7 +12,7 @@ trait EnsuresAuthentication
 {
     protected function isAuthenticated(): bool
     {
-        if (UserConfig::hasCredentials()) {
+        if (UserConfig::isConfigured()) {
             return true;
         }
 
@@ -25,7 +25,7 @@ trait EnsuresAuthentication
         $this->warn('The app is not yet configured. Running app:setup first ...');
         $this->call('app:setup');
 
-        if (! UserConfig::isConfigured() || ! UserConfig::hasCredentials()) {
+        if (! UserConfig::isConfigured()) {
             $this->error("Command execution aborted because the setup wasn't successful. Please run app:setup again.");
 
             return false;

@@ -118,20 +118,12 @@ final class UserConfig
     }
 
     /**
-     * Whether the user config file holds a complete set of credentials.
+     * Whether every credential the app needs to reach the Timely API is present,
+     * regardless of whether it came from the environment or from the user config file.
      */
     public static function isConfigured(): bool
     {
-        return array_all(ConfigKey::credentials(), fn (ConfigKey $key) => filled(self::get($key)));
-    }
-
-    /**
-     * Whether the necessary credentials are present in the effective configuration,
-     * regardless of whether they come from the environment or from the user config file.
-     */
-    public static function hasCredentials(): bool
-    {
-        return array_all(ConfigKey::credentials(), fn (ConfigKey $key) => filled(config($key->value)));
+        return array_all(ConfigKey::credentials(), fn (ConfigKey $key) => filled($key->getConfigValue()));
     }
 
     /**

@@ -16,17 +16,17 @@ dataset('credentials', fn () => collect(ConfigKey::credentials())
     ->all());
 
 it('detects required credentials', function () {
-    expect(UserConfig::hasCredentials())->toBeTrue();
+    expect(UserConfig::isConfigured())->toBeTrue();
 });
 
 it('detects missing required credentials', function (ConfigKey $missing) {
     $missing->setConfigValue(null);
 
-    expect(UserConfig::hasCredentials())->toBeFalse();
+    expect(UserConfig::isConfigured())->toBeFalse();
 })->with('credentials');
 
-it('has no credentials when a value is an empty string', function (ConfigKey $empty) {
+it('detects missing required credentials when their values are empty strings', function (ConfigKey $empty) {
     $empty->setConfigValue('');
 
-    expect(UserConfig::hasCredentials())->toBeFalse();
+    expect(UserConfig::isConfigured())->toBeFalse();
 })->with('credentials');
