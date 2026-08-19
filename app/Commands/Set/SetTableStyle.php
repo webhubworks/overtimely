@@ -26,7 +26,7 @@ class SetTableStyle extends Command
      */
     protected $description = 'Sets your preferred table border style for the output.';
 
-    const array STYLES = [
+    const array TABLE_STYLES = [
         'default',
         'compact',
         'markdown',
@@ -43,16 +43,20 @@ class SetTableStyle extends Command
     {
         $styleArg = $this->argument('style');
 
-        if ($styleArg !== null && ! in_array($styleArg, self::STYLES, true)) {
-            $this->error("Unknown table style '{$styleArg}'. Choose one of: ".implode(', ', self::STYLES));
+        if ($styleArg !== null && ! in_array($styleArg, self::TABLE_STYLES, true)) {
+            $this->error("Unknown table style '{$styleArg}'. Choose one of: ".implode(', ', self::TABLE_STYLES));
 
             return self::FAILURE;
         }
 
-        $style = $styleArg ?? select('Select a table style', self::STYLES);
+        $style = $styleArg ?? select(
+            label: 'Select a table style',
+            options: self::TABLE_STYLES,
+            default: config(ConfigKey::TableStyle->value),
+        );
 
         UserConfig::set(ConfigKey::TableStyle, $style);
-        config()->set('display.table_style', $style);
+        config()->set(ConfigKey::TableStyle->value, $style);
 
         info("Table style set to '{$style}'.");
         note('Config file: '.UserConfig::path());
