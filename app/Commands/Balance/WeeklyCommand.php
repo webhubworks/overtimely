@@ -1,25 +1,22 @@
 <?php
 
-namespace App\Commands\Get;
+namespace App\Commands\Balance;
 
+use App\Console\BalanceCommand;
 use App\DataTransferObjects\BalanceData;
 use App\DataTransferObjects\PeriodBalanceData;
 use App\DataTransferObjects\PeriodData;
 use App\Enums\ConfigKey;
 use App\Services\LoggedHoursService;
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Helper\TableStyle;
 
-class GetListWeeksCommand extends BaseGetCommand
+class WeeklyCommand extends BalanceCommand
 {
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
+    protected $signature = 'balance:weekly';
+
     protected $description = 'Lists all calendar weeks with a non-zero overtime balance in the given period with their individual logged hours, expected hours and overtime balance.';
 
     /**
@@ -27,19 +24,7 @@ class GetListWeeksCommand extends BaseGetCommand
      */
     private Collection $weeks;
 
-    public function __construct()
-    {
-        $this->signature = 'get:list:weeks '.implode(' ', $this->periodOptions);
-
-        parent::__construct();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws ConnectionException
-     */
-    protected function get(): int
+    protected function report(): int
     {
         $this->line('Fetching your logged hours ...');
         $loggedHours = LoggedHoursService::fromDailyDurations(

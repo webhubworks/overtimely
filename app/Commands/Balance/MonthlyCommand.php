@@ -1,25 +1,22 @@
 <?php
 
-namespace App\Commands\Get;
+namespace App\Commands\Balance;
 
+use App\Console\BalanceCommand;
 use App\DataTransferObjects\BalanceData;
 use App\DataTransferObjects\PeriodBalanceData;
 use App\DataTransferObjects\PeriodData;
 use App\Enums\ConfigKey;
 use App\Services\LoggedHoursService;
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Helper\TableStyle;
 
-class GetListMonthsCommand extends BaseGetCommand
+class MonthlyCommand extends BalanceCommand
 {
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
+    protected $signature = 'balance:monthly';
+
     protected $description = 'Lists all calendar months in the given period with their individual logged hours, expected hours and overtime balance.';
 
     /**
@@ -27,19 +24,7 @@ class GetListMonthsCommand extends BaseGetCommand
      */
     private Collection $months;
 
-    public function __construct()
-    {
-        $this->signature = 'get:list:months '.implode(' ', $this->periodOptions);
-
-        parent::__construct();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws ConnectionException
-     */
-    protected function get(): int
+    protected function report(): int
     {
         $this->line('Fetching your logged hours ...');
         $loggedHours = LoggedHoursService::fromDailyDurations(

@@ -1,26 +1,21 @@
 <?php
 
-namespace App\Commands\Get;
+namespace App\Console;
 
 use App\Concerns\EnsuresAuthentication;
 use App\DataTransferObjects\PeriodData;
 use App\Enums\ConfigKey;
+use App\Enums\ReportPeriod;
 use App\Services\CapacityService;
 use App\Services\TimelyDataService;
 use Carbon\CarbonImmutable;
 use Carbon\Exceptions\InvalidFormatException;
-use Illuminate\Http\Client\ConnectionException;
 use LaravelZero\Framework\Commands\Command;
 use RuntimeException;
 
-abstract class BaseGetCommand extends Command
+abstract class BalanceCommand extends Command
 {
     use EnsuresAuthentication;
-
-    protected array $periodOptions = [
-        'since' => '{--s|since= : Start of the fetched report period. Defaults to the date your Timely account was created. A persistent custom default can be set using the set:since command.}',
-        'until' => '{--u|until= : End of the fetched report period. Defaults to yesterday if omitted.}',
-    ];
 
     protected CapacityService $capacity;
 
@@ -28,11 +23,13 @@ abstract class BaseGetCommand extends Command
 
     protected TimelyDataService $timely;
 
-    /**
-     * Execute the console command.
-     *
-     * @throws ConnectionException
-     */
+    public function __construct()
+    {
+        $this->signature = trim($this->signature.' '.self::periodOptions());
+
+        parent::__construct();
+    }
+
     final public function handle(): int
     {
         if (! $this->isAuthenticated()) {
@@ -65,31 +62,38 @@ abstract class BaseGetCommand extends Command
 
         $this->capacity = CapacityService::fromCapacities($capacities);
 
-        return $this->get();
+        return $this->report();
     }
 
-    /**
-     * Called by `handle()` for actual child-specific command execution.
-     */
-    abstract protected function get(): int;
+    abstract protected function report(): int;
 
-    /**
-     * @throws ConnectionException
-     */
+    private static function periodOptions(): string
+    {
+        $presets = implode(', ', ReportPeriod::values());
+
+        return implode(' ', [
+            '{--s|since= : Start of the fetched report period. Defaults to the date your Timely account was created. A persistent custom default can be set using the set:since command.}',
+            '{--u|until= : End of the fetched report period. Defaults to yesterday if omitted.}',
+            "{--p|period= : A preset report period, used instead of --since and --until. One of $presets. The this-* presets run up to today, so hours you have not logged yet count towards minus hours.}",
+        ]);
+    }
+
     private function parsePeriod(): ?PeriodData
     {
-        [$sinceOption, $untilOption] = array_keys($this->periodOptions);
+        if (filled($this->option('period'))) {
+            return $this->parsePreset($this->option('period'));
+        }
 
-        $since = $this->parsePeriodOption(
-            $sinceOption,
-            $this->option($sinceOption)
+        $since = $this->parseDateOption(
+            'since',
+            $this->option('since')
                 ?? ConfigKey::Since->getConfigValue()
                 ?? $this->timely->getCreationDate()
         );
 
-        $until = $this->parsePeriodOption(
-            $untilOption,
-            $this->option($untilOption)
+        $until = $this->parseDateOption(
+            'until',
+            $this->option('until')
                 ?? CarbonImmutable::yesterday()
         );
 
@@ -100,7 +104,26 @@ abstract class BaseGetCommand extends Command
         return PeriodData::fromBoundaries($since, $until);
     }
 
-    private function parsePeriodOption(string $option, string|CarbonImmutable $value): ?CarbonImmutable
+    private function parsePreset(string $preset): ?PeriodData
+    {
+        if (filled($this->option('since')) || filled($this->option('until'))) {
+            $this->error('The --period option cannot be combined with --since or --until.');
+
+            return null;
+        }
+
+        $period = ReportPeriod::tryFrom($preset);
+
+        if ($period === null) {
+            $this->error("Unknown period '$preset'. Choose one of: ".implode(', ', ReportPeriod::values()));
+
+            return null;
+        }
+
+        return $period->toPeriodData();
+    }
+
+    private function parseDateOption(string $option, string|CarbonImmutable $value): ?CarbonImmutable
     {
         if ($value instanceof CarbonImmutable) {
             return $value->startOfDay();

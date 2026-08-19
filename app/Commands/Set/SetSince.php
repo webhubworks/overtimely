@@ -18,7 +18,7 @@ class SetSince extends Command
      *
      * @var string
      */
-    protected $signature = 'set:since {date? : The default report start date which is used when the --since option of the get:total command is omitted. (Format: YYYY-MM-DD) [non-interactive]}';
+    protected $signature = 'set:since {date? : The default report start date which is used when the --since option of the balance:total command is omitted. (Format: YYYY-MM-DD) [non-interactive]}';
 
     /**
      * The console command description.

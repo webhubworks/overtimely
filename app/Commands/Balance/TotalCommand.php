@@ -1,33 +1,18 @@
 <?php
 
-namespace App\Commands\Get;
+namespace App\Commands\Balance;
 
+use App\Console\BalanceCommand;
 use App\DataTransferObjects\BalanceData;
 use App\Enums\ConfigKey;
-use Illuminate\Http\Client\ConnectionException;
 
-class GetTotalCommand extends BaseGetCommand
+class TotalCommand extends BalanceCommand
 {
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Fetches your capacities and logged hours for the period of SINCE to UNTIL and calculates the total overtime balance.';
+    protected $signature = 'balance:total';
 
-    public function __construct()
-    {
-        $this->signature = 'get:total '.implode(' ', $this->periodOptions);
+    protected $description = 'Fetches your capacities and logged hours for the report period and calculates the total overtime balance.';
 
-        parent::__construct();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws ConnectionException
-     */
-    protected function get(): int
+    protected function report(): int
     {
         $this->line('Fetching your total logged hours ...');
         $totalLoggedHours = $this->timely->getTotalLoggedHoursForPeriod($this->period);
