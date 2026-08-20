@@ -78,7 +78,9 @@ class WeeklyCommand extends BalanceCommand
                 ->all())
             ->values()
             ->flatMap(fn (array $rows, int $index): array => $index === 0 ? $rows : [new TableSeparator, ...$rows])
-            ->concat([new TableSeparator, $this->totalsRow()])
+            ->concat($this->weeks->isEmpty()
+                ? [$this->totalsRow()]
+                : [new TableSeparator, $this->totalsRow()])
             ->all();
     }
 
