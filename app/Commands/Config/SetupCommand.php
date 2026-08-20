@@ -14,12 +14,12 @@ class SetupCommand extends Command
 
     protected $description = 'Interactively configures this app by running each setup step in turn.';
 
-    private const array SETUP_STEPS = [
-        'auth:login',
-        'config:set account-id',
-        'auth:whoami',
-        'config:set since',
-        'config:set table-style',
+    public const array SETUP_STEPS = [
+        ['auth:login', []],
+        ['config:set', ['setting' => 'account-id']],
+        ['auth:whoami', []],
+        ['config:set', ['setting' => 'since']],
+        ['config:set', ['setting' => 'table-style']],
     ];
 
     public function handle(): int
@@ -30,9 +30,9 @@ class SetupCommand extends Command
             info('Running setup:');
         }
 
-        foreach (self::SETUP_STEPS as $step) {
-            if ($this->call($step) !== self::SUCCESS) {
-                $this->warn("Setup aborted at {$step}.");
+        foreach (self::SETUP_STEPS as [$command, $arguments]) {
+            if ($this->call($command, $arguments) !== self::SUCCESS) {
+                $this->warn('Setup aborted at '.trim($command.' '.implode(' ', $arguments)).'.');
 
                 return self::FAILURE;
             }
