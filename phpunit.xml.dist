@@ -13,6 +13,7 @@
         </testsuite>
     </testsuites>
     <php>
+        <env name="APP_ENV" value="testing"/>
         <env name="XDG_CONFIG_HOME" value="/tmp/overtimely-testing-config"/>
     </php>
     <source>

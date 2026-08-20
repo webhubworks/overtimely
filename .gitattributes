@@ -13,5 +13,6 @@ CONTRIBUTING.md export-ignore
 /Makefile export-ignore
 /overtimely export-ignore
 /phpunit.xml.dist export-ignore
+/.env.testing export-ignore
 /.editorconfig export-ignore
 /composer.lock export-ignore

@@ -23,8 +23,6 @@ it('masks secrets', function () {
 });
 
 it('reports where each value came from', function () {
-    forgetSetting(ConfigKey::AccountId, ConfigKey::Since);
-
     UserConfig::set(ConfigKey::AccountId, 4711);
     ConfigKey::AccountId->setConfigValue(4711);
 
@@ -34,8 +32,6 @@ it('reports where each value came from', function () {
 });
 
 it('marks unset settings with a dash', function () {
-    forgetSetting(ConfigKey::Since);
-
     $this->artisan('config:list')
         ->expectsOutputToContain('—')
         ->assertSuccessful();

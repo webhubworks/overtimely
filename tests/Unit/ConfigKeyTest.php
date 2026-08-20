@@ -2,6 +2,10 @@
 
 use App\Enums\ConfigKey;
 
+afterEach(function () {
+    withEnv(ConfigKey::TableStyle, null);
+});
+
 it('gives every key a unique setting name', function () {
     $names = array_map(fn (ConfigKey $key): string => $key->settingName(), ConfigKey::cases());
 
@@ -45,4 +49,28 @@ it('labels every key', function () {
     foreach (ConfigKey::cases() as $key) {
         expect($key->label())->not->toBeEmpty();
     }
+});
+
+it('reads a value from the environment', function () {
+    withEnv(ConfigKey::TableStyle, 'box');
+
+    expect(ConfigKey::TableStyle->envValue('default'))->toBe('box');
+});
+
+it('falls back to the default when the environment variable is blank', function () {
+    withEnv(ConfigKey::TableStyle, '');
+
+    expect(ConfigKey::TableStyle->envValue('default'))->toBe('default');
+});
+
+it('falls back to the default when the environment variable is absent', function () {
+    withEnv(ConfigKey::TableStyle, null);
+
+    expect(ConfigKey::TableStyle->envValue('default'))->toBe('default');
+});
+
+it('has no value of its own when the environment variable is blank and there is no default', function () {
+    withEnv(ConfigKey::TableStyle, '');
+
+    expect(ConfigKey::TableStyle->envValue())->toBeNull();
 });

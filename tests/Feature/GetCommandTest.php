@@ -25,8 +25,6 @@ it('fails for an unknown setting', function () {
 });
 
 it('fails when the setting holds no value', function () {
-    forgetSetting(ConfigKey::Since);
-
     $this->artisan('config:get', ['setting' => 'since'])
         ->expectsOutputToContain('The since setting is not set.')
         ->assertFailed();
