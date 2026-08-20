@@ -90,10 +90,13 @@ enum ConfigKey: string
 
     /**
      * The value of the environment variable that overrides this key.
+     * A variable that is set but blank counts as absent, so the default still applies.
      */
     public function envValue(mixed $default = null): mixed
     {
-        return env($this->envKey(), $default);
+        $value = env($this->envKey());
+
+        return filled($value) ? $value : $default;
     }
 
     /**
