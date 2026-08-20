@@ -6,35 +6,47 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## 2.0.0 - 2026-08-20
+
 ### Added
-- Added the `-p|--period` option to every `balance:*` command. It takes one of `this-week`, `last-week`, `this-month`, `last-month`, `this-year`, `last-year` and cannot be combined with `--since`/`--until`. Presets are now available on the list commands as well, so `balance:weekly --period=last-month` works.
-- Added the `config:list` command. It lists every setting with its current value and whether that value comes from the environment, the config file or a built-in default. Secrets are masked.
-- Added the `config:get <setting>` command, which prints a single value.
+- Added new commands:
+    - `config:path`: Prints the path to the config file. With `-o`/ `--open` it tries to open the file in your default editor.
+    - `config:list` : Lists every setting with its current value and where that value comes from. Secrets are masked.
+    - `config:get <setting>` : Prints a single config setting's value.
+- Added the `-p`|`--period` option to every `balance:*` command. It cannot be combined with the `-s`|`--since` and `-u`|`--until` options and takes one of:
+  - `this-week`
+  - `last-week`
+  - `this-month`
+  - `last-month`
+  - `this-year`
+  - `last-year`
 
 ### Changed
-- **BREAKING:** Renamed the report commands to a consistent `<subject>:<action>` scheme:
+- **BREAKING**\
+  Changed the structure of the config file. After the upgrade to `2.0.0` your existing config file cannot be understood by the app anymore. You'll need to:
+  1. Make a copy of your current settings in the file. You can open it via running `overtimely config:path --open`.
+  2. Delete the file.
+  3. Run `config:setup` and enter your recorded settings accordingly so the config file gets recreated with the new structure.
+- Renamed commands into a more consistent pattern:
+  - `app:setup` => `config:setup`
+  - `set:identity` => `auth:whoami`
   - `get:total` => `balance:total`
   - `get:list:weeks` => `balance:weekly`
   - `get:list:months` => `balance:monthly`
-- **BREAKING:** Replaced the four period wrapper commands with the `--period` option:
-  - `get:total:this-week` => `balance:total --period=this-week`
-  - `get:total:last-week` => `balance:total --period=last-week`
-  - `get:total:this-month` => `balance:total --period=this-month`
-  - `get:total:last-month` => `balance:total --period=last-month`
-- **BREAKING:** Renamed `set:identity` to `auth:whoami`.
-- **BREAKING:** Renamed `app:setup` to `config:setup`.
-- **BREAKING:** Replaced the three `set:*` commands with a single `config:set <setting> [value]`:
-  - `set:account-id 123` => `config:set account-id 123`
-  - `set:since 2025-01-01` => `config:set since 2025-01-01`
-  - `set:table-style box` => `config:set table-style box`
-
-  Run `config:set` without arguments to pick a setting from a list. The setting names are the ones `config:list` prints.
-- **BREAKING:** Changed the structure of the config file. After the upgrade to `2.0.0` your existing config file cannot be understood by the app anymore. **Please make a copy of your current settings in the file** and delete the file. **After that you will need to run `config:setup` again** and enter your recorded settings accordingly so the config file gets recreated with the new structure.
+- Replaced the four `get:total` wrapper commands with the `--period` option. See #Added above for more info on the option.
+    - `get:total:this-week` => `balance:total --period=this-week`
+    - `get:total:last-week` => `balance:total --period=last-week`
+    - `get:total:this-month` => `balance:total --period=this-month`
+    - `get:total:last-month` => `balance:total --period=last-month`
+- Replaced the three `set:*` commands with `config:set <setting> [value]`:
+    - `set:account-id [value]` => `config:set account-id [value]`
+    - `set:since [value]` => `config:set since [value]`
+    - `set:table-style [value]` => `config:set table-style [value]`
 - `config:set table-style` now pre-selects the table style currently in use.
 
 ### Fixed
-- Fixed negative durations below one hour being displayed as positive in table cells.
-- Fixed the previous calendar month being reported as the current one when the command ran on the 29th, 30th or 31st of a month (the former `get:total:last-month`). The same overflow affected year boundaries on leap days.
+- Fixed the previous calendar month being reported as the current one when the command `balance:monthly -p last-month` (former `get:total:last-month`) ran on the 29th, 30th or 31st of a month.
+- Fixed a visual bug where negative durations below one hour were displayed as positive in table cells.
+- Fixed a visual bug where the table was displayed incorrectly when you ran `balance:weekly` on a period that had no weeks with minus hours or overtime in it.
 
 ## 1.2.3 - 2026-08-18
 
