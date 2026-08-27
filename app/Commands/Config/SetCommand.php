@@ -5,7 +5,6 @@ namespace App\Commands\Config;
 use App\Enums\ConfigKey;
 use App\Enums\TableStyle;
 use App\Support\UserConfig;
-use Carbon\CarbonImmutable;
 use LaravelZero\Framework\Commands\Command;
 
 use function Laravel\Prompts\info;
@@ -104,8 +103,8 @@ class SetCommand extends Command
                 validate: fn (string $value): ?string => $this->validationError($key, $value),
             ),
             ConfigKey::Since => text(
-                label: $key->label().' (Format: YYYY-MM-DD)',
-                placeholder: now()->subYear()->format('Y-m-d'),
+                label: $key->label().' (Supported formats: https://www.php.net/manual/en/datetime.formats.php)',
+                placeholder: 'first day of this month',
                 default: (string) $key->getConfigValue(),
                 validate: fn (string $value): ?string => $this->validationError($key, $value),
             ),
@@ -123,9 +122,9 @@ class SetCommand extends Command
             ConfigKey::AccountId => ctype_digit($value)
                 ? null
                 : 'The account ID must be numeric.',
-            ConfigKey::Since => CarbonImmutable::hasFormat($value, 'Y-m-d')
-                ? null
-                : 'Your input has the wrong date format. Please use YYYY-MM-DD.',
+            ConfigKey::Since => strtotime($value) === false
+                ? 'Your input has the wrong format. Supported formats: https://www.php.net/manual/en/datetime.formats.php'
+                : null,
             ConfigKey::TableStyle => TableStyle::tryFrom($value) === null
                 ? "Unknown table style '{$value}'. Choose one of: ".implode(', ', TableStyle::values()).'.'
                 : null,

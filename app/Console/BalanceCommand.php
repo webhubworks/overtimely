@@ -109,7 +109,7 @@ abstract class BalanceCommand extends Command
         }
 
         if ($since->greaterThan($until)) {
-            $this->warn("--since (".$since->format('Y-m-d').") cannot be after --until (".$until->format('Y-m-d').").");
+            $this->warn('--since ('.$since->format('Y-m-d').') cannot be after --until ('.$until->format('Y-m-d').').');
 
             return null;
         }
@@ -146,7 +146,7 @@ abstract class BalanceCommand extends Command
             return CarbonImmutable::parse($value)->startOfDay();
 
         } catch (InvalidFormatException) {
-            $this->warn("Cannot parse $option '$value' | For supported date formats see: https://www.php.net/manual/en/datetime.formats.php");
+            $this->warn("Cannot parse $option '$value' | Supported formats: https://www.php.net/manual/en/datetime.formats.php");
 
             return null;
         }

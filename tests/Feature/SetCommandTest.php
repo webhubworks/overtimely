@@ -27,9 +27,16 @@ it('stores a report start date', function () {
     expect(UserConfig::get(ConfigKey::Since))->toBe('2025-03-01');
 });
 
-it('rejects a report start date in the wrong format', function () {
-    $this->artisan('config:set', ['setting' => 'since', 'value' => '01.03.2025'])
-        ->expectsOutputToContain('Please use YYYY-MM-DD.')
+it('stores a relative report start date', function () {
+    $this->artisan('config:set', ['setting' => 'since', 'value' => 'first day of this month'])
+        ->assertSuccessful();
+
+    expect(UserConfig::get(ConfigKey::Since))->toBe('first day of this month');
+});
+
+it('rejects an unparsable report start date', function () {
+    $this->artisan('config:set', ['setting' => 'since', 'value' => 'garbage-input'])
+        ->expectsOutputToContain('Your input has the wrong format.')
         ->assertFailed();
 
     expect(UserConfig::get(ConfigKey::Since))->toBeNull();
