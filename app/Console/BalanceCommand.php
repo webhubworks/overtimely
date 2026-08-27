@@ -10,6 +10,7 @@ use App\Services\CapacityService;
 use App\Services\TimelyDataService;
 use Carbon\CarbonImmutable;
 use Carbon\Exceptions\InvalidFormatException;
+use Illuminate\Http\Client\ConnectionException;
 use LaravelZero\Framework\Commands\Command;
 use RuntimeException;
 
@@ -30,6 +31,9 @@ abstract class BalanceCommand extends Command
         parent::__construct();
     }
 
+    /**
+     * @throws ConnectionException
+     */
     final public function handle(): int
     {
         if (! $this->isAuthenticated()) {
@@ -49,7 +53,7 @@ abstract class BalanceCommand extends Command
 
         if ($this->period === null) {
             $this->newLine();
-            $this->error('Could not determine a data-fetching period.');
+            $this->error('Could not determine a valid data-fetching period.');
 
             return self::FAILURE;
         }
@@ -78,6 +82,9 @@ abstract class BalanceCommand extends Command
         ]);
     }
 
+    /**
+     * @throws ConnectionException
+     */
     private function parsePeriod(): ?PeriodData
     {
         if (filled($this->option('period'))) {
@@ -85,19 +92,25 @@ abstract class BalanceCommand extends Command
         }
 
         $since = $this->parseDateOption(
-            'since',
+            '--since',
             $this->option('since')
                 ?? ConfigKey::Since->getConfigValue()
                 ?? $this->timely->getCreationDate()
         );
 
         $until = $this->parseDateOption(
-            'until',
+            '--until',
             $this->option('until')
                 ?? CarbonImmutable::yesterday()
         );
 
         if ($since === null || $until === null) {
+            return null;
+        }
+
+        if ($since->greaterThan($until)) {
+            $this->warn("--since (".$since->format('Y-m-d').") cannot be after --until (".$until->format('Y-m-d').").");
+
             return null;
         }
 
@@ -107,7 +120,7 @@ abstract class BalanceCommand extends Command
     private function parsePreset(string $preset): ?PeriodData
     {
         if (filled($this->option('since')) || filled($this->option('until'))) {
-            $this->error('The --period option cannot be combined with --since or --until.');
+            $this->warn('The --period option cannot be combined with --since or --until.');
 
             return null;
         }
@@ -115,7 +128,7 @@ abstract class BalanceCommand extends Command
         $period = ReportPeriod::tryFrom($preset);
 
         if ($period === null) {
-            $this->error("Unknown period '$preset'. Choose one of: ".implode(', ', ReportPeriod::values()));
+            $this->warn("Unknown period '$preset'. Choose one of: ".implode(', ', ReportPeriod::values()));
 
             return null;
         }
@@ -133,7 +146,7 @@ abstract class BalanceCommand extends Command
             return CarbonImmutable::parse($value)->startOfDay();
 
         } catch (InvalidFormatException) {
-            $this->error("Cannot parse $option date '$value' | All dates must be provided in a format Carbon::parse() can understand.");
+            $this->warn("Cannot parse $option '$value' | For supported date formats see: https://www.php.net/manual/en/datetime.formats.php");
 
             return null;
         }
