@@ -73,7 +73,7 @@ abstract class BalanceCommand extends Command
 
     private static function periodOptions(): string
     {
-        $formatHint = SUPPORTED_DATE_FORMATS_HINT;
+        $formatHint = ConfigKey::DATE_FORMATS_HINT;
         $presets = implode(', ', ReportPeriod::values());
 
         return implode(' ', [
@@ -147,7 +147,7 @@ abstract class BalanceCommand extends Command
             return CarbonImmutable::parse($value)->startOfDay();
 
         } catch (InvalidFormatException) {
-            $this->warn("Cannot parse $option '$value' ".SUPPORTED_DATE_FORMATS_HINT);
+            $this->warn("Cannot parse $option '$value' ".ConfigKey::DATE_FORMATS_HINT);
 
             return null;
         }

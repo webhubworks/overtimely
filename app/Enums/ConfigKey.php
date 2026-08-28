@@ -12,6 +12,8 @@ use Illuminate\Support\Str;
  */
 enum ConfigKey: string
 {
+    public const string DATE_FORMATS_HINT = '(Supported formats: https://www.php.net/manual/en/datetime.formats.php)';
+
     case AccessToken = 'timely.tokens.access';
 
     case RefreshToken = 'timely.tokens.refresh';

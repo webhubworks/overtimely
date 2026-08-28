@@ -36,7 +36,7 @@ it('stores a relative report start date', function () {
 
 it('rejects an unparsable report start date', function () {
     $this->artisan('config:set', ['setting' => 'since', 'value' => 'garbage-input'])
-        ->expectsOutputToContain('Your input has the wrong format.')
+        ->expectsOutputToContain('Unsupported format.')
         ->assertFailed();
 
     expect(UserConfig::get(ConfigKey::Since))->toBeNull();
