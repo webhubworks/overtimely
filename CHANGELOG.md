@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.0.1 - 2026-08-28
+
+### Fixed
+- Fixed a `-s`|`--since` after `-u`|`--until` being a valid input resulting in no data being fetched.
+- Fixed `config:set since [value]` not allowing relative dates, although the app could already handle them.
+- Fixed outdated instructions for supported date formats throughout the app.
+- Fixed UTC being used instead of the user's timezone.\
+  (only relevant for parsing relative dates as expected)
+
 ## 2.0.0 - 2026-08-20
 
 ### Added
