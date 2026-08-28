@@ -24,6 +24,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        define('SUPPORTED_DATE_FORMATS_HINT', '(Supported formats: https://www.php.net/manual/en/datetime.formats.php)');
+
         foreach (ConfigKey::cases() as $key) {
             // An explicit environment variable should always win. So we let the config.php take precedence.
             if (filled($key->envValue())) {

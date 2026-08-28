@@ -73,11 +73,12 @@ abstract class BalanceCommand extends Command
 
     private static function periodOptions(): string
     {
+        $formatHint = SUPPORTED_DATE_FORMATS_HINT;
         $presets = implode(', ', ReportPeriod::values());
 
         return implode(' ', [
-            '{--s|since= : Start of the fetched report period. Defaults to the date your Timely account was created. A persistent custom default can be set with config:set since.}',
-            '{--u|until= : End of the fetched report period. Defaults to yesterday if omitted.}',
+            "{--s|since= : Start of the fetched report period. Defaults to the date your Timely account was created. A persistent custom default can be set with config:set since. $formatHint}",
+            "{--u|until= : End of the fetched report period. Defaults to yesterday if omitted. $formatHint}",
             "{--p|period= : A preset report period, used instead of --since and --until. One of $presets. The this-* presets run up to today, so hours you have not logged yet count towards minus hours.}",
         ]);
     }
@@ -146,7 +147,7 @@ abstract class BalanceCommand extends Command
             return CarbonImmutable::parse($value)->startOfDay();
 
         } catch (InvalidFormatException) {
-            $this->warn("Cannot parse $option '$value' | Supported formats: https://www.php.net/manual/en/datetime.formats.php");
+            $this->warn("Cannot parse $option '$value' ".SUPPORTED_DATE_FORMATS_HINT);
 
             return null;
         }

@@ -103,7 +103,7 @@ class SetCommand extends Command
                 validate: fn (string $value): ?string => $this->validationError($key, $value),
             ),
             ConfigKey::Since => text(
-                label: $key->label().' (Supported formats: https://www.php.net/manual/en/datetime.formats.php)',
+                label: $key->label().' '.SUPPORTED_DATE_FORMATS_HINT,
                 placeholder: 'first day of this month',
                 default: (string) $key->getConfigValue(),
                 validate: fn (string $value): ?string => $this->validationError($key, $value),
@@ -123,7 +123,7 @@ class SetCommand extends Command
                 ? null
                 : 'The account ID must be numeric.',
             ConfigKey::Since => strtotime($value) === false
-                ? 'Your input has the wrong format. Supported formats: https://www.php.net/manual/en/datetime.formats.php'
+                ? 'Unsupported format. '.SUPPORTED_DATE_FORMATS_HINT
                 : null,
             ConfigKey::TableStyle => TableStyle::tryFrom($value) === null
                 ? "Unknown table style '{$value}'. Choose one of: ".implode(', ', TableStyle::values()).'.'
