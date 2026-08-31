@@ -5,6 +5,7 @@ namespace App\DataTransferObjects;
 use App\Casts\CollectionFromSeparatedStringCast;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
@@ -50,6 +51,6 @@ final class CapacityData extends Data
 
     private function hasDayAsWorkDay(CarbonImmutable $day): bool
     {
-        return $this->workDays->contains(strtoupper($day->format('D')));
+        return $this->workDays->contains(Str::upper(Str::substr($day->dayName, 0, 3)));
     }
 }
