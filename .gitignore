@@ -8,3 +8,5 @@
 .DS_Store
 docs/*
 !docs/timely-api-v1.yaml
+DebugCommand.php
+Debug.php

@@ -5,6 +5,7 @@ namespace App\Commands\Balance;
 use App\Console\BalanceCommand;
 use App\DataTransferObjects\BalanceData;
 use App\Enums\ConfigKey;
+use Illuminate\Http\Client\ConnectionException;
 
 class TotalCommand extends BalanceCommand
 {
@@ -12,6 +13,9 @@ class TotalCommand extends BalanceCommand
 
     protected $description = 'Fetches your capacities and logged hours for the report period and calculates the total overtime balance.';
 
+    /**
+     * @throws ConnectionException
+     */
     protected function report(): int
     {
         $this->line('Fetching your total logged hours ...');
