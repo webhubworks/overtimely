@@ -16,7 +16,7 @@ final readonly class LoggedHoursService
      */
     private Collection $dailyDurations;
 
-    public function __construct(DailyDurationData|Collection $dailyDurations)
+    public function __construct(DailyDurationData|Collection|array $dailyDurations)
     {
         $this->dailyDurations = Collection::wrap($dailyDurations)
             ->keyBy(fn (DailyDurationData $dailyDuration): string => $dailyDuration->day->format('Y-m-d'));
