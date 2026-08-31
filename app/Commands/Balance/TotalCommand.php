@@ -43,7 +43,7 @@ class TotalCommand extends BalanceCommand
                 [
                     "$balance->logged",
                     "$balance->expected",
-                    $balance->balance->readable(true),
+                    $balance->balance->toString(true),
                 ],
             ],
             ConfigKey::TableStyle->getConfigValue(),

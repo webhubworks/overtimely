@@ -23,9 +23,7 @@ final class BalanceData extends Data
     }
 
     /**
-     * Sum a set of balances into one: logged and expected add up, the balance
-     * follows from those. Guarantees the total matches the operands it is
-     * built from.
+     * Sum a set of balances into one: Logged and Expected durations of individual balances are summed up to mitigate rounding errors.
      *
      * @param  Collection<int, self>  $balances
      */

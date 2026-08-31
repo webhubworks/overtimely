@@ -89,9 +89,9 @@ class WeeklyCommand extends BalanceCommand
         return [
             ...(filled($yearCell) ? [$yearCell] : []),
             $periodBalance->period->since->format('W')." ($periodBalance->period)",
-            $periodBalance->balance->logged->tabular(),
-            $periodBalance->balance->expected->tabular(),
-            $periodBalance->balance->balance->tabular(true),
+            $periodBalance->balance->logged->toString(tabular: true),
+            $periodBalance->balance->expected->toString(tabular: true),
+            $periodBalance->balance->balance->toString(prefixPositive: true, tabular: true),
         ];
     }
 
@@ -104,7 +104,7 @@ class WeeklyCommand extends BalanceCommand
             $this->weeks->count().' weeks',
             "$total->logged",
             "$total->expected",
-            $total->balance->readable(true),
+            $total->balance->toString(prefixPositive: true),
         ];
     }
 }

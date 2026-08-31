@@ -43,22 +43,32 @@ final class DurationData extends Data
 
     public function __toString(): string
     {
-        return $this->readable();
+        return $this->toString();
     }
 
     /**
-     * Returns a human-readable string representation of the duration, e.g. `1h 30m`, `8h` or `24m`.
+     * Returns a human-readable string representation of the duration, e.g. `12h 30m`, `8h` or `24m`.
      * This format is used by Timely themselves throughout their app.
      *
-     * @param  string  $glue  Glue between components.
      * @param  bool  $prefixPositive  Prefix positive durations with a `+` sign.
+     * @param  bool  $tabular  Use a tabular format, meaning components zero-padded to two digits and printed even if they are zero, e.g. `12h 30m`, `08h 00m` or `00h 24m`.
+     * @param  string  $glue  Glue between components.
+     * @param  string  $fallback  Fallback printed if this duration is zero.
      */
-    public function readable(
+    public function toString(
         bool $prefixPositive = false,
+        bool $tabular = false,
         string $glue = ' ',
+        string $fallback = '—'
     ): string {
         if ($this->totalSeconds === 0) {
-            return '—';
+            return $fallback;
+        }
+
+        $sign = $this->totalSeconds < 0 ? '-' : ($prefixPositive ? '+' : '');
+
+        if ($tabular) {
+            return $sign.sprintf('%02dh%s%02dm', $this->hours, $glue, $this->minutes);
         }
 
         $components = collect([
@@ -68,24 +78,6 @@ final class DurationData extends Data
             ->map(fn (int $value, string $unit): string => "{$value}{$unit}")
             ->implode($glue);
 
-        $sign = $this->totalSeconds < 0 ? '-' : ($prefixPositive ? '+' : '');
-
-        return "{$sign}{$components}";
-    }
-
-    /**
-     * Returns a table-friendly string representation of the duration, e.g. `01h 30m`, `08h 00m` or `00h 24m`.
-     *
-     * @param  bool  $prefixPositive  Prefix positive durations with a `+` sign.
-     */
-    public function tabular(bool $prefixPositive = false): string
-    {
-        if ($this->totalSeconds === 0) {
-            return '—';
-        }
-
-        $sign = $this->totalSeconds < 0 ? '-' : ($prefixPositive ? '+' : '');
-
-        return $sign.sprintf('%02dh %02dm', $this->hours, $this->minutes);
+        return $sign.$components;
     }
 }

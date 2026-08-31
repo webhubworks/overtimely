@@ -93,9 +93,9 @@ class MonthlyCommand extends BalanceCommand
         return [
             ...(filled($yearCell) ? [$yearCell] : []),
             $month->period->since->format('F'),
-            $month->balance->logged->tabular(),
-            $month->balance->expected->tabular(),
-            $month->balance->balance->tabular(true),
+            $month->balance->logged->toString(tabular: true),
+            $month->balance->expected->toString(tabular: true),
+            $month->balance->balance->toString(prefixPositive: true, tabular: true),
         ];
     }
 
@@ -108,7 +108,7 @@ class MonthlyCommand extends BalanceCommand
             $this->months->count().' months',
             "$total->logged",
             "$total->expected",
-            $total->balance->readable(true),
+            $total->balance->toString(prefixPositive: true),
         ];
     }
 }
