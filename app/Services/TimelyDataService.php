@@ -7,6 +7,7 @@ use App\Data\CurrentUserData;
 use App\Data\DailyDurationData;
 use App\Data\DurationData;
 use App\Data\PeriodData;
+use App\Data\EventData;
 use Carbon\CarbonImmutable;
 use Generator;
 use Illuminate\Http\Client\ConnectionException;
@@ -99,46 +100,44 @@ final readonly class TimelyDataService
     }
 
     /**
+     * @return Collection<int, EventData>
+     *
      * @throws ConnectionException
      */
     public function getEventsForPeriod(PeriodData $period): Collection
     {
         $events = collect();
 
-        foreach ($this->yieldEventsForPeriod($period) as $batch) {
-            foreach ($batch as $event) {
-                if ($event['deleted'] ?? false) {
-                    continue;
-                }
+        foreach ($this->yieldEventBatchesForPeriod($period) as $batch) {
+            $realEventsFromBatch = $batch->reject(fn (EventData $event): bool => $event->deleted || $event->draft);
 
-                $events->push($event);
-            }
+            $events->push(...$realEventsFromBatch);
         }
 
         return $events;
     }
 
     /**
-     * @return Generator<int, Collection<int, array<string, mixed>>>
+     * @return Generator<int, Collection<int, EventData>>
      *
      * @throws ConnectionException
      */
-    public function yieldEventsForPeriod(PeriodData $period): Generator
+    private function yieldEventBatchesForPeriod(PeriodData $period): Generator
     {
         $page = 1;
 
         do {
-            $batch = $this->client
-                ->get("{$this->accountId}/hours", array_filter([
-                    'since' => $period->since->format('Y-m-d'),
-                    'upto' => $period->until->format('Y-m-d'),
+            $batch = EventData::collect($this->client
+                ->get("{$this->accountId}/hours", [
+                    'since' => $period->since?->format('Y-m-d'),
+                    'upto' => $period->until?->format('Y-m-d'),
                     'user_id' => $this->userId,
                     'per_page' => self::EVENTS_PER_PAGE,
                     'page' => $page,
                     'sort' => 'day',
                     'order' => 'asc',
-                ], fn (mixed $value): bool => $value !== null))
-                ->collect();
+                ])->collect()
+            );
 
             yield $batch;
 
