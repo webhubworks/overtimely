@@ -1,11 +1,11 @@
 <?php
 
 use App\Data\PeriodData;
-use App\Services\LoggedHoursService;
+use App\Services\TotalLoggedHoursService;
 use Carbon\CarbonImmutable;
 
 it('sums the logged hours over the period', function () {
-    $service = LoggedHoursService::fromDailyDurations(makeDailyLoggedHours([
+    $service = TotalLoggedHoursService::fromDailyDurations(makeDailyLoggedHours([
         '2026-06-01' => 8.0, // since
         '2026-06-02' => 7.5,
         '2026-06-03' => 6.0, // until
@@ -21,7 +21,7 @@ it('sums the logged hours over the period', function () {
 });
 
 it('ignores logged days outside the period', function () {
-    $service = LoggedHoursService::fromDailyDurations(makeDailyLoggedHours([
+    $service = TotalLoggedHoursService::fromDailyDurations(makeDailyLoggedHours([
         '2026-05-31' => 9.0, // before since
         '2026-06-01' => 8.0,
         '2026-06-02' => 8.0,
@@ -39,7 +39,7 @@ it('ignores logged days outside the period', function () {
 
 it('treats days with no logged entry as zero', function () {
     // 06-02 is absent, as the API omits zero-hour days from the response.
-    $service = LoggedHoursService::fromDailyDurations(makeDailyLoggedHours([
+    $service = TotalLoggedHoursService::fromDailyDurations(makeDailyLoggedHours([
         '2026-06-01' => 8.0,
         '2026-06-03' => 8.0,
     ]));
@@ -54,7 +54,7 @@ it('treats days with no logged entry as zero', function () {
 });
 
 it('counts a single day', function () {
-    $service = LoggedHoursService::fromDailyDurations(makeDailyLoggedHours([
+    $service = TotalLoggedHoursService::fromDailyDurations(makeDailyLoggedHours([
         '2026-06-01' => 8.0,
         '2026-06-02' => 8.0,
     ]));
@@ -69,7 +69,7 @@ it('counts a single day', function () {
 });
 
 it('returns zero when no logged days fall in the period', function () {
-    $service = LoggedHoursService::fromDailyDurations(makeDailyLoggedHours([
+    $service = TotalLoggedHoursService::fromDailyDurations(makeDailyLoggedHours([
         '2026-05-01' => 8.0,
     ]));
 

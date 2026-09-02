@@ -9,7 +9,7 @@ use Carbon\CarbonImmutable;
 use Carbon\CarbonPeriodImmutable;
 use Illuminate\Support\Collection;
 
-final readonly class LoggedHoursService
+final readonly class TotalLoggedHoursService
 {
     /**
      * @var Collection<string, DailyDurationData>
