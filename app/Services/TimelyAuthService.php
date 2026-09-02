@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\DataTransferObjects\OAuthTokenData;
+use App\Data\OAuthTokenData;
 use App\Enums\ConfigKey;
 use App\Support\UserConfig;
 use Illuminate\Http\Client\ConnectionException;

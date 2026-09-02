@@ -1,7 +1,7 @@
 <?php
 
-use App\DataTransferObjects\BalanceData;
-use App\DataTransferObjects\DurationData;
+use App\Data\BalanceData;
+use App\Data\DurationData;
 
 it('computes the balance as logged hours minus expected hours', function (float $logged, float $expected, float $balance) {
     $result = BalanceData::fromOperands(

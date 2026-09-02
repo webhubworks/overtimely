@@ -1,6 +1,6 @@
 <?php
 
-use App\DataTransferObjects\OAuthTokenData;
+use App\Data\OAuthTokenData;
 use App\Enums\ConfigKey;
 use App\Services\TimelyAuthService;
 use App\Support\UserConfig;

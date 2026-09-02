@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\DataTransferObjects\CapacityData;
-use App\DataTransferObjects\CurrentUserData;
-use App\DataTransferObjects\DailyDurationData;
-use App\DataTransferObjects\DurationData;
-use App\DataTransferObjects\PeriodData;
+use App\Data\CapacityData;
+use App\Data\CurrentUserData;
+use App\Data\DailyDurationData;
+use App\Data\DurationData;
+use App\Data\PeriodData;
 use Carbon\CarbonImmutable;
 use Generator;
 use Illuminate\Http\Client\ConnectionException;

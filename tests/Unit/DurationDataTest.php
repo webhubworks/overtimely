@@ -1,6 +1,6 @@
 <?php
 
-use App\DataTransferObjects\DurationData;
+use App\Data\DurationData;
 
 it('decomposes hour totals into h/m/s', function () {
     $duration = DurationData::fromTotalHours(45.5);

@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\DataTransferObjects\CapacityData;
-use App\DataTransferObjects\DurationData;
-use App\DataTransferObjects\PeriodData;
+use App\Data\CapacityData;
+use App\Data\DurationData;
+use App\Data\PeriodData;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonPeriodImmutable;
 use Illuminate\Support\Collection;

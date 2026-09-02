@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DataTransferObjects;
+namespace App\Data;
 
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;

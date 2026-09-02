@@ -3,9 +3,9 @@
 namespace App\Commands\Balance;
 
 use App\Console\BalanceCommand;
-use App\DataTransferObjects\BalanceData;
-use App\DataTransferObjects\PeriodBalanceData;
-use App\DataTransferObjects\PeriodData;
+use App\Data\BalanceData;
+use App\Data\PeriodBalanceData;
+use App\Data\PeriodData;
 use App\Enums\ConfigKey;
 use App\Services\LoggedHoursService;
 use Illuminate\Http\Client\ConnectionException;

@@ -3,7 +3,7 @@
 namespace App\Console;
 
 use App\Concerns\EnsuresAuthentication;
-use App\DataTransferObjects\PeriodData;
+use App\Data\PeriodData;
 use App\Enums\ConfigKey;
 use App\Enums\ReportPeriod;
 use App\Services\CapacityService;

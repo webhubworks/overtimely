@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-use App\DataTransferObjects\PeriodData;
+use App\Data\PeriodData;
 use Carbon\CarbonImmutable;
 
 enum ReportPeriod: string

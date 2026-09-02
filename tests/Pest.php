@@ -1,8 +1,8 @@
 <?php
 
-use App\DataTransferObjects\CapacityData;
-use App\DataTransferObjects\DailyDurationData;
-use App\DataTransferObjects\DurationData;
+use App\Data\CapacityData;
+use App\Data\DailyDurationData;
+use App\Data\DurationData;
 use App\Enums\ConfigKey;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;

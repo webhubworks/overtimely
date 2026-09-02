@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DataTransferObjects;
+namespace App\Data;
 
 use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\WithCast;

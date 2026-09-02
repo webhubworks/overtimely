@@ -1,6 +1,6 @@
 <?php
 
-use App\DataTransferObjects\PeriodData;
+use App\Data\PeriodData;
 use App\Services\LoggedHoursService;
 use Carbon\CarbonImmutable;
 

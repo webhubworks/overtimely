@@ -1,6 +1,6 @@
 <?php
 
-use App\DataTransferObjects\OAuthTokenData;
+use App\Data\OAuthTokenData;
 
 it('computes the absolute expiry from created_at plus expires_in', function () {
     $token = new OAuthTokenData('at', 'rt', 3600, 1000, 'manage', 'Bearer');
