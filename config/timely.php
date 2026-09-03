@@ -31,6 +31,7 @@ return [
     ],
 
     'report' => [
+        'fetch_mode' => ConfigKey::Mode->envValue(),
         'since' => ConfigKey::Since->envValue(),
     ],
 ];

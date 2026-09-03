@@ -32,6 +32,8 @@ enum ConfigKey: string
 
     case UserCreatedAt = 'timely.user.created_at';
 
+    case Mode = 'timely.report.fetch_mode';
+
     case Since = 'timely.report.since';
 
     case TableStyle = 'display.table_style';
@@ -59,6 +61,7 @@ enum ConfigKey: string
             self::AccountId => 'Timely account ID',
             self::UserId => 'Timely user ID',
             self::UserCreatedAt => 'Timely account creation date',
+            self::Mode => 'Report fetch mode',
             self::Since => 'Default report start date',
             self::TableStyle => 'Table style',
         };
@@ -142,6 +145,7 @@ enum ConfigKey: string
     {
         return [
             self::AccountId,
+            self::Mode,
             self::Since,
             self::TableStyle,
         ];

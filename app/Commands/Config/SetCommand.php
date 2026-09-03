@@ -3,6 +3,7 @@
 namespace App\Commands\Config;
 
 use App\Enums\ConfigKey;
+use App\Enums\ReportMode;
 use App\Enums\TableStyle;
 use App\Support\UserConfig;
 use LaravelZero\Framework\Commands\Command;
@@ -113,6 +114,13 @@ class SetCommand extends Command
                 options: TableStyle::values(),
                 default: $key->getConfigValue(),
             ),
+            ConfigKey::Mode => select(
+                label: $key->label(),
+                options: ReportMode::values(),
+                default: $key->getConfigValue(),
+                info: fn(string $value): string => ReportMode::settingInfo($value)
+            ),
+            default => null,
         };
     }
 
@@ -128,6 +136,10 @@ class SetCommand extends Command
             ConfigKey::TableStyle => TableStyle::tryFrom($value) === null
                 ? "Unknown table style '{$value}'. Choose one of: ".implode(', ', TableStyle::values()).'.'
                 : null,
+            ConfigKey::Mode => ReportMode::tryFrom($value) === null
+                ? "Unknown report mode '{$value}'. Choose one of: ".implode(', ', ReportMode::values()).'.'
+                : null,
+            default => null,
         };
     }
 
