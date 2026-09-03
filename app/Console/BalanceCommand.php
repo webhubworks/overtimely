@@ -5,6 +5,7 @@ namespace App\Console;
 use App\Concerns\EnsuresAuthentication;
 use App\Data\PeriodData;
 use App\Enums\ConfigKey;
+use App\Enums\ReportMode;
 use App\Enums\ReportPeriod;
 use App\Services\CapacityService;
 use App\Services\TimelyDataService;
@@ -24,9 +25,11 @@ abstract class BalanceCommand extends Command
 
     protected TimelyDataService $timely;
 
+    protected ReportMode $mode = ReportMode::Totals;
+
     public function __construct()
     {
-        $this->signature = trim($this->signature.' '.self::periodOptions());
+        $this->signature = trim($this->signature.' '.self::balanceOptions());
 
         parent::__construct();
     }
@@ -58,7 +61,9 @@ abstract class BalanceCommand extends Command
             return self::FAILURE;
         }
 
-        $this->line("Fetching your data for the period of $this->period");
+        $this->mode = $this->parseMode();
+
+        $this->info("Fetching your data for the period of $this->period:");
 
         $this->line('Fetching your capacities ...');
 
@@ -71,15 +76,17 @@ abstract class BalanceCommand extends Command
 
     abstract protected function report(): int;
 
-    private static function periodOptions(): string
+    private static function balanceOptions(): string
     {
         $formatHint = ConfigKey::DATE_FORMATS_HINT;
         $presets = implode(', ', ReportPeriod::values());
+        $modes = implode(', ', ReportMode::values());
 
         return implode(' ', [
+            "{--m|mode= : The report mode. One of [$modes]. Defaults to 'totals'. Run 'config:set mode' to set a custom default and see what each mode does.}",
             "{--s|since= : Start of the fetched report period. Defaults to the date your Timely account was created. A persistent custom default can be set with config:set since. $formatHint}",
             "{--u|until= : End of the fetched report period. Defaults to yesterday if omitted. $formatHint}",
-            "{--p|period= : A preset report period, used instead of --since and --until. One of $presets. The this-* presets run up to today, so hours you have not logged yet count towards minus hours.}",
+            "{--p|period= : A preset report period, used instead of --since and --until. One of [$presets]. The this-* presets run up to today, so hours you have not logged yet count towards minus hours.}",
         ]);
     }
 
@@ -151,5 +158,11 @@ abstract class BalanceCommand extends Command
 
             return null;
         }
+    }
+
+    private function parseMode(): ReportMode
+    {
+        return ReportMode::tryFrom($this->option('mode'))
+            ?? ReportMode::Totals;
     }
 }
