@@ -11,9 +11,7 @@ use Illuminate\Support\Collection;
 
 final readonly class TotalLoggedHoursService
 {
-    /**
-     * @var Collection<string, DailyDurationData>
-     */
+    /** @var Collection<string, DailyDurationData> */
     private Collection $dailyDurations;
 
     public function __construct(DailyDurationData|Collection|array $dailyDurations)
@@ -22,6 +20,9 @@ final readonly class TotalLoggedHoursService
             ->keyBy(fn (DailyDurationData $dailyDuration): string => $dailyDuration->day->format('Y-m-d'));
     }
 
+    /**
+     * @param DailyDurationData|Collection<string,DailyDurationData> $dailyDurations
+     */
     public static function fromDailyDurations(DailyDurationData|Collection $dailyDurations): self
     {
         return new self($dailyDurations);
@@ -32,7 +33,7 @@ final readonly class TotalLoggedHoursService
         $totalSeconds = 0;
 
         foreach (CarbonPeriodImmutable::create($period->since, $period->until) as $day) {
-            $totalSeconds += $this->getDurationOfDay($day);
+            $totalSeconds += $this->getSecondsOfDay($day);
         }
 
         return DurationData::fromTotalSeconds($totalSeconds);
@@ -41,7 +42,7 @@ final readonly class TotalLoggedHoursService
     /**
      * Returns the duration for a given day in seconds.
      */
-    private function getDurationOfDay(CarbonImmutable $day): int
+    private function getSecondsOfDay(CarbonImmutable $day): int
     {
         $applicableDailyDuration = $this->dailyDurations->get($day->format('Y-m-d'));
 
