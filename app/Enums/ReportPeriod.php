@@ -2,11 +2,14 @@
 
 namespace App\Enums;
 
+use App\Concerns\EnumValuesTrait;
 use App\Data\PeriodData;
 use Carbon\CarbonImmutable;
 
 enum ReportPeriod: string
 {
+    use EnumValuesTrait;
+
     case ThisWeek = 'this-week';
 
     case LastWeek = 'last-week';
@@ -34,10 +37,5 @@ enum ReportPeriod: string
             self::ThisYear => PeriodData::fromBoundaries($today->startOfYear(), $today),
             self::LastYear => PeriodData::fromBoundaries($lastYear, $lastYear->endOfYear()),
         };
-    }
-
-    public static function values(): array
-    {
-        return array_column(self::cases(), 'value');
     }
 }

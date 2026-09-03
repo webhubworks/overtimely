@@ -2,16 +2,15 @@
 
 namespace App\Enums;
 
+use App\Concerns\EnumValuesTrait;
+
 enum ReportMode: string
 {
+    use EnumValuesTrait;
+
     case Events = 'events';
 
     case Totals = 'totals';
-
-    public static function values(): array
-    {
-        return array_column(self::cases(), 'value');
-    }
 
     public static function settingInfo(string $value): string
     {

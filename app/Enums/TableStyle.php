@@ -2,8 +2,12 @@
 
 namespace App\Enums;
 
+use App\Concerns\EnumValuesTrait;
+
 enum TableStyle: string
 {
+    use EnumValuesTrait;
+
     case Default = 'default';
 
     case Compact = 'compact';
@@ -17,9 +21,4 @@ enum TableStyle: string
     case Box = 'box';
 
     case BoxDouble = 'box-double';
-
-    public static function values(): array
-    {
-        return array_column(self::cases(), 'value');
-    }
 }
