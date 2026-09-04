@@ -192,8 +192,8 @@ abstract class BalanceCommand extends Command
 
     private function parseMode(): FetchMode
     {
-        return FetchMode::tryFrom($this->option('mode'))
-            ?? FetchMode::tryFrom(Setting::ReportFetchMode->getConfigValue())
+        return FetchMode::tryFrom($this->option('mode') ?? '')
+            ?? FetchMode::tryFrom(Setting::ReportFetchMode->getConfigValue(''))
             ?? FetchMode::Totals;
     }
 }
