@@ -103,9 +103,21 @@ class SetCommand extends Command
                 required: true,
                 validate: fn (string $value): ?string => $this->validationError($setting, $value),
             ),
+            Setting::ReportFetchMode => select(
+                label: $setting->label(),
+                options: FetchMode::values(),
+                default: $setting->getConfigValue(),
+                info: fn (string $value): string => FetchMode::settingInfo($value)
+            ),
             Setting::ReportSince => text(
                 label: $setting->label().' '.Setting::DATE_FORMATS_HINT,
-                placeholder: 'first day of this month',
+                placeholder: 'first day of last month',
+                default: (string) $setting->getConfigValue(),
+                validate: fn (string $value): ?string => $this->validationError($setting, $value),
+            ),
+            Setting::ReportUntil => text(
+                label: $setting->label().' '.Setting::DATE_FORMATS_HINT,
+                placeholder: 'last day of last month',
                 default: (string) $setting->getConfigValue(),
                 validate: fn (string $value): ?string => $this->validationError($setting, $value),
             ),
@@ -113,12 +125,6 @@ class SetCommand extends Command
                 label: 'Select a table style',
                 options: TableStyle::values(),
                 default: $setting->getConfigValue(),
-            ),
-            Setting::ReportFetchMode => select(
-                label: $setting->label(),
-                options: FetchMode::values(),
-                default: $setting->getConfigValue(),
-                info: fn (string $value): string => FetchMode::settingInfo($value)
             ),
             default => null,
         };
@@ -130,14 +136,14 @@ class SetCommand extends Command
             Setting::AccountId => ctype_digit($value)
                 ? null
                 : 'The account ID must be numeric.',
-            Setting::ReportSince => strtotime($value) === false
+            Setting::ReportFetchMode => FetchMode::tryFrom($value) === null
+                ? "Unknown report mode '{$value}'. Choose one of: ".implode(', ', FetchMode::values()).'.'
+                : null,
+            Setting::ReportSince, Setting::ReportUntil => strtotime($value) === false
                 ? 'Unsupported format. '.Setting::DATE_FORMATS_HINT
                 : null,
             Setting::TableStyle => TableStyle::tryFrom($value) === null
                 ? "Unknown table style '{$value}'. Choose one of: ".implode(', ', TableStyle::values()).'.'
-                : null,
-            Setting::ReportFetchMode => FetchMode::tryFrom($value) === null
-                ? "Unknown report mode '{$value}'. Choose one of: ".implode(', ', FetchMode::values()).'.'
                 : null,
             default => null,
         };
@@ -151,7 +157,7 @@ class SetCommand extends Command
     private function settableHint(): string
     {
         return 'Choose one of: '.collect(Setting::settable())
-            ->map(fn (Setting $key): string => $key->kebabName())
+            ->map(fn (Setting $setting): string => $setting->kebabName())
             ->implode(', ').'.';
     }
 }

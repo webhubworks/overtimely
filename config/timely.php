@@ -33,5 +33,6 @@ return [
     'report' => [
         'fetch_mode' => Setting::ReportFetchMode->envValue(),
         'since' => Setting::ReportSince->envValue(),
+        'until' => Setting::ReportUntil->envValue(),
     ],
 ];

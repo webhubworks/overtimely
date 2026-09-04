@@ -105,13 +105,14 @@ abstract class BalanceCommand extends Command
     private static function baseOptions(): string
     {
         $formatHint = Setting::DATE_FORMATS_HINT;
+        $modeSettingName = Setting::ReportFetchMode->kebabName();
         $presets = implode(', ', FetchPeriod::values());
         $modes = implode(', ', FetchMode::values());
 
         return implode(' ', [
-            "{--m|mode= : The report mode. One of [$modes]. Defaults to 'totals'. Run 'config:set mode' to set a custom default and see what each mode does.}",
-            "{--s|since= : Start of the fetched report period. Defaults to the date your Timely account was created. A persistent custom default can be set with config:set since. $formatHint}",
-            "{--u|until= : End of the fetched report period. Defaults to yesterday if omitted. $formatHint}",
+            "{--m|mode= : The report fetch mode. One of [$modes]. Defaults to 'totals'. Run 'config:set $modeSettingName' to set a custom default and see what each mode does.}",
+            "{--s|since= : Start of the fetched report period. Defaults to the date your Timely account was created. A persistent custom default can be set with 'config:set since'. $formatHint}",
+            "{--u|until= : End of the fetched report period. Defaults to yesterday if omitted. A persistent custom default can be set with 'config:set until'. $formatHint}",
             "{--p|period= : A preset report period, used instead of --since and --until. One of [$presets]. The this-* presets run up to today, so hours you have not logged yet count towards minus hours.}",
         ]);
     }
@@ -135,6 +136,7 @@ abstract class BalanceCommand extends Command
         $until = $this->parseDateOption(
             '--until',
             $this->option('until')
+                ?? Setting::ReportUntil->getConfigValue()
                 ?? CarbonImmutable::yesterday()
         );
 
@@ -143,7 +145,7 @@ abstract class BalanceCommand extends Command
         }
 
         if ($since->greaterThan($until)) {
-            $this->warn('--since ('.$since->format('Y-m-d').') cannot be after --until ('.$until->format('Y-m-d').').');
+            $this->warn("--since ({$since->format('Y-m-d')}) cannot be after --until ({$until->format('Y-m-d')}).");
 
             return null;
         }

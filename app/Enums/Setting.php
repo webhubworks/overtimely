@@ -36,6 +36,8 @@ enum Setting: string
 
     case ReportSince = 'timely.report.since';
 
+    case ReportUntil = 'timely.report.until';
+
     case TableStyle = 'display.table_style';
 
     /**
@@ -63,6 +65,7 @@ enum Setting: string
             self::UserCreatedAt => 'Timely account creation date',
             self::ReportFetchMode => 'Default report fetch mode',
             self::ReportSince => 'Default report fetch period start',
+            self::ReportUntil => 'Default report fetch period end',
             self::TableStyle => 'Table style',
         };
     }
@@ -147,6 +150,7 @@ enum Setting: string
             self::AccountId,
             self::ReportFetchMode,
             self::ReportSince,
+            self::ReportUntil,
             self::TableStyle,
         ];
     }
