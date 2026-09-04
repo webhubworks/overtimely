@@ -7,7 +7,9 @@ use App\Data\BalanceData;
 use App\Data\PeriodBalanceData;
 use App\Data\PeriodData;
 use App\Enums\ConfigKey;
+use App\Enums\ReportMode;
 use App\Services\DailyTotalHoursService;
+use App\Services\HoursService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Helper\TableCell;
@@ -30,20 +32,14 @@ class MonthlyCommand extends BalanceCommand
      */
     protected function report(): int
     {
-        $this->line('Fetching your logged hours ...');
-        $loggedHours = DailyTotalHoursService::fromDailyDurations(
-            $this->timely->getDailyTotalHoursForPeriod($this->period),
-        );
-
         $this->months = $this->period->months()
             ->map(fn (PeriodData $month): PeriodBalanceData => new PeriodBalanceData(
                 period: $month,
                 balance: BalanceData::fromOperands(
-                    $loggedHours->forPeriod($month),
+                    $this->hours->forPeriod($month),
                     $this->capacity->forPeriod($month),
                 ),
-            ),
-            );
+            ));
 
         $rightAlignment = (new TableStyle)->setPadType(STR_PAD_LEFT);
 
@@ -110,9 +106,20 @@ class MonthlyCommand extends BalanceCommand
         return [
             'Total',
             $this->months->count().' months',
-            "$total->logged",
-            "$total->expected",
+            $total->logged,
+            $total->expected,
             $total->balance->toString(prefixPositive: true),
         ];
+    }
+
+    /**
+     * @throws ConnectionException
+     */
+    protected function buildHoursService(): HoursService
+    {
+        return match ($this->mode) {
+            ReportMode::Totals => $this->buildDailyTotalHoursService(),
+            ReportMode::Events => $this->buildEventHoursService(),
+        };
     }
 }

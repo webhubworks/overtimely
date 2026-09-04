@@ -4,7 +4,10 @@ namespace App\Commands\Balance;
 
 use App\Console\BalanceCommand;
 use App\Data\BalanceData;
+use App\Data\DurationData;
 use App\Enums\ConfigKey;
+use App\Enums\ReportMode;
+use App\Services\HoursService;
 use Illuminate\Http\Client\ConnectionException;
 use Symfony\Component\Console\Helper\TableStyle;
 
@@ -19,10 +22,11 @@ class TotalCommand extends BalanceCommand
      */
     protected function report(): int
     {
-        $this->line('Fetching your total logged hours ...');
-        $logged = $this->timely->getTotalHoursForPeriod($this->period);
+        $logged = match ($this->mode) {
+            ReportMode::Totals => $this->timely->getTotalHoursForPeriod($this->period),
+            ReportMode::Events => $this->hours->forPeriod($this->period),
+        };
 
-        $this->line('Calculating your total capacity ...');
         $expected = $this->capacity->forPeriod($this->period);
 
         $balance = BalanceData::fromOperands($logged, $expected);
@@ -68,5 +72,13 @@ class TotalCommand extends BalanceCommand
         }
 
         return 'You are on time!';
+    }
+
+    /**
+     * @throws ConnectionException
+     */
+    protected function buildHoursService(): HoursService
+    {
+        return $this->buildEventHoursService();
     }
 }

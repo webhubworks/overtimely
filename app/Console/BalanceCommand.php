@@ -8,7 +8,10 @@ use App\Enums\ConfigKey;
 use App\Enums\ReportMode;
 use App\Enums\ReportPeriod;
 use App\Services\CapacityService;
+use App\Services\HoursService;
 use App\Services\TimelyDataService;
+use App\Services\EventHoursService;
+use App\Services\DailyTotalHoursService;
 use Carbon\CarbonImmutable;
 use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Http\Client\ConnectionException;
@@ -19,17 +22,19 @@ abstract class BalanceCommand extends Command
 {
     use EnsuresAuthentication;
 
+    protected TimelyDataService $timely;
+
     protected CapacityService $capacity;
+
+    protected HoursService $hours;
 
     protected ?PeriodData $period;
 
-    protected TimelyDataService $timely;
-
-    protected ReportMode $mode = ReportMode::Totals;
+    protected ReportMode $mode;
 
     public function __construct()
     {
-        $this->signature = trim($this->signature.' '.self::balanceOptions());
+        $this->signature = trim($this->signature.' '.self::baseOptions());
 
         parent::__construct();
     }
@@ -63,20 +68,41 @@ abstract class BalanceCommand extends Command
 
         $this->mode = $this->parseMode();
 
-        $this->info("Fetching your data for the period of $this->period:");
-
-        $this->line('Fetching your capacities ...');
+        $this->info("Fetching your data for the period of $this->period using '{$this->mode->value}' mode.");
 
         $capacities = $this->timely->getCapacities();
-
         $this->capacity = CapacityService::fromCapacities($capacities);
+
+        $this->hours = $this->buildHoursService();
 
         return $this->report();
     }
 
     abstract protected function report(): int;
 
-    private static function balanceOptions(): string
+    abstract protected function buildHoursService(): HoursService;
+
+    /**
+     * @throws ConnectionException
+     */
+    protected function buildDailyTotalHoursService(): DailyTotalHoursService
+    {
+        $dailyTotalHours = $this->timely->getDailyTotalHoursForPeriod($this->period);
+
+        return DailyTotalHoursService::fromDailyDurations($dailyTotalHours);
+    }
+
+    /**
+     * @throws ConnectionException
+     */
+    protected function buildEventHoursService(): EventHoursService
+    {
+        $events = $this->timely->getEventsForPeriod($this->period);
+
+        return EventHoursService::fromEvents($events);
+    }
+
+    private static function baseOptions(): string
     {
         $formatHint = ConfigKey::DATE_FORMATS_HINT;
         $presets = implode(', ', ReportPeriod::values());
@@ -163,6 +189,7 @@ abstract class BalanceCommand extends Command
     private function parseMode(): ReportMode
     {
         return ReportMode::tryFrom($this->option('mode'))
+            ?? ReportMode::tryFrom(ConfigKey::Mode->getConfigValue())
             ?? ReportMode::Totals;
     }
 }

@@ -7,7 +7,9 @@ use App\Data\BalanceData;
 use App\Data\PeriodBalanceData;
 use App\Data\PeriodData;
 use App\Enums\ConfigKey;
+use App\Enums\ReportMode;
 use App\Services\DailyTotalHoursService;
+use App\Services\HoursService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Helper\TableCell;
@@ -30,16 +32,11 @@ class WeeklyCommand extends BalanceCommand
      */
     protected function report(): int
     {
-        $this->line('Fetching your logged hours ...');
-        $loggedHours = DailyTotalHoursService::fromDailyDurations(
-            $this->timely->getDailyTotalHoursForPeriod($this->period),
-        );
-
         $this->weeks = $this->period->weeks()
             ->map(fn (PeriodData $week): PeriodBalanceData => new PeriodBalanceData(
                 period: $week,
                 balance: BalanceData::fromOperands(
-                    $loggedHours->forPeriod($week),
+                    $this->hours->forPeriod($week),
                     $this->capacity->forPeriod($week),
                 ),
             ))
@@ -106,9 +103,20 @@ class WeeklyCommand extends BalanceCommand
         return [
             'Total',
             $this->weeks->count().' weeks',
-            "$total->logged",
-            "$total->expected",
+            $total->logged,
+            $total->expected,
             $total->balance->toString(prefixPositive: true),
         ];
+    }
+
+    /**
+     * @throws ConnectionException
+     */
+    protected function buildHoursService(): HoursService
+    {
+        return match ($this->mode) {
+            ReportMode::Totals => $this->buildDailyTotalHoursService(),
+            ReportMode::Events => $this->buildEventHoursService(),
+        };
     }
 }
