@@ -21,21 +21,21 @@ it('rejects a non-numeric account id', function () {
 });
 
 it('stores a report start date', function () {
-    $this->artisan('config:set', ['setting' => 'since', 'value' => '2025-03-01'])
+    $this->artisan('config:set', ['setting' => 'report-since', 'value' => '2025-03-01'])
         ->assertSuccessful();
 
     expect(UserConfig::get(Setting::ReportSince))->toBe('2025-03-01');
 });
 
 it('stores a relative report start date', function () {
-    $this->artisan('config:set', ['setting' => 'since', 'value' => 'first day of this month'])
+    $this->artisan('config:set', ['setting' => 'report-since', 'value' => 'first day of this month'])
         ->assertSuccessful();
 
     expect(UserConfig::get(Setting::ReportSince))->toBe('first day of this month');
 });
 
 it('rejects an unparsable report start date', function () {
-    $this->artisan('config:set', ['setting' => 'since', 'value' => 'garbage-input'])
+    $this->artisan('config:set', ['setting' => 'report-since', 'value' => 'garbage-input'])
         ->expectsOutputToContain('Unsupported format.')
         ->assertFailed();
 
@@ -78,7 +78,7 @@ it('fails instead of prompting when it cannot ask for a setting', function () {
 });
 
 it('fails instead of prompting when it cannot ask for a value', function () {
-    $this->artisan('config:set', ['setting' => 'since', '--no-interaction' => true])
-        ->expectsOutputToContain('No value given for the since setting.')
+    $this->artisan('config:set', ['setting' => 'report-since', '--no-interaction' => true])
+        ->expectsOutputToContain('No value given for the report-since setting.')
         ->assertFailed();
 });

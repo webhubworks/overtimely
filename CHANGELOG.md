@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a config setting for a custom default [fetching mode](#new-feature-fetching-modes).\
   Run `overtimely config:set report-fetch-mode` to set it.
 - Added a config setting for a custom default for the `-u`|`--until` option.\
-  Run `overtimely config:set until` to set it.
+  Run `overtimely config:set report-until` to set it.
 
 ### Changed
 - Changed some command outputs and option descriptions.

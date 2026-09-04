@@ -47,7 +47,9 @@ it('mirrors the config repository structure on disk', function () {
         [Setting::AccountId, 123],
         [Setting::UserId, 42],
         [Setting::UserCreatedAt, '2024-01-01'],
+        [Setting::ReportFetchMode, 'events'],
         [Setting::ReportSince, '2025-01-01'],
+        [Setting::ReportUntil, '2025-12-31'],
         [Setting::TableStyle, 'box'],
     ]);
 
@@ -57,7 +59,7 @@ it('mirrors the config repository structure on disk', function () {
             'tokens' => ['access' => 'at', 'refresh' => 'rt', 'expires_at' => 4600],
             'account' => ['id' => 123],
             'user' => ['id' => 42, 'created_at' => '2024-01-01'],
-            'report' => ['since' => '2025-01-01'],
+            'report' => ['fetch_mode' => 'events', 'since' => '2025-01-01', 'until' => '2025-12-31'],
         ],
         'display' => ['table_style' => 'box'],
     ]);

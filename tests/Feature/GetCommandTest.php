@@ -25,7 +25,7 @@ it('fails for an unknown setting', function () {
 });
 
 it('fails when the setting holds no value', function () {
-    $this->artisan('config:get', ['setting' => 'since'])
-        ->expectsOutputToContain('The since setting is not set.')
+    $this->artisan('config:get', ['setting' => 'report-since'])
+        ->expectsOutputToContain('The report-since setting is not set.')
         ->assertFailed();
 });
