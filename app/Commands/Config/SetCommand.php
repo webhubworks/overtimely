@@ -2,8 +2,8 @@
 
 namespace App\Commands\Config;
 
-use App\Enums\Setting;
 use App\Enums\FetchMode;
+use App\Enums\Setting;
 use App\Enums\TableStyle;
 use App\Support\UserConfig;
 use LaravelZero\Framework\Commands\Command;
@@ -118,7 +118,7 @@ class SetCommand extends Command
                 label: $setting->label(),
                 options: FetchMode::values(),
                 default: $setting->getConfigValue(),
-                info: fn(string $value): string => FetchMode::settingInfo($value)
+                info: fn (string $value): string => FetchMode::settingInfo($value)
             ),
             default => null,
         };

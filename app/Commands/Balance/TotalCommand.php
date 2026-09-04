@@ -4,9 +4,8 @@ namespace App\Commands\Balance;
 
 use App\Console\BalanceCommand;
 use App\Data\BalanceData;
-use App\Data\DurationData;
-use App\Enums\Setting;
 use App\Enums\FetchMode;
+use App\Enums\Setting;
 use App\Services\HoursService;
 use Illuminate\Http\Client\ConnectionException;
 use Symfony\Component\Console\Helper\TableStyle;
@@ -47,7 +46,7 @@ class TotalCommand extends BalanceCommand
                     $balance->logged,
                     $balance->expected,
                     $balance->balance->toString(true),
-                    self::evaluate($balance)
+                    self::evaluate($balance),
                 ],
             ],
             Setting::TableStyle->getConfigValue(),

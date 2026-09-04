@@ -3,10 +3,7 @@
 namespace App\Services;
 
 use App\Data\DailyDurationData;
-use App\Data\DurationData;
-use App\Data\PeriodData;
 use Carbon\CarbonImmutable;
-use Carbon\CarbonPeriodImmutable;
 use Illuminate\Support\Collection;
 
 final readonly class DailyTotalHoursService extends HoursService
@@ -21,7 +18,7 @@ final readonly class DailyTotalHoursService extends HoursService
     }
 
     /**
-     * @param DailyDurationData|Collection<string,DailyDurationData> $dailyDurations
+     * @param  DailyDurationData|Collection<string,DailyDurationData>  $dailyDurations
      */
     public static function fromDailyDurations(DailyDurationData|Collection $dailyDurations): self
     {

@@ -4,14 +4,14 @@ namespace App\Console;
 
 use App\Concerns\EnsuresAuthentication;
 use App\Data\PeriodData;
-use App\Enums\Setting;
 use App\Enums\FetchMode;
 use App\Enums\FetchPeriod;
+use App\Enums\Setting;
 use App\Services\CapacityService;
+use App\Services\DailyTotalHoursService;
+use App\Services\EventHoursService;
 use App\Services\HoursService;
 use App\Services\TimelyDataService;
-use App\Services\EventHoursService;
-use App\Services\DailyTotalHoursService;
 use Carbon\CarbonImmutable;
 use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Http\Client\ConnectionException;

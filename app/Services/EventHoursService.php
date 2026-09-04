@@ -2,26 +2,23 @@
 
 namespace App\Services;
 
-use App\Data\DurationData;
 use App\Data\EventData;
-use App\Data\PeriodData;
 use App\Data\TimestampData;
 use Carbon\CarbonImmutable;
-use Carbon\CarbonPeriodImmutable;
 use Illuminate\Support\Collection;
 
 final readonly class EventHoursService extends HoursService
 {
-    /** @var Collection<string, Collection<int, TimeStampData>> */
+    /** @var Collection<string, Collection<int, TimestampData>> */
     private Collection $timestampsByDay;
 
     /**
-     * @param EventData|Collection<int,EventData>|array<int,EventData> $events
+     * @param  EventData|Collection<int,EventData>|array<int,EventData>  $events
      */
     public function __construct(EventData|Collection|array $events)
     {
         $eventsGroupedByDay = Collection::wrap($events)
-            ->groupBy(fn(EventData $event): string => $event->day->format('Y-m-d'));
+            ->groupBy(fn (EventData $event): string => $event->day->format('Y-m-d'));
 
         /**
          * Extract the timestamp collections of each event into its day's group.
@@ -35,7 +32,7 @@ final readonly class EventHoursService extends HoursService
     }
 
     /**
-     * @param EventData|Collection<int,EventData> $events
+     * @param  EventData|Collection<int,EventData>  $events
      */
     public static function fromEvents(EventData|Collection $events): self
     {
@@ -52,7 +49,7 @@ final readonly class EventHoursService extends HoursService
 
         $sequentialTimestamps = $this->resolveOverlappingTimestamps($timestampsOfDay);
 
-        return $sequentialTimestamps->sum(fn(TimestampData $timestamp) => $timestamp->seconds());
+        return $sequentialTimestamps->sum(fn (TimestampData $timestamp) => $timestamp->seconds());
     }
 
     /**
@@ -66,7 +63,7 @@ final readonly class EventHoursService extends HoursService
      * The (merged) timestamp is added to the output collection as it now cannot have any overlaps with any other timestamp.
      * A new top-level iteration starts with the next available timestamp still in the input collection.
      *
-     * @param Collection<int, TimestampData> $timestamps
+     * @param  Collection<int, TimestampData>  $timestamps
      * @return Collection<int, TimestampData>
      */
     private function resolveOverlappingTimestamps(Collection $timestamps): Collection
