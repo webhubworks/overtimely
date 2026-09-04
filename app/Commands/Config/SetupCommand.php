@@ -18,7 +18,9 @@ class SetupCommand extends Command
         ['auth:login', []],
         ['config:set', ['setting' => 'account-id']],
         ['auth:whoami', []],
-        ['config:set', ['setting' => 'since']],
+        ['config:set', ['setting' => 'report-fetch-mode']],
+        ['config:set', ['setting' => 'report-since']],
+        ['config:set', ['setting' => 'report-until']],
         ['config:set', ['setting' => 'table-style']],
     ];
 
