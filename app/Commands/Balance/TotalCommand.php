@@ -20,7 +20,7 @@ class TotalCommand extends BalanceCommand
     protected function report(): int
     {
         $this->line('Fetching your total logged hours ...');
-        $logged = $this->timely->getTotalLoggedHoursForPeriod($this->period);
+        $logged = $this->timely->getTotalHoursForPeriod($this->period);
 
         $this->line('Calculating your total capacity ...');
         $expected = $this->capacity->forPeriod($this->period);

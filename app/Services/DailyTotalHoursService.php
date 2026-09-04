@@ -9,7 +9,7 @@ use Carbon\CarbonImmutable;
 use Carbon\CarbonPeriodImmutable;
 use Illuminate\Support\Collection;
 
-final readonly class TotalLoggedHoursService
+final readonly class DailyTotalHoursService extends HoursService
 {
     /** @var Collection<string, DailyDurationData> */
     private Collection $dailyDurations;
@@ -28,21 +28,7 @@ final readonly class TotalLoggedHoursService
         return new self($dailyDurations);
     }
 
-    public function forPeriod(PeriodData $period): DurationData
-    {
-        $totalSeconds = 0;
-
-        foreach (CarbonPeriodImmutable::create($period->since, $period->until) as $day) {
-            $totalSeconds += $this->getSecondsOfDay($day);
-        }
-
-        return DurationData::fromTotalSeconds($totalSeconds);
-    }
-
-    /**
-     * Returns the duration for a given day in seconds.
-     */
-    private function getSecondsOfDay(CarbonImmutable $day): int
+    protected function getSecondsOfDay(CarbonImmutable $day): int
     {
         $applicableDailyDuration = $this->dailyDurations->get($day->format('Y-m-d'));
 

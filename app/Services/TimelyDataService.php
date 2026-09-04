@@ -68,7 +68,7 @@ final readonly class TimelyDataService
      *
      * @throws ConnectionException
      */
-    public function getTotalLoggedHoursForPeriod(PeriodData $period): DurationData
+    public function getTotalHoursForPeriod(PeriodData $period): DurationData
     {
         return DurationData::from($this->client
             ->get("{$this->accountId}/reports/filter", [
@@ -86,7 +86,7 @@ final readonly class TimelyDataService
      *
      * @throws ConnectionException
      */
-    public function getDailyTotalLoggedHoursForPeriod(PeriodData $period): Collection
+    public function getDailyTotalHoursForPeriod(PeriodData $period): Collection
     {
         return DailyDurationData::collect($this->client
             ->get("{$this->accountId}/reports/filter", [

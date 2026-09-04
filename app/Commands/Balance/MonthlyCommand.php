@@ -7,7 +7,7 @@ use App\Data\BalanceData;
 use App\Data\PeriodBalanceData;
 use App\Data\PeriodData;
 use App\Enums\ConfigKey;
-use App\Services\TotalLoggedHoursService;
+use App\Services\DailyTotalHoursService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Helper\TableCell;
@@ -31,8 +31,8 @@ class MonthlyCommand extends BalanceCommand
     protected function report(): int
     {
         $this->line('Fetching your logged hours ...');
-        $loggedHours = TotalLoggedHoursService::fromDailyDurations(
-            $this->timely->getDailyTotalLoggedHoursForPeriod($this->period),
+        $loggedHours = DailyTotalHoursService::fromDailyDurations(
+            $this->timely->getDailyTotalHoursForPeriod($this->period),
         );
 
         $this->months = $this->period->months()

@@ -10,7 +10,7 @@ use Carbon\CarbonImmutable;
 use Carbon\CarbonPeriodImmutable;
 use Illuminate\Support\Collection;
 
-final readonly class TimestampHoursService
+final readonly class EventHoursService extends HoursService
 {
     /** @var Collection<string, Collection<int, TimeStampData>> */
     private Collection $timestampsByDay;
@@ -42,20 +42,13 @@ final readonly class TimestampHoursService
         return new self($events);
     }
 
-    public function forPeriod(PeriodData $period): DurationData
-    {
-        $totalSeconds = 0;
-
-        foreach (CarbonPeriodImmutable::create($period->since, $period->until) as $day) {
-            $totalSeconds += $this->getSecondsOfDay($day);
-        }
-
-        return DurationData::fromTotalSeconds($totalSeconds);
-    }
-
-    private function getSecondsOfDay(CarbonImmutable $day): int
+    protected function getSecondsOfDay(CarbonImmutable $day): int
     {
         $timestampsOfDay = $this->timestampsByDay->get($day->format('Y-m-d'));
+
+        if (! $timestampsOfDay || $timestampsOfDay->isEmpty()) {
+            return 0;
+        }
 
         $sequentialTimestamps = $this->resolveOverlappingTimestamps($timestampsOfDay);
 
