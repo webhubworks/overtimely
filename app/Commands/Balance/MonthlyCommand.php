@@ -6,8 +6,8 @@ use App\Console\BalanceCommand;
 use App\Data\BalanceData;
 use App\Data\PeriodBalanceData;
 use App\Data\PeriodData;
-use App\Enums\ConfigKey;
-use App\Enums\ReportMode;
+use App\Enums\Setting;
+use App\Enums\FetchMode;
 use App\Services\DailyTotalHoursService;
 use App\Services\HoursService;
 use Illuminate\Http\Client\ConnectionException;
@@ -53,7 +53,7 @@ class MonthlyCommand extends BalanceCommand
                 'Overtime Balance',
             ],
             $this->buildMonthRows(),
-            ConfigKey::TableStyle->getConfigValue(),
+            Setting::TableStyle->getConfigValue(),
             [
                 2 => $rightAlignment,
                 3 => $rightAlignment,
@@ -118,8 +118,8 @@ class MonthlyCommand extends BalanceCommand
     protected function buildHoursService(): HoursService
     {
         return match ($this->mode) {
-            ReportMode::Totals => $this->buildDailyTotalHoursService(),
-            ReportMode::Events => $this->buildEventHoursService(),
+            FetchMode::Totals => $this->buildDailyTotalHoursService(),
+            FetchMode::Events => $this->buildEventHoursService(),
         };
     }
 }

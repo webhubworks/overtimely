@@ -1,31 +1,31 @@
 <?php
 
-use App\Enums\ConfigKey;
+use App\Enums\Setting;
 use App\Support\UserConfig;
 
 beforeEach(function () {
-    ConfigKey::RefreshToken->setConfigValue('token');
-    ConfigKey::AccountId->setConfigValue(1);
-    ConfigKey::UserId->setConfigValue(1);
-    ConfigKey::ClientId->setConfigValue(1);
-    ConfigKey::ClientSecret->setConfigValue('secret');
+    Setting::RefreshToken->setConfigValue('token');
+    Setting::AccountId->setConfigValue(1);
+    Setting::UserId->setConfigValue(1);
+    Setting::ClientId->setConfigValue(1);
+    Setting::ClientSecret->setConfigValue('secret');
 });
 
-dataset('credentials', fn () => collect(ConfigKey::credentials())
-    ->mapWithKeys(fn (ConfigKey $key): array => [$key->name => $key])
+dataset('credentials', fn () => collect(Setting::credentials())
+    ->mapWithKeys(fn (Setting $key): array => [$key->name => $key])
     ->all());
 
 it('detects required credentials', function () {
     expect(UserConfig::isConfigured())->toBeTrue();
 });
 
-it('detects missing required credentials', function (ConfigKey $missing) {
+it('detects missing required credentials', function (Setting $missing) {
     $missing->setConfigValue(null);
 
     expect(UserConfig::isConfigured())->toBeFalse();
 })->with('credentials');
 
-it('detects missing required credentials when their values are empty strings', function (ConfigKey $empty) {
+it('detects missing required credentials when their values are empty strings', function (Setting $empty) {
     $empty->setConfigValue('');
 
     expect(UserConfig::isConfigured())->toBeFalse();

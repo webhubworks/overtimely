@@ -1,7 +1,7 @@
 <?php
 
 use App\Data\OAuthTokenData;
-use App\Enums\ConfigKey;
+use App\Enums\Setting;
 use App\Services\TimelyAuthService;
 use App\Support\UserConfig;
 use Illuminate\Support\Facades\Http;
@@ -15,9 +15,9 @@ beforeEach(function () {
         'scope' => 'manage',
         'redirect_uri' => 'urn:ietf:wg:oauth:2.0:oob',
     ]);
-    ConfigKey::AccessToken->setConfigValue(null);
-    ConfigKey::RefreshToken->setConfigValue(null);
-    ConfigKey::TokenExpiresAt->setConfigValue(null);
+    Setting::AccessToken->setConfigValue(null);
+    Setting::RefreshToken->setConfigValue(null);
+    Setting::TokenExpiresAt->setConfigValue(null);
 });
 
 it('builds the authorize url from config', function () {
@@ -59,7 +59,7 @@ it('exchanges an authorization code for tokens', function () {
 });
 
 it('persists tokens, keeping the existing refresh token when not rotated', function () {
-    UserConfig::set(ConfigKey::RefreshToken, 'old-refresh');
+    UserConfig::set(Setting::RefreshToken, 'old-refresh');
 
     app(TimelyAuthService::class)->persist(new OAuthTokenData(
         accessToken: 'new-access',
@@ -70,15 +70,15 @@ it('persists tokens, keeping the existing refresh token when not rotated', funct
         tokenType: 'Bearer',
     ));
 
-    expect(UserConfig::get(ConfigKey::AccessToken))->toBe('new-access')
-        ->and(UserConfig::get(ConfigKey::RefreshToken))->toBe('old-refresh')
-        ->and((int) UserConfig::get(ConfigKey::TokenExpiresAt))->toBe(9200);
+    expect(UserConfig::get(Setting::AccessToken))->toBe('new-access')
+        ->and(UserConfig::get(Setting::RefreshToken))->toBe('old-refresh')
+        ->and((int) UserConfig::get(Setting::TokenExpiresAt))->toBe(9200);
 });
 
 it('refreshes an expired access token and persists the result', function () {
-    ConfigKey::AccessToken->setConfigValue('stale');
-    ConfigKey::RefreshToken->setConfigValue('rt');
-    ConfigKey::TokenExpiresAt->setConfigValue(100);
+    Setting::AccessToken->setConfigValue('stale');
+    Setting::RefreshToken->setConfigValue('rt');
+    Setting::TokenExpiresAt->setConfigValue(100);
 
     Http::fake([
         '*/oauth/token' => Http::response([
@@ -94,17 +94,17 @@ it('refreshes an expired access token and persists the result', function () {
     $token = app(TimelyAuthService::class)->validAccessToken();
 
     expect($token)->toBe('fresh')
-        ->and(ConfigKey::AccessToken->getConfigValue())->toBe('fresh')
-        ->and(UserConfig::get(ConfigKey::AccessToken))->toBe('fresh')
-        ->and(UserConfig::get(ConfigKey::RefreshToken))->toBe('rt2');
+        ->and(Setting::AccessToken->getConfigValue())->toBe('fresh')
+        ->and(UserConfig::get(Setting::AccessToken))->toBe('fresh')
+        ->and(UserConfig::get(Setting::RefreshToken))->toBe('rt2');
 
     Http::assertSent(fn ($request) => $request['grant_type'] === 'refresh_token' && $request['refresh_token'] === 'rt');
 });
 
 it('returns the stored token while it is still valid', function () {
-    ConfigKey::AccessToken->setConfigValue('good');
-    ConfigKey::RefreshToken->setConfigValue('rt');
-    ConfigKey::TokenExpiresAt->setConfigValue(now()->timestamp + 100000);
+    Setting::AccessToken->setConfigValue('good');
+    Setting::RefreshToken->setConfigValue('rt');
+    Setting::TokenExpiresAt->setConfigValue(now()->timestamp + 100000);
 
     Http::fake();
 
@@ -114,8 +114,8 @@ it('returns the stored token while it is still valid', function () {
 });
 
 it('returns the stored token when it never expires', function () {
-    ConfigKey::AccessToken->setConfigValue('forever');
-    ConfigKey::TokenExpiresAt->setConfigValue(null);
+    Setting::AccessToken->setConfigValue('forever');
+    Setting::TokenExpiresAt->setConfigValue(null);
 
     Http::fake();
 
@@ -129,9 +129,9 @@ it('throws when no tokens are present', function () {
 })->throws(RuntimeException::class);
 
 it('does not treat an empty expiry as an expired token', function () {
-    ConfigKey::AccessToken->setConfigValue('good');
-    ConfigKey::RefreshToken->setConfigValue('rt');
-    ConfigKey::TokenExpiresAt->setConfigValue('');
+    Setting::AccessToken->setConfigValue('good');
+    Setting::RefreshToken->setConfigValue('rt');
+    Setting::TokenExpiresAt->setConfigValue('');
 
     Http::fake();
 
@@ -141,9 +141,9 @@ it('does not treat an empty expiry as an expired token', function () {
 });
 
 it('treats empty credentials as no tokens at all', function () {
-    ConfigKey::AccessToken->setConfigValue('');
-    ConfigKey::RefreshToken->setConfigValue('');
-    ConfigKey::TokenExpiresAt->setConfigValue('');
+    Setting::AccessToken->setConfigValue('');
+    Setting::RefreshToken->setConfigValue('');
+    Setting::TokenExpiresAt->setConfigValue('');
 
     app(TimelyAuthService::class)->validAccessToken();
 })->throws(RuntimeException::class, 'Not authenticated with Timely. Run auth:login first.');

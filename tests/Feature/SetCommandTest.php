@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\ConfigKey;
+use App\Enums\Setting;
 use App\Support\UserConfig;
 
 it('stores an account id given as an argument', function () {
@@ -8,8 +8,8 @@ it('stores an account id given as an argument', function () {
         ->expectsOutputToContain('Timely account ID set to 4711.')
         ->assertSuccessful();
 
-    expect(UserConfig::get(ConfigKey::AccountId))->toBe(4711)
-        ->and(ConfigKey::AccountId->getConfigValue())->toBe(4711);
+    expect(UserConfig::get(Setting::AccountId))->toBe(4711)
+        ->and(Setting::AccountId->getConfigValue())->toBe(4711);
 });
 
 it('rejects a non-numeric account id', function () {
@@ -17,21 +17,21 @@ it('rejects a non-numeric account id', function () {
         ->expectsOutputToContain('The account ID must be numeric.')
         ->assertFailed();
 
-    expect(UserConfig::get(ConfigKey::AccountId))->toBeNull();
+    expect(UserConfig::get(Setting::AccountId))->toBeNull();
 });
 
 it('stores a report start date', function () {
     $this->artisan('config:set', ['setting' => 'since', 'value' => '2025-03-01'])
         ->assertSuccessful();
 
-    expect(UserConfig::get(ConfigKey::Since))->toBe('2025-03-01');
+    expect(UserConfig::get(Setting::ReportSince))->toBe('2025-03-01');
 });
 
 it('stores a relative report start date', function () {
     $this->artisan('config:set', ['setting' => 'since', 'value' => 'first day of this month'])
         ->assertSuccessful();
 
-    expect(UserConfig::get(ConfigKey::Since))->toBe('first day of this month');
+    expect(UserConfig::get(Setting::ReportSince))->toBe('first day of this month');
 });
 
 it('rejects an unparsable report start date', function () {
@@ -39,14 +39,14 @@ it('rejects an unparsable report start date', function () {
         ->expectsOutputToContain('Unsupported format.')
         ->assertFailed();
 
-    expect(UserConfig::get(ConfigKey::Since))->toBeNull();
+    expect(UserConfig::get(Setting::ReportSince))->toBeNull();
 });
 
 it('stores a table style', function () {
     $this->artisan('config:set', ['setting' => 'table-style', 'value' => 'box-double'])
         ->assertSuccessful();
 
-    expect(UserConfig::get(ConfigKey::TableStyle))->toBe('box-double');
+    expect(UserConfig::get(Setting::TableStyle))->toBe('box-double');
 });
 
 it('rejects an unknown table style', function () {
@@ -54,7 +54,7 @@ it('rejects an unknown table style', function () {
         ->expectsOutputToContain("Unknown table style 'fancy'.")
         ->assertFailed();
 
-    expect(UserConfig::get(ConfigKey::TableStyle))->toBeNull();
+    expect(UserConfig::get(Setting::TableStyle))->toBeNull();
 });
 
 it('rejects an unknown setting', function () {
@@ -68,7 +68,7 @@ it('refuses to set a value the app manages itself', function () {
         ->expectsOutputToContain('managed by the app')
         ->assertFailed();
 
-    expect(UserConfig::get(ConfigKey::AccessToken))->toBeNull();
+    expect(UserConfig::get(Setting::AccessToken))->toBeNull();
 });
 
 it('fails instead of prompting when it cannot ask for a setting', function () {

@@ -1,7 +1,7 @@
 <?php
 
 use App\Commands\Config\SetupCommand;
-use App\Enums\ConfigKey;
+use App\Enums\Setting;
 use Illuminate\Support\Facades\Artisan;
 
 it('names a registered command in every setup step', function () {
@@ -18,7 +18,7 @@ it('only asks config:set for settings that can be set', function () {
             continue;
         }
 
-        $key = ConfigKey::fromSettingName($arguments['setting']);
+        $key = Setting::fromKebabName($arguments['setting']);
 
         expect($key)->not->toBeNull()
             ->and($key->isSettable())->toBeTrue();
@@ -32,7 +32,7 @@ it('covers every settable setting', function () {
         ->values()
         ->all();
 
-    $settable = array_map(fn (ConfigKey $key): string => $key->settingName(), ConfigKey::settable());
+    $settable = array_map(fn (Setting $key): string => $key->kebabName(), Setting::settable());
 
     expect($prompted)->toEqualCanonicalizing($settable);
 });

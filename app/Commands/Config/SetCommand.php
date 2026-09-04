@@ -2,8 +2,8 @@
 
 namespace App\Commands\Config;
 
-use App\Enums\ConfigKey;
-use App\Enums\ReportMode;
+use App\Enums\Setting;
+use App\Enums\FetchMode;
 use App\Enums\TableStyle;
 use App\Support\UserConfig;
 use LaravelZero\Framework\Commands\Command;
@@ -52,7 +52,7 @@ class SetCommand extends Command
         return self::SUCCESS;
     }
 
-    private function resolveSetting(): ?ConfigKey
+    private function resolveSetting(): ?Setting
     {
         $name = $this->argument('setting');
 
@@ -65,93 +65,93 @@ class SetCommand extends Command
 
             $name = select(
                 label: 'Which setting do you want to change?',
-                options: collect(ConfigKey::settable())
-                    ->mapWithKeys(fn (ConfigKey $key): array => [$key->settingName() => $key->label()])
+                options: collect(Setting::settable())
+                    ->mapWithKeys(fn (Setting $setting): array => [$setting->kebabName() => $setting->label()])
                     ->all(),
             );
         }
 
-        $key = ConfigKey::fromSettingName($name);
+        $setting = Setting::fromKebabName($name);
 
-        if ($key === null) {
+        if ($setting === null) {
             $this->error("Unknown setting '{$name}'. ".$this->settableHint());
 
             return null;
         }
 
-        if (! $key->isSettable()) {
-            $this->error("The {$key->settingName()} setting is managed by the app and cannot be set by hand. ".$this->settableHint());
+        if (! $setting->isSettable()) {
+            $this->error("The {$setting->kebabName()} setting is managed by the app and cannot be set by hand. ".$this->settableHint());
 
             return null;
         }
 
-        return $key;
+        return $setting;
     }
 
-    private function askForValue(ConfigKey $key): ?string
+    private function askForValue(Setting $setting): ?string
     {
         if (! $this->input->isInteractive()) {
-            $this->error("No value given for the {$key->settingName()} setting.");
+            $this->error("No value given for the {$setting->kebabName()} setting.");
 
             return null;
         }
 
-        return match ($key) {
-            ConfigKey::AccountId => text(
-                label: $key->label(),
-                default: (string) $key->getConfigValue(),
+        return match ($setting) {
+            Setting::AccountId => text(
+                label: $setting->label(),
+                default: (string) $setting->getConfigValue(),
                 required: true,
-                validate: fn (string $value): ?string => $this->validationError($key, $value),
+                validate: fn (string $value): ?string => $this->validationError($setting, $value),
             ),
-            ConfigKey::Since => text(
-                label: $key->label().' '.ConfigKey::DATE_FORMATS_HINT,
+            Setting::ReportSince => text(
+                label: $setting->label().' '.Setting::DATE_FORMATS_HINT,
                 placeholder: 'first day of this month',
-                default: (string) $key->getConfigValue(),
-                validate: fn (string $value): ?string => $this->validationError($key, $value),
+                default: (string) $setting->getConfigValue(),
+                validate: fn (string $value): ?string => $this->validationError($setting, $value),
             ),
-            ConfigKey::TableStyle => select(
+            Setting::TableStyle => select(
                 label: 'Select a table style',
                 options: TableStyle::values(),
-                default: $key->getConfigValue(),
+                default: $setting->getConfigValue(),
             ),
-            ConfigKey::Mode => select(
-                label: $key->label(),
-                options: ReportMode::values(),
-                default: $key->getConfigValue(),
-                info: fn(string $value): string => ReportMode::settingInfo($value)
+            Setting::ReportFetchMode => select(
+                label: $setting->label(),
+                options: FetchMode::values(),
+                default: $setting->getConfigValue(),
+                info: fn(string $value): string => FetchMode::settingInfo($value)
             ),
             default => null,
         };
     }
 
-    private function validationError(ConfigKey $key, string $value): ?string
+    private function validationError(Setting $setting, string $value): ?string
     {
-        return match ($key) {
-            ConfigKey::AccountId => ctype_digit($value)
+        return match ($setting) {
+            Setting::AccountId => ctype_digit($value)
                 ? null
                 : 'The account ID must be numeric.',
-            ConfigKey::Since => strtotime($value) === false
-                ? 'Unsupported format. '.ConfigKey::DATE_FORMATS_HINT
+            Setting::ReportSince => strtotime($value) === false
+                ? 'Unsupported format. '.Setting::DATE_FORMATS_HINT
                 : null,
-            ConfigKey::TableStyle => TableStyle::tryFrom($value) === null
+            Setting::TableStyle => TableStyle::tryFrom($value) === null
                 ? "Unknown table style '{$value}'. Choose one of: ".implode(', ', TableStyle::values()).'.'
                 : null,
-            ConfigKey::Mode => ReportMode::tryFrom($value) === null
-                ? "Unknown report mode '{$value}'. Choose one of: ".implode(', ', ReportMode::values()).'.'
+            Setting::ReportFetchMode => FetchMode::tryFrom($value) === null
+                ? "Unknown report mode '{$value}'. Choose one of: ".implode(', ', FetchMode::values()).'.'
                 : null,
             default => null,
         };
     }
 
-    private function cast(ConfigKey $key, string $value): int|string
+    private function cast(Setting $setting, string $value): int|string
     {
-        return $key === ConfigKey::AccountId ? (int) $value : $value;
+        return $setting === Setting::AccountId ? (int) $value : $value;
     }
 
     private function settableHint(): string
     {
-        return 'Choose one of: '.collect(ConfigKey::settable())
-            ->map(fn (ConfigKey $key): string => $key->settingName())
+        return 'Choose one of: '.collect(Setting::settable())
+            ->map(fn (Setting $key): string => $key->kebabName())
             ->implode(', ').'.';
     }
 }

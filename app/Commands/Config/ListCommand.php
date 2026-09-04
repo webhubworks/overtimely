@@ -2,7 +2,7 @@
 
 namespace App\Commands\Config;
 
-use App\Enums\ConfigKey;
+use App\Enums\Setting;
 use App\Support\UserConfig;
 use LaravelZero\Framework\Commands\Command;
 
@@ -23,8 +23,8 @@ class ListCommand extends Command
                 'Value',
                 'Source',
             ],
-            array_map($this->settingRow(...), ConfigKey::cases()),
-            ConfigKey::TableStyle->getConfigValue(),
+            array_map($this->settingRow(...), Setting::cases()),
+            Setting::TableStyle->getConfigValue(),
         );
 
         note('Config file: '.UserConfig::path());
@@ -32,32 +32,32 @@ class ListCommand extends Command
         return self::SUCCESS;
     }
 
-    private function settingRow(ConfigKey $key): array
+    private function settingRow(Setting $setting): array
     {
         return [
-            $key->settingName(),
-            $this->displayValue($key),
-            $this->source($key),
+            $setting->kebabName(),
+            $this->displayValue($setting),
+            $this->source($setting),
         ];
     }
 
-    private function displayValue(ConfigKey $key): string
+    private function displayValue(Setting $setting): string
     {
-        $value = $key->getConfigValue();
+        $value = $setting->getConfigValue();
 
         if (blank($value)) {
             return '—';
         }
 
-        return $key->isSecret() ? '********' : (string) $value;
+        return $setting->isSecret() ? '********' : (string) $value;
     }
 
-    private function source(ConfigKey $key): string
+    private function source(Setting $setting): string
     {
         return match (true) {
-            filled($key->envValue()) => 'environment',
-            filled(UserConfig::get($key)) => 'config file',
-            filled($key->getConfigValue()) => 'default',
+            filled($setting->envValue()) => 'environment',
+            filled(UserConfig::get($setting)) => 'config file',
+            filled($setting->getConfigValue()) => 'default',
             default => '—',
         };
     }

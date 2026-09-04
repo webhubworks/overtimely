@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Enums\ConfigKey;
+use App\Enums\Setting;
 use App\Services\TimelyAuthService;
 use App\Services\TimelyDataService;
 use App\Support\UserConfig;
@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        foreach (ConfigKey::cases() as $key) {
+        foreach (Setting::cases() as $key) {
             // An explicit environment variable should always win. So we let the config.php take precedence.
             if (filled($key->envValue())) {
                 continue;
@@ -55,17 +55,17 @@ class AppServiceProvider extends ServiceProvider
             return new TimelyDataService(
                 $client,
                 $this->requireNumericId(
-                    ConfigKey::AccountId->getConfigValue(),
+                    Setting::AccountId->getConfigValue(),
                     'No valid Timely account ID set. Run config:set account-id first.'
                 ),
-                filled(ConfigKey::UserId->getConfigValue())
+                filled(Setting::UserId->getConfigValue())
                     ? $this->requireNumericId(
-                        ConfigKey::UserId->getConfigValue(),
+                        Setting::UserId->getConfigValue(),
                         'No valid Timely user ID set. Run auth:whoami first.'
                     )
                     : null,
-                filled(ConfigKey::UserCreatedAt->getConfigValue())
-                    ? CarbonImmutable::createFromFormat('!Y-m-d', ConfigKey::UserCreatedAt->getConfigValue())
+                filled(Setting::UserCreatedAt->getConfigValue())
+                    ? CarbonImmutable::createFromFormat('!Y-m-d', Setting::UserCreatedAt->getConfigValue())
                     : null,
             );
         });

@@ -3,7 +3,7 @@
 namespace App\Commands\Auth;
 
 use App\Concerns\OpensExternally;
-use App\Enums\ConfigKey;
+use App\Enums\Setting;
 use App\Services\TimelyAuthService;
 use App\Support\UserConfig;
 use LaravelZero\Framework\Commands\Command;
@@ -50,9 +50,9 @@ class LoginCommand extends Command
 
         $auth->persist($token);
 
-        ConfigKey::AccessToken->setConfigValue($token->accessToken);
-        ConfigKey::RefreshToken->setConfigValue($token->refreshToken);
-        ConfigKey::TokenExpiresAt->setConfigValue($token->expiresAt());
+        Setting::AccessToken->setConfigValue($token->accessToken);
+        Setting::RefreshToken->setConfigValue($token->refreshToken);
+        Setting::TokenExpiresAt->setConfigValue($token->expiresAt());
 
         info('Logged in to Timely.');
         note('Config file: '.UserConfig::path());
@@ -62,9 +62,9 @@ class LoginCommand extends Command
 
     private function ensureOAuthApp(): bool
     {
-        $clientId = ConfigKey::ClientId->getConfigValue();
-        $clientSecret = ConfigKey::ClientSecret->getConfigValue();
-        $redirectUri = ConfigKey::RedirectUri->getConfigValue();
+        $clientId = Setting::ClientId->getConfigValue();
+        $clientSecret = Setting::ClientSecret->getConfigValue();
+        $redirectUri = Setting::RedirectUri->getConfigValue();
 
         if (blank($clientId) || blank($clientSecret) || blank($redirectUri)) {
             if (! $this->input->isInteractive()) {
@@ -87,14 +87,14 @@ class LoginCommand extends Command
         }
 
         UserConfig::setMany([
-            [ConfigKey::ClientId, $clientId],
-            [ConfigKey::ClientSecret, $clientSecret],
-            [ConfigKey::RedirectUri, $redirectUri],
+            [Setting::ClientId, $clientId],
+            [Setting::ClientSecret, $clientSecret],
+            [Setting::RedirectUri, $redirectUri],
         ]);
 
-        ConfigKey::ClientId->setConfigValue($clientId);
-        ConfigKey::ClientSecret->setConfigValue($clientSecret);
-        ConfigKey::RedirectUri->setConfigValue($redirectUri);
+        Setting::ClientId->setConfigValue($clientId);
+        Setting::ClientSecret->setConfigValue($clientSecret);
+        Setting::RedirectUri->setConfigValue($redirectUri);
 
         return true;
     }

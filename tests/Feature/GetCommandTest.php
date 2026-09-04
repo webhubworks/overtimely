@@ -1,9 +1,9 @@
 <?php
 
-use App\Enums\ConfigKey;
+use App\Enums\Setting;
 
 it('prints the value of a setting', function () {
-    ConfigKey::AccountId->setConfigValue(967619);
+    Setting::AccountId->setConfigValue(967619);
 
     $this->artisan('config:get', ['setting' => 'account-id'])
         ->expectsOutputToContain('967619')
@@ -11,7 +11,7 @@ it('prints the value of a setting', function () {
 });
 
 it('prints secrets in full', function () {
-    ConfigKey::AccessToken->setConfigValue('plaintext-token');
+    Setting::AccessToken->setConfigValue('plaintext-token');
 
     $this->artisan('config:get', ['setting' => 'access-token'])
         ->expectsOutputToContain('plaintext-token')

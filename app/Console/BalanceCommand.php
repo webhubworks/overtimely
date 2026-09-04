@@ -4,9 +4,9 @@ namespace App\Console;
 
 use App\Concerns\EnsuresAuthentication;
 use App\Data\PeriodData;
-use App\Enums\ConfigKey;
-use App\Enums\ReportMode;
-use App\Enums\ReportPeriod;
+use App\Enums\Setting;
+use App\Enums\FetchMode;
+use App\Enums\FetchPeriod;
 use App\Services\CapacityService;
 use App\Services\HoursService;
 use App\Services\TimelyDataService;
@@ -30,7 +30,7 @@ abstract class BalanceCommand extends Command
 
     protected ?PeriodData $period;
 
-    protected ReportMode $mode;
+    protected FetchMode $mode;
 
     public function __construct()
     {
@@ -104,9 +104,9 @@ abstract class BalanceCommand extends Command
 
     private static function baseOptions(): string
     {
-        $formatHint = ConfigKey::DATE_FORMATS_HINT;
-        $presets = implode(', ', ReportPeriod::values());
-        $modes = implode(', ', ReportMode::values());
+        $formatHint = Setting::DATE_FORMATS_HINT;
+        $presets = implode(', ', FetchPeriod::values());
+        $modes = implode(', ', FetchMode::values());
 
         return implode(' ', [
             "{--m|mode= : The report mode. One of [$modes]. Defaults to 'totals'. Run 'config:set mode' to set a custom default and see what each mode does.}",
@@ -128,7 +128,7 @@ abstract class BalanceCommand extends Command
         $since = $this->parseDateOption(
             '--since',
             $this->option('since')
-                ?? ConfigKey::Since->getConfigValue()
+                ?? Setting::ReportSince->getConfigValue()
                 ?? $this->timely->getCreationDate()
         );
 
@@ -159,10 +159,10 @@ abstract class BalanceCommand extends Command
             return null;
         }
 
-        $period = ReportPeriod::tryFrom($preset);
+        $period = FetchPeriod::tryFrom($preset);
 
         if ($period === null) {
-            $this->warn("Unknown period '$preset'. Choose one of: ".implode(', ', ReportPeriod::values()));
+            $this->warn("Unknown period '$preset'. Choose one of: ".implode(', ', FetchPeriod::values()));
 
             return null;
         }
@@ -180,16 +180,16 @@ abstract class BalanceCommand extends Command
             return CarbonImmutable::parse($value)->startOfDay();
 
         } catch (InvalidFormatException) {
-            $this->warn("Cannot parse $option '$value' ".ConfigKey::DATE_FORMATS_HINT);
+            $this->warn("Cannot parse $option '$value' ".Setting::DATE_FORMATS_HINT);
 
             return null;
         }
     }
 
-    private function parseMode(): ReportMode
+    private function parseMode(): FetchMode
     {
-        return ReportMode::tryFrom($this->option('mode'))
-            ?? ReportMode::tryFrom(ConfigKey::Mode->getConfigValue())
-            ?? ReportMode::Totals;
+        return FetchMode::tryFrom($this->option('mode'))
+            ?? FetchMode::tryFrom(Setting::ReportFetchMode->getConfigValue())
+            ?? FetchMode::Totals;
     }
 }

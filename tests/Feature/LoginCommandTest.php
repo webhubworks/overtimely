@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\ConfigKey;
+use App\Enums\Setting;
 use App\Support\UserConfig;
 use Illuminate\Support\Facades\Http;
 
@@ -29,15 +29,15 @@ it('exchanges a pasted code and stores the tokens', function () {
 
     $this->artisan('auth:login', ['code' => 'code123'])->assertSuccessful();
 
-    expect(UserConfig::get(ConfigKey::AccessToken))->toBe('at')
-        ->and(UserConfig::get(ConfigKey::RefreshToken))->toBe('rt')
-        ->and((int) UserConfig::get(ConfigKey::TokenExpiresAt))->toBe(4600);
+    expect(UserConfig::get(Setting::AccessToken))->toBe('at')
+        ->and(UserConfig::get(Setting::RefreshToken))->toBe('rt')
+        ->and((int) UserConfig::get(Setting::TokenExpiresAt))->toBe(4600);
 });
 
 it('fails non-interactively when the oauth app is not configured', function () {
-    ConfigKey::ClientId->setConfigValue(null);
-    ConfigKey::ClientSecret->setConfigValue(null);
-    ConfigKey::RedirectUri->setConfigValue(null);
+    Setting::ClientId->setConfigValue(null);
+    Setting::ClientSecret->setConfigValue(null);
+    Setting::RedirectUri->setConfigValue(null);
 
     $this->artisan('auth:login', ['code' => 'code123', '--no-interaction' => true])->assertFailed();
 });
@@ -56,7 +56,7 @@ it('persists the oauth application even when it came from the environment', func
 
     $this->artisan('auth:login', ['code' => 'code123'])->assertSuccessful();
 
-    expect(UserConfig::get(ConfigKey::ClientId))->toBe('cid')
-        ->and(UserConfig::get(ConfigKey::ClientSecret))->toBe('secret')
-        ->and(UserConfig::get(ConfigKey::RedirectUri))->toBe('urn:ietf:wg:oauth:2.0:oob');
+    expect(UserConfig::get(Setting::ClientId))->toBe('cid')
+        ->and(UserConfig::get(Setting::ClientSecret))->toBe('secret')
+        ->and(UserConfig::get(Setting::RedirectUri))->toBe('urn:ietf:wg:oauth:2.0:oob');
 });

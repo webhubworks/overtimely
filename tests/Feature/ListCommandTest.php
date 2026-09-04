@@ -1,20 +1,20 @@
 <?php
 
-use App\Enums\ConfigKey;
+use App\Enums\Setting;
 use App\Support\UserConfig;
 
 it('lists every setting', function () {
     $command = $this->artisan('config:list');
 
-    foreach (ConfigKey::cases() as $key) {
-        $command->expectsOutputToContain($key->settingName());
+    foreach (Setting::cases() as $key) {
+        $command->expectsOutputToContain($key->kebabName());
     }
 
     $command->assertSuccessful();
 });
 
 it('masks secrets', function () {
-    ConfigKey::AccessToken->setConfigValue('plaintext-token');
+    Setting::AccessToken->setConfigValue('plaintext-token');
 
     $this->artisan('config:list')
         ->expectsOutputToContain('********')
@@ -23,8 +23,8 @@ it('masks secrets', function () {
 });
 
 it('reports where each value came from', function () {
-    UserConfig::set(ConfigKey::AccountId, 4711);
-    ConfigKey::AccountId->setConfigValue(4711);
+    UserConfig::set(Setting::AccountId, 4711);
+    Setting::AccountId->setConfigValue(4711);
 
     $this->artisan('config:list')
         ->expectsOutputToContain('config file')

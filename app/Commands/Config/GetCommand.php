@@ -2,7 +2,7 @@
 
 namespace App\Commands\Config;
 
-use App\Enums\ConfigKey;
+use App\Enums\Setting;
 use LaravelZero\Framework\Commands\Command;
 
 class GetCommand extends Command
@@ -14,18 +14,18 @@ class GetCommand extends Command
     public function handle(): int
     {
         $name = $this->argument('setting');
-        $key = ConfigKey::fromSettingName($name);
+        $setting = Setting::fromKebabName($name);
 
-        if ($key === null) {
+        if ($setting === null) {
             $this->error("Unknown setting '{$name}'. Run config:list to see them all.");
 
             return self::FAILURE;
         }
 
-        $value = $key->getConfigValue();
+        $value = $setting->getConfigValue();
 
         if (blank($value)) {
-            $this->error("The {$key->settingName()} setting is not set.");
+            $this->error("The {$setting->kebabName()} setting is not set.");
 
             return self::FAILURE;
         }

@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\ConfigKey;
+use App\Enums\Setting;
 
 return [
     'base_url' => env('TIMELY_API_URL', 'https://api.timelyapp.com/1.1/'),
@@ -9,29 +9,29 @@ return [
     'oauth' => [
         'authorize_url' => env('TIMELY_OAUTH_AUTHORIZE_URL', 'https://api.timelyapp.com/1.1/oauth/authorize'),
         'token_url' => env('TIMELY_OAUTH_TOKEN_URL', 'https://api.timelyapp.com/1.1/oauth/token'),
-        'client_id' => ConfigKey::ClientId->envValue(),
-        'client_secret' => ConfigKey::ClientSecret->envValue(),
-        'redirect_uri' => ConfigKey::RedirectUri->envValue('urn:ietf:wg:oauth:2.0:oob'),
+        'client_id' => Setting::ClientId->envValue(),
+        'client_secret' => Setting::ClientSecret->envValue(),
+        'redirect_uri' => Setting::RedirectUri->envValue('urn:ietf:wg:oauth:2.0:oob'),
         'scope' => 'manage',
     ],
 
     'tokens' => [
-        'access' => ConfigKey::AccessToken->envValue(),
-        'refresh' => ConfigKey::RefreshToken->envValue(),
-        'expires_at' => ConfigKey::TokenExpiresAt->envValue(),
+        'access' => Setting::AccessToken->envValue(),
+        'refresh' => Setting::RefreshToken->envValue(),
+        'expires_at' => Setting::TokenExpiresAt->envValue(),
     ],
 
     'account' => [
-        'id' => ConfigKey::AccountId->envValue(),
+        'id' => Setting::AccountId->envValue(),
     ],
 
     'user' => [
-        'id' => ConfigKey::UserId->envValue(),
-        'created_at' => ConfigKey::UserCreatedAt->envValue(),
+        'id' => Setting::UserId->envValue(),
+        'created_at' => Setting::UserCreatedAt->envValue(),
     ],
 
     'report' => [
-        'fetch_mode' => ConfigKey::Mode->envValue(),
-        'since' => ConfigKey::Since->envValue(),
+        'fetch_mode' => Setting::ReportFetchMode->envValue(),
+        'since' => Setting::ReportSince->envValue(),
     ],
 ];

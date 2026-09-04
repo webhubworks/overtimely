@@ -1,54 +1,54 @@
 <?php
 
-use App\Enums\ConfigKey;
+use App\Enums\Setting;
 use App\Support\UserConfig;
 
 it('round-trips a value through set and get', function () {
-    UserConfig::set(ConfigKey::AccountId, '123');
+    UserConfig::set(Setting::AccountId, '123');
 
-    expect(UserConfig::get(ConfigKey::AccountId))->toBe('123');
+    expect(UserConfig::get(Setting::AccountId))->toBe('123');
 });
 
 it('returns null for an unset key', function () {
-    expect(UserConfig::get(ConfigKey::Since))->toBeNull();
+    expect(UserConfig::get(Setting::ReportSince))->toBeNull();
 });
 
 it('treats an empty string as null', function () {
-    UserConfig::set(ConfigKey::Since, '');
+    UserConfig::set(Setting::ReportSince, '');
 
-    expect(UserConfig::get(ConfigKey::Since))->toBeNull();
+    expect(UserConfig::get(Setting::ReportSince))->toBeNull();
 });
 
 it('unsets a key when set to null', function () {
-    UserConfig::set(ConfigKey::UserId, '42');
-    UserConfig::set(ConfigKey::UserId, null);
+    UserConfig::set(Setting::UserId, '42');
+    UserConfig::set(Setting::UserId, null);
 
-    expect(UserConfig::get(ConfigKey::UserId))->toBeNull();
+    expect(UserConfig::get(Setting::UserId))->toBeNull();
 });
 
 it('writes many keys in a single call', function () {
     UserConfig::setMany([
-        [ConfigKey::RefreshToken, 'tok'],
-        [ConfigKey::AccountId, '1'],
-        [ConfigKey::UserId, '2'],
+        [Setting::RefreshToken, 'tok'],
+        [Setting::AccountId, '1'],
+        [Setting::UserId, '2'],
     ]);
 
-    expect(UserConfig::get(ConfigKey::RefreshToken))->toBe('tok')
-        ->and(UserConfig::get(ConfigKey::AccountId))->toBe('1')
-        ->and(UserConfig::get(ConfigKey::UserId))->toBe('2');
+    expect(UserConfig::get(Setting::RefreshToken))->toBe('tok')
+        ->and(UserConfig::get(Setting::AccountId))->toBe('1')
+        ->and(UserConfig::get(Setting::UserId))->toBe('2');
 });
 
 it('mirrors the config repository structure on disk', function () {
     UserConfig::setMany([
-        [ConfigKey::ClientId, 'abc'],
-        [ConfigKey::AccessToken, 'at'],
-        [ConfigKey::RefreshToken, 'rt'],
-        [ConfigKey::TokenExpiresAt, 4600],
-        [ConfigKey::AccountId, 123],
-        [ConfigKey::UserId, 42],
-        [ConfigKey::UserCreatedAt, '2024-01-01'],
-        [ConfigKey::Since, '2025-01-01'],
-        [ConfigKey::TableStyle, 'box'],
+        [Setting::ClientId, 'abc'],
+        [Setting::AccessToken, 'at'],
+        [Setting::RefreshToken, 'rt'],
+        [Setting::TokenExpiresAt, 4600],
+        [Setting::AccountId, 123],
+        [Setting::UserId, 42],
+        [Setting::UserCreatedAt, '2024-01-01'],
+        [Setting::ReportSince, '2025-01-01'],
+        [Setting::TableStyle, 'box'],
     ]);
 
     expect(json_decode(file_get_contents(UserConfig::path()), true))->toBe([
@@ -70,7 +70,7 @@ it('drops settings left behind by an older key layout', function () {
 });
 
 it('maps every config key to a real config entry', function () {
-    foreach (ConfigKey::cases() as $key) {
+    foreach (Setting::cases() as $key) {
         expect(config()->has($key->value))->toBeTrue("missing config entry for {$key->name}");
     }
 });

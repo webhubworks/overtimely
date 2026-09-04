@@ -3,7 +3,7 @@
 use App\Data\CapacityData;
 use App\Data\DailyDurationData;
 use App\Data\DurationData;
-use App\Enums\ConfigKey;
+use App\Enums\Setting;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
@@ -94,7 +94,7 @@ function makeDailyLoggedHours(array $hoursByDay): Collection
 /**
  * Puts a value behind a setting's environment variable, or removes the variable when the value is null.
  */
-function withEnv(ConfigKey $key, ?string $value): void
+function withEnv(Setting $key, ?string $value): void
 {
     if ($value === null) {
         putenv($key->envKey());

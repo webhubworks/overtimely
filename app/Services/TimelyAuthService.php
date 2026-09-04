@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Data\OAuthTokenData;
-use App\Enums\ConfigKey;
+use App\Enums\Setting;
 use App\Support\UserConfig;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
@@ -33,7 +33,7 @@ final readonly class TimelyAuthService
         return $this->requestToken([
             'grant_type' => 'authorization_code',
             'code' => $code,
-            'redirect_uri' => ConfigKey::RedirectUri->getConfigValue(),
+            'redirect_uri' => Setting::RedirectUri->getConfigValue(),
         ]);
     }
 
@@ -52,12 +52,12 @@ final readonly class TimelyAuthService
     public function persist(OAuthTokenData $token): void
     {
         $values = [
-            [ConfigKey::AccessToken, $token->accessToken],
-            [ConfigKey::TokenExpiresAt, $token->expiresAt()],
+            [Setting::AccessToken, $token->accessToken],
+            [Setting::TokenExpiresAt, $token->expiresAt()],
         ];
 
         if ($token->refreshToken !== null) {
-            $values[] = [ConfigKey::RefreshToken, $token->refreshToken];
+            $values[] = [Setting::RefreshToken, $token->refreshToken];
         }
 
         UserConfig::setMany($values);
@@ -70,9 +70,9 @@ final readonly class TimelyAuthService
      */
     public function validAccessToken(): string
     {
-        $accessToken = ConfigKey::AccessToken->getConfigValue();
-        $refreshToken = ConfigKey::RefreshToken->getConfigValue();
-        $expiresAt = ConfigKey::TokenExpiresAt->getConfigValue();
+        $accessToken = Setting::AccessToken->getConfigValue();
+        $refreshToken = Setting::RefreshToken->getConfigValue();
+        $expiresAt = Setting::TokenExpiresAt->getConfigValue();
 
         $expired = filled($expiresAt) && now()->timestamp >= (int) $expiresAt - 60;
 
@@ -87,9 +87,9 @@ final readonly class TimelyAuthService
         $token = $this->refresh($refreshToken);
         $this->persist($token);
 
-        ConfigKey::AccessToken->setConfigValue($token->accessToken);
-        ConfigKey::RefreshToken->setConfigValue($token->refreshToken ?? $refreshToken);
-        ConfigKey::TokenExpiresAt->setConfigValue($token->expiresAt());
+        Setting::AccessToken->setConfigValue($token->accessToken);
+        Setting::RefreshToken->setConfigValue($token->refreshToken ?? $refreshToken);
+        Setting::TokenExpiresAt->setConfigValue($token->expiresAt());
 
         return $token->accessToken;
     }

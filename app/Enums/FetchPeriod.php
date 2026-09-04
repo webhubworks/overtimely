@@ -6,7 +6,7 @@ use App\Concerns\EnumValuesTrait;
 use App\Data\PeriodData;
 use Carbon\CarbonImmutable;
 
-enum ReportPeriod: string
+enum FetchPeriod: string
 {
     use EnumValuesTrait;
 

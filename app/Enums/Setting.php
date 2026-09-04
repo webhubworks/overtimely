@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
  * That same dot path addresses the value inside the user config JSON file,
  * and the environment variable that overrides it is derived from it.
  */
-enum ConfigKey: string
+enum Setting: string
 {
     public const string DATE_FORMATS_HINT = '(Supported formats: https://www.php.net/manual/en/datetime.formats.php)';
 
@@ -32,16 +32,16 @@ enum ConfigKey: string
 
     case UserCreatedAt = 'timely.user.created_at';
 
-    case Mode = 'timely.report.fetch_mode';
+    case ReportFetchMode = 'timely.report.fetch_mode';
 
-    case Since = 'timely.report.since';
+    case ReportSince = 'timely.report.since';
 
     case TableStyle = 'display.table_style';
 
     /**
-     * The name this key goes by on the command line, e.g. `config:set account-id`.
+     * The name this setting goes by on the command line, e.g. `config:set account-id`.
      */
-    public function settingName(): string
+    public function kebabName(): string
     {
         return Str::kebab($this->name);
     }
@@ -61,8 +61,8 @@ enum ConfigKey: string
             self::AccountId => 'Timely account ID',
             self::UserId => 'Timely user ID',
             self::UserCreatedAt => 'Timely account creation date',
-            self::Mode => 'Report fetch mode',
-            self::Since => 'Default report start date',
+            self::ReportFetchMode => 'Default report fetch mode',
+            self::ReportSince => 'Default report fetch period start',
             self::TableStyle => 'Table style',
         };
     }
@@ -80,9 +80,9 @@ enum ConfigKey: string
         return in_array($this, self::settable(), true);
     }
 
-    public static function fromSettingName(string $name): ?self
+    public static function fromKebabName(string $name): ?self
     {
-        return array_find(self::cases(), fn (self $key): bool => $key->settingName() === $name);
+        return array_find(self::cases(), fn (self $setting): bool => $setting->kebabName() === $name);
     }
 
     /**
@@ -145,8 +145,8 @@ enum ConfigKey: string
     {
         return [
             self::AccountId,
-            self::Mode,
-            self::Since,
+            self::ReportFetchMode,
+            self::ReportSince,
             self::TableStyle,
         ];
     }

@@ -5,8 +5,8 @@ namespace App\Commands\Balance;
 use App\Console\BalanceCommand;
 use App\Data\BalanceData;
 use App\Data\DurationData;
-use App\Enums\ConfigKey;
-use App\Enums\ReportMode;
+use App\Enums\Setting;
+use App\Enums\FetchMode;
 use App\Services\HoursService;
 use Illuminate\Http\Client\ConnectionException;
 use Symfony\Component\Console\Helper\TableStyle;
@@ -23,8 +23,8 @@ class TotalCommand extends BalanceCommand
     protected function report(): int
     {
         $logged = match ($this->mode) {
-            ReportMode::Totals => $this->timely->getTotalHoursForPeriod($this->period),
-            ReportMode::Events => $this->hours->forPeriod($this->period),
+            FetchMode::Totals => $this->timely->getTotalHoursForPeriod($this->period),
+            FetchMode::Events => $this->hours->forPeriod($this->period),
         };
 
         $expected = $this->capacity->forPeriod($this->period);
@@ -50,7 +50,7 @@ class TotalCommand extends BalanceCommand
                     self::evaluate($balance)
                 ],
             ],
-            ConfigKey::TableStyle->getConfigValue(),
+            Setting::TableStyle->getConfigValue(),
             [
                 0 => $rightAlignment,
                 1 => $rightAlignment,

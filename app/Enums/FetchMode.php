@@ -4,7 +4,7 @@ namespace App\Enums;
 
 use App\Concerns\EnumValuesTrait;
 
-enum ReportMode: string
+enum FetchMode: string
 {
     use EnumValuesTrait;
 
@@ -18,7 +18,7 @@ enum ReportMode: string
 
         return match ($mode) {
             self::Totals => 'Fetches total durations',
-            self::Events => 'Fetches individual time entries and checks for overlaps',
+            self::Events => 'Fetches individual time entries and merges overlapping durations',
         };
     }
 }

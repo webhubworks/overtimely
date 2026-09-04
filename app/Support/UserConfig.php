@@ -2,7 +2,7 @@
 
 namespace App\Support;
 
-use App\Enums\ConfigKey;
+use App\Enums\Setting;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -78,7 +78,7 @@ final class UserConfig
         @chmod($path, 0600);
     }
 
-    public static function get(ConfigKey $key): mixed
+    public static function get(Setting $key): mixed
     {
         $value = data_get(self::load(), $key->value);
 
@@ -88,13 +88,13 @@ final class UserConfig
     /**
      * @throws RuntimeException
      */
-    public static function set(ConfigKey $key, mixed $value): void
+    public static function set(Setting $key, mixed $value): void
     {
         self::setMany([[$key, $value]]);
     }
 
     /**
-     * @param  list<array{ConfigKey, mixed}>  $values
+     * @param  list<array{Setting, mixed}>  $values
      *
      * @throws RuntimeException
      */
@@ -123,7 +123,7 @@ final class UserConfig
      */
     public static function isConfigured(): bool
     {
-        return array_all(ConfigKey::credentials(), fn (ConfigKey $key) => filled($key->getConfigValue()));
+        return array_all(Setting::credentials(), fn (Setting $key) => filled($key->getConfigValue()));
     }
 
     /**
@@ -135,8 +135,8 @@ final class UserConfig
     private static function sections(): array
     {
         return array_values(array_unique(array_map(
-            fn (ConfigKey $key): string => Str::before($key->value, '.'),
-            ConfigKey::cases()
+            fn (Setting $key): string => Str::before($key->value, '.'),
+            Setting::cases()
         )));
     }
 }
