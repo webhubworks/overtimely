@@ -3,6 +3,7 @@
 namespace App\Data;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
@@ -76,5 +77,60 @@ class TimestampData extends Data
     public function duration(): DurationData
     {
         return DurationData::fromTotalSeconds($this->seconds());
+    }
+
+    public function earliestMidnightInTimespan(): CarbonImmutable
+    {
+        return $this->from->addDay()->startOfDay();
+    }
+
+    public function crossesMidnight(): bool
+    {
+        return $this->to->greaterThan($this->earliestMidnightInTimespan());
+    }
+
+    public function isSingleDay(): bool
+    {
+        return ! $this->crossesMidnight();
+    }
+
+    /**
+     * Returns an array containing:
+     * - A `TimestampData` spanning `from` to the earliest midnight in the timespan.
+     * - A `TimestampData` spanning from the earliest midnight in the timespan to `to`.
+     *
+     * @return self[]
+     */
+    public function splitOnEarliestMidnight(): array
+    {
+        $nextMidnight = $this->earliestMidnightInTimespan();
+
+        return [
+            new self($this->from, $nextMidnight),
+            new self($nextMidnight, $this->to),
+        ];
+    }
+
+    /**
+     * Splits this timestamp into single-day fragments if it spans multiple days.
+     *
+     * @return Collection<int,self>
+     */
+    public function fragments(): Collection
+    {
+        if ($this->isSingleDay()) {
+            return collect([$this]);
+        }
+
+        $fragments = collect();
+        $fragment = $this;
+
+        do {
+            [$fragments[], $fragment] = $fragment->splitOnEarliestMidnight();
+        } while ($fragment->crossesMidnight());
+
+        $fragments->push($fragment);
+
+        return $fragments;
     }
 }
