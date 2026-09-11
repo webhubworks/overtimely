@@ -19,6 +19,7 @@ class EventData extends Data
     public function __construct(
         #[WithCast(DateTimeInterfaceCast::class, format: '!Y-m-d')]
         public CarbonImmutable $day,
+        public DurationData $duration,
         public int $sequence,
         public bool $deleted,
         public bool $draft,
