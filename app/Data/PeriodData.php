@@ -36,7 +36,7 @@ final class PeriodData extends Data
      */
     public function months(): Collection
     {
-        return collect(CarbonPeriodImmutable::create($this->since, '1 month', $this->until))
+        return collect(CarbonPeriodImmutable::create($this->since->startOfMonth(), '1 month', $this->until))
             ->map(fn (CarbonImmutable $monthStart): self => new self(
                 since: $monthStart->startOfMonth()->max($this->since),
                 until: $monthStart->endOfMonth()->startOfDay()->min($this->until),
@@ -52,7 +52,7 @@ final class PeriodData extends Data
      */
     public function weeks(): Collection
     {
-        return collect(CarbonPeriodImmutable::create($this->since, '1 week', $this->until))
+        return collect(CarbonPeriodImmutable::create($this->since->startOfWeek(), '1 week', $this->until))
             ->map(fn (CarbonImmutable $weekStart): self => new self(
                 since: $weekStart->startOfWeek()->max($this->since),
                 until: $weekStart->endOfWeek()->startOfDay()->min($this->until),
