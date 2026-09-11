@@ -107,15 +107,4 @@ class WeeklyCommand extends BalanceCommand
             $total->balance->toString(prefixPositive: true),
         ];
     }
-
-    /**
-     * @throws ConnectionException
-     */
-    protected function buildHoursService(): HoursService
-    {
-        return match ($this->mode) {
-            FetchMode::Totals => $this->buildDailyTotalHoursService(),
-            FetchMode::Events => $this->buildEventHoursService(),
-        };
-    }
 }

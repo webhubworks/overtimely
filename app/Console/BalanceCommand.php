@@ -80,7 +80,16 @@ abstract class BalanceCommand extends Command
 
     abstract protected function report(): int;
 
-    abstract protected function buildHoursService(): HoursService;
+    /**
+     * @throws ConnectionException
+     */
+    protected function buildHoursService(): HoursService
+    {
+        return match ($this->mode) {
+            FetchMode::Totals => $this->buildDailyTotalHoursService(),
+            FetchMode::Events => $this->buildEventHoursService(),
+        };
+    }
 
     /**
      * @throws ConnectionException
