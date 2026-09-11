@@ -22,6 +22,12 @@ final class PeriodData extends Data
         return new self($since->startOfDay(), $until->startOfDay());
     }
 
+    public function includes(PeriodData $period): bool
+    {
+        return $this->since->lessThanOrEqualTo($period->since)
+            && $this->until->greaterThanOrEqualTo($period->until);
+    }
+
     public function __toString(): string
     {
         return "{$this->since->format('Y-m-d')} to {$this->until->format('Y-m-d')}";

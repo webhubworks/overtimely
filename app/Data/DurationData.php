@@ -18,6 +18,11 @@ final class DurationData extends Data
         public int $totalSeconds,
     ) {}
 
+    public static function zero(): self
+    {
+        return self::fromTotalSeconds(0);
+    }
+
     public static function fromTotalHours(float $totalHours): self
     {
         return self::fromTotalSeconds((int) round($totalHours * 3600));
