@@ -21,10 +21,7 @@ class TotalCommand extends BalanceCommand
      */
     protected function report(): int
     {
-        $logged = match ($this->mode) {
-            FetchMode::Totals => $this->timely->getTotalHoursForPeriod($this->period),
-            FetchMode::Events => $this->hours->forPeriod($this->period),
-        };
+        $logged = $this->hours->forPeriod($this->period);
 
         $expected = $this->capacity->forPeriod($this->period);
 
@@ -78,6 +75,9 @@ class TotalCommand extends BalanceCommand
      */
     protected function buildHoursService(): HoursService
     {
-        return $this->buildEventHoursService();
+        return match ($this->mode) {
+            FetchMode::Totals => $this->buildTotalHoursService(),
+            FetchMode::Events => $this->buildEventHoursService(),
+        };
     }
 }

@@ -3,11 +3,12 @@
 namespace App\Services;
 
 use App\Data\EventData;
+use App\Data\PeriodData;
 use App\Data\TimestampData;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 
-final readonly class EventHoursService extends HoursService
+final readonly class EventHoursService extends DayWalkingHoursService
 {
     /** @var Collection<string, Collection<int, TimestampData>> */
     private Collection $timestampsByDay;
@@ -15,8 +16,10 @@ final readonly class EventHoursService extends HoursService
     /**
      * @param  EventData|Collection<int,EventData>|array<int,EventData>  $events
      */
-    public function __construct(EventData|Collection|array $events)
+    public function __construct(EventData|Collection|array $events, PeriodData $datasetPeriod)
     {
+        parent::__construct($datasetPeriod);
+
         $eventsGroupedByDay = Collection::wrap($events)
             ->groupBy(fn (EventData $event): string => $event->day->format('Y-m-d'));
 
@@ -34,9 +37,9 @@ final readonly class EventHoursService extends HoursService
     /**
      * @param  EventData|Collection<int,EventData>  $events
      */
-    public static function fromEvents(EventData|Collection $events): self
+    public static function from(EventData|Collection $events, PeriodData $datasetPeriod): self
     {
-        return new self($events);
+        return new self($events, $datasetPeriod);
     }
 
     protected function getSecondsOfDay(CarbonImmutable $day): int

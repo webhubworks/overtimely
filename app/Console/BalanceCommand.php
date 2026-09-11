@@ -12,6 +12,7 @@ use App\Services\DailyTotalHoursService;
 use App\Services\EventHoursService;
 use App\Services\HoursService;
 use App\Services\TimelyDataService;
+use App\Services\TotalHoursService;
 use Carbon\CarbonImmutable;
 use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Http\Client\ConnectionException;
@@ -70,8 +71,7 @@ abstract class BalanceCommand extends Command
 
         $this->info("Fetching your data for the period of $this->period using '{$this->mode->value}' mode.");
 
-        $capacities = $this->timely->getCapacities();
-        $this->capacity = CapacityService::fromCapacities($capacities);
+        $this->capacity = $this->buildCapacityService();
 
         $this->hours = $this->buildHoursService();
 
@@ -79,6 +79,16 @@ abstract class BalanceCommand extends Command
     }
 
     abstract protected function report(): int;
+
+    /**
+     * @throws ConnectionException
+     */
+    protected function buildCapacityService(): CapacityService
+    {
+        $capacities = $this->timely->getCapacities();
+
+        return CapacityService::fromCapacities($capacities);
+    }
 
     /**
      * @throws ConnectionException
@@ -94,11 +104,21 @@ abstract class BalanceCommand extends Command
     /**
      * @throws ConnectionException
      */
+    protected function buildTotalHoursService(): TotalHoursService
+    {
+        $totalHours = $this->timely->getTotalHoursForPeriod($this->period);
+
+        return TotalHoursService::from($totalHours, $this->period);
+    }
+
+    /**
+     * @throws ConnectionException
+     */
     protected function buildDailyTotalHoursService(): DailyTotalHoursService
     {
         $dailyTotalHours = $this->timely->getDailyTotalHoursForPeriod($this->period);
 
-        return DailyTotalHoursService::fromDailyDurations($dailyTotalHours);
+        return DailyTotalHoursService::from($dailyTotalHours, $this->period);
     }
 
     /**
@@ -108,7 +128,7 @@ abstract class BalanceCommand extends Command
     {
         $events = $this->timely->getEventsForPeriod($this->period);
 
-        return EventHoursService::fromEvents($events);
+        return EventHoursService::from($events, $this->period);
     }
 
     private static function baseOptions(): string
