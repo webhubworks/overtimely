@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Data\DurationData;
 use App\Data\PeriodData;
 
-abstract readonly class HoursService
+abstract class HoursService
 {
     public function __construct(protected PeriodData $datasetPeriod) {}
 

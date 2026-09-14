@@ -7,7 +7,7 @@ use App\Data\PeriodData;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonPeriodImmutable;
 
-abstract readonly class DayWalkingHoursService extends HoursService
+abstract class DayWalkingHoursService extends HoursService
 {
     public function forPeriod(PeriodData $period): DurationData
     {

@@ -8,7 +8,7 @@ use App\Data\TimestampData;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 
-final readonly class EventHoursService extends DayWalkingHoursService
+final class EventHoursService extends DayWalkingHoursService
 {
     /** @var Collection<string, Collection<int, TimestampData>> */
     private Collection $timestampsByDay;
