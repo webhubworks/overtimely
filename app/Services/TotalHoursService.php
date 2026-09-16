@@ -6,10 +6,10 @@ use App\Data\DurationData;
 use App\Data\PeriodData;
 use Illuminate\Http\Client\ConnectionException;
 
-final readonly class TotalHoursService extends HoursService
+final class TotalHoursService extends HoursService
 {
     public function __construct(
-        private ?DurationData $totalHours,
+        private readonly ?DurationData $totalHours,
         PeriodData $datasetPeriod
     ) {
         parent::__construct($datasetPeriod);

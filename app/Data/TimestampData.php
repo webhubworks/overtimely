@@ -31,8 +31,8 @@ class TimestampData extends Data
      *
      * The logic is as follows:\
      * Assuming the start of A is before the end of A and the start of B is before the end of B, then ...
-     * - If the start of A is after the end of B, A is entirely after B. No overlap.
-     * - If the end of A is before the start of B, A is entirely before B. No overlap.
+     * 1. If the start of A is after the end of B, A is entirely after B. No overlap.
+     * 2. If the end of A is before the start of B, A is entirely before B. No overlap.
      *
      * Terse notation of the above:\
      * If `A.from > B.to || A.to < B.from`, then A does **not** overlap with B.\
@@ -42,20 +42,25 @@ class TimestampData extends Data
      * 3. `!(A.from > B.to) && !(A.to < B.from)` is equivalent to ...
      * 4. `A.from < B.to && A.to > B.from`
      *
-     * An alternative logic/implementation would be:\
+     * Actually, the correct equivalent of 3 would use <= and >= for comparisons,
+     * but we explicitly allow the exact overlapping of timestamps at
+     * their start or end points since Timely does so as well.
+     *
+     * An equivalent logic / alternative implementation would also be:\
      * `maximum(A.from, B.from) < minimum(A.to, B.to)`
      */
     public function overlapsWith(self $otherTimestamp): bool
     {
         /**
-         * Alternative logic:
+         * Equivalent Logic / Alternative Implementation:
          * ```
-         * $this->from
-         *  ->max($otherTimestamp->from)
-         *  ->lessThan($this->to->min($otherTimestamp->to));
+         * $maxFrom = $this->from->max($otherTimestamp->from)
+         * $minTo = $this->to->min($otherTimestamp->to)
+         * return $maxFrom->lessThan($minTo);
          * ```
          */
-        return $this->from->lessThan($otherTimestamp->to) && $this->to->greaterThan($otherTimestamp->from);
+        return $this->from->lessThan($otherTimestamp->to)
+            && $this->to->greaterThan($otherTimestamp->from);
     }
 
     /**

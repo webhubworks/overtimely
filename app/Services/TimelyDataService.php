@@ -100,34 +100,16 @@ final readonly class TimelyDataService
     }
 
     /**
-     * @return Collection<int, EventData>
-     *
-     * @throws ConnectionException
-     */
-    public function getEventsForPeriod(PeriodData $period): Collection
-    {
-        $events = collect();
-
-        foreach ($this->yieldEventBatchesForPeriod($period) as $batch) {
-            $realEventsFromBatch = $batch->reject(fn (EventData $event): bool => $event->deleted || $event->draft);
-
-            $events->push(...$realEventsFromBatch);
-        }
-
-        return $events;
-    }
-
-    /**
      * @return Generator<int, Collection<int, EventData>>
      *
      * @throws ConnectionException
      */
-    private function yieldEventBatchesForPeriod(PeriodData $period): Generator
+    public function yieldEventBatchesForPeriod(PeriodData $period): Generator
     {
         $page = 1;
 
         do {
-            $batch = EventData::collect($this->client
+            $eventBatch = EventData::collect($this->client
                 ->get("{$this->accountId}/hours", [
                     'since' => $period->since?->format('Y-m-d'),
                     'upto' => $period->until?->format('Y-m-d'),
@@ -139,10 +121,10 @@ final readonly class TimelyDataService
                 ])->collect()
             );
 
-            yield $batch;
+            yield $eventBatch;
 
             $page++;
 
-        } while ($batch->count() === self::EVENTS_PER_PAGE);
+        } while ($eventBatch->count() === self::EVENTS_PER_PAGE);
     }
 }

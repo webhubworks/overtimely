@@ -7,7 +7,7 @@ use App\Data\PeriodData;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 
-final readonly class DailyTotalHoursService extends DayWalkingHoursService
+final class DailyTotalHoursService extends DayWalkingHoursService
 {
     /** @var Collection<string, DailyDurationData> */
     private Collection $dailyDurations;

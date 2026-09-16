@@ -85,4 +85,9 @@ final class DurationData extends Data
 
         return $sign.$components;
     }
+
+    public function isZero(): bool
+    {
+        return $this->totalSeconds === 0;
+    }
 }
