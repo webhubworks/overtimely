@@ -36,6 +36,22 @@ overtimely config:setup
 
 Run `overtimely` to get a list of the available commands and use the `--help` option with a command to see its description, arguments and options.
 
+### Fetching Modes
+Throughout the app you will find it referencing `fetching modes`.
+
+The app features two different modes for fetching your logged hours from Timely's API, those being:
+
+#### Totals
+Fetches Timely's reports, which directly include the total duration of logged hours for a given period. Aggregated by Timely based on time entry durations.
+
+#### Events
+Fetches individual events (aka time entries with their individual timestamps) for a given period and merges overlapping timestamps.\
+This takes **much** longer. But it solves the issue of **parallel** timestamps counting fully towards the total working time.
+
+> [!NOTE]
+> **In essence:**\
+> Two parallel timestamps of one hour will result in the `Totals` mode counting **two hours**, while the `Events` mode will only count **one hour** of working time. Use whichever mode is applicable to your situation.
+
 ## Development
 
 ### Local development
