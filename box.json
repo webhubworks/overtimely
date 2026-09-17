@@ -9,6 +9,10 @@
     "files": [
         "composer.json"
     ],
+    "blacklist": [
+        "app/Commands/DebugCommand.php",
+        "app/Commands/Debug.php"
+    ],
     "exclude-composer-files": false,
     "exclude-dev-files": false,
     "compression": "GZ",
