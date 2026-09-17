@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 2.1.0 - 2026-09-04
+## 2.1.0 - 2026-09-17
 ### Added
 - Added the [*Fetching Modes*](#new-feature-fetching-modes) feature.
 - Added the `-m`|`--mode` option to the balance commands to set the [fetching mode](#new-feature-fetching-modes) for the run of that command
@@ -15,7 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Run `overtimely config:set report-until` to set it.
 
 ### Changed
-- Changed some command outputs and option descriptions.
+- Changed the wording of some command and option descriptions.
+- Changed some command outputs visually
+- Renamed the persistent default since setting from `since` to `report-since`. Affecting the corresponding `config:set` argument now reading `config:set report-since [value]` accordingly.
+
+### Fixed
+- Fixed the `balance:monthly` and `balance:weekly` commands not logging certain days on rare occasions.
 
 ### *New feature:* Fetching Modes
 Introduced two different fetching modes:
@@ -24,11 +29,11 @@ Introduced two different fetching modes:
 Fetches Timely's reports, which directly include the total duration of logged hours for a given period.
 
 #### Events
-Fetches individual events (aka time entries) for a given period and merges overlapping timestamps.\
+Fetches individual events (aka time entries with their individual timestamps) for a given period and merges overlapping timestamps.\
 This takes much longer. But it solves the issue of **parallel** time entries counting fully towards the total working time.
 
 #### In essence
-Working on two things in parallel for one hour will result in the `Totals` mode counting **two hours**, while the `Events` mode will only count **one hour** of working time. Use whichever mode is applicable to your situation.
+Two parallel timestamps of one hour will result in the `Totals` mode counting **two hours**, while the `Events` mode will only count **one hour** of working time. Use whichever mode is applicable to your situation.
 
 ## 2.0.2 - 2026-08-28
 

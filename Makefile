@@ -18,4 +18,4 @@ endif
 	git push
 	git push origin $(VERSION)
 	@echo ""
-	@echo "Released and pushed $(VERSION)."
+	@echo "Built and released version $(VERSION)."
