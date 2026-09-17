@@ -161,7 +161,7 @@ abstract class BalanceCommand extends Command
             '--since',
             $this->option('since')
                 ?? Setting::ReportSince->getConfigValue()
-                ?? $this->timely->getCreationDate()
+                ?? Setting::UserCreatedAt->getConfigValue()
         );
 
         $until = $this->parseDateOption(
