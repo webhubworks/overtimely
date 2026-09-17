@@ -1,16 +1,7 @@
 <?php
 
 use App\Data\PeriodData;
-use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
-
-function makePeriod(string $since, string $until): PeriodData
-{
-    return PeriodData::fromBoundaries(
-        CarbonImmutable::parse($since),
-        CarbonImmutable::parse($until),
-    );
-}
 
 /**
  * @param  Collection<int, PeriodData>  $slices

@@ -3,6 +3,9 @@
 use App\Data\CapacityData;
 use App\Data\DailyDurationData;
 use App\Data\DurationData;
+use App\Data\EventData;
+use App\Data\PeriodData;
+use App\Data\TimestampData;
 use App\Enums\Setting;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\Factory;
@@ -90,6 +93,41 @@ function makeDailyLoggedHours(array $hoursByDay): Collection
                 duration: DurationData::fromTotalHours($hours),
             );
         });
+}
+
+function makePeriod(string $since, string $until): PeriodData
+{
+    return PeriodData::fromBoundaries(
+        CarbonImmutable::parse($since),
+        CarbonImmutable::parse($until),
+    );
+}
+
+/**
+ * Builds an event as TimelyDataService yields it.
+ * Timestamps are given as [from, to] pairs in any format CarbonImmutable::parse() understands;
+ * an event without timestamps falls back to $hours, the way a manually logged entry does.
+ *
+ * @param  array<int, array{string, string}>  $timestamps
+ */
+function makeEvent(
+    string $day,
+    array $timestamps = [],
+    float $hours = 0.0,
+    bool $deleted = false,
+    bool $draft = false,
+): EventData {
+    return new EventData(
+        day: CarbonImmutable::createFromFormat('!Y-m-d', $day),
+        duration: DurationData::fromTotalHours($hours),
+        sequence: 0,
+        deleted: $deleted,
+        draft: $draft,
+        timestamps: collect($timestamps)->map(fn (array $span): TimestampData => new TimestampData(
+            CarbonImmutable::parse($span[0]),
+            CarbonImmutable::parse($span[1]),
+        )),
+    );
 }
 
 /**
