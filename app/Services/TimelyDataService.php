@@ -26,7 +26,7 @@ final readonly class TimelyDataService
         private PendingRequest $client,
         private int $accountId,
         private ?int $userId = null,
-        private ?CarbonImmutable $createdAt = null,
+        private ?CarbonImmutable $userCreatedAt = null,
     ) {}
 
     /**
@@ -46,7 +46,7 @@ final readonly class TimelyDataService
      */
     public function getCreationDate(): CarbonImmutable
     {
-        return $this->createdAt ?? $this->getCurrentUser()->createdAt->startOfDay();
+        return $this->userCreatedAt ?? $this->getCurrentUser()->createdAt->startOfDay();
     }
 
     /** @return Collection<int, CapacityData>

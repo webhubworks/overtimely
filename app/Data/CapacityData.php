@@ -37,7 +37,8 @@ final class CapacityData extends Data
 
     public function hasDay(CarbonImmutable $day): bool
     {
-        return $this->hasDayInRange($day) && $this->hasDayAsWorkDay($day);
+        return $this->hasDayInRange($day)
+            && $this->hasDayAsWorkDay($day);
     }
 
     private function hasDayInRange(CarbonImmutable $day): bool
@@ -46,11 +47,13 @@ final class CapacityData extends Data
             return false;
         }
 
-        return $this->endDate === null || $day->lessThanOrEqualTo($this->endDate);
+        return $this->endDate === null
+            || $day->lessThanOrEqualTo($this->endDate);
     }
 
     private function hasDayAsWorkDay(CarbonImmutable $day): bool
     {
-        return $this->workDays->contains(Str::upper(Str::substr($day->dayName, 0, 3)));
+        return $this->workDays
+            ->contains(Str::upper(Str::substr($day->dayName, 0, 3)));
     }
 }

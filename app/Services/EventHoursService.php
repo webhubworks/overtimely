@@ -19,24 +19,20 @@ final class EventHoursService extends DayWalkingHoursService
     /** @var Collection<string, int> */
     private Collection $secondsByDay;
 
-    private Collection $secondsOfEventDurationsByDay;
+    /** @var Collection<string, int> */
+    private Collection $untimedSecondsByDay;
 
     /**
-     * @param  EventData|Generator<int,Collection<int,EventData>>|iterable<int,iterable<int,EventData>>  $eventOrBatches
+     * @param  Generator<int,Collection<int,EventData>>|iterable<int,iterable<int,EventData>>  $eventBatches
      */
-    public function __construct(EventData|Generator|iterable $eventOrBatches, PeriodData $datasetPeriod)
+    public function __construct(Generator|iterable $eventBatches, PeriodData $datasetPeriod)
     {
         parent::__construct($datasetPeriod);
 
         $this->allTimestamps = collect();
-        $this->secondsByDay = collect();
-        $this->secondsOfEventDurationsByDay = collect();
+        $this->untimedSecondsByDay = collect();
 
-        $batches = $eventOrBatches instanceof EventData
-            ? [[$eventOrBatches]] // wrap single EventData in a batch
-            : $eventOrBatches;
-
-        foreach ($batches as $events) {
+        foreach ($eventBatches as $events) {
 
             /** @var EventData $event */
             foreach ($events as $event) {
@@ -45,41 +41,41 @@ final class EventHoursService extends DayWalkingHoursService
                 }
 
                 if ($event->timestamps->isEmpty()) {
-                    $this->handleEventByDuration($event);
+                    $this->handleUntimedEvent($event);
 
                     continue;
                 }
 
-                $this->handleEventByTimestamps($event);
+                $this->handleTimedEvent($event);
             }
         }
 
         $timestampsByDay = $this->allTimestamps
-            ->groupBy(function (TimestampData $timestamp) {
+            ->groupBy(function (TimestampData $timestamp): string {
                 return $timestamp->from->format(self::DAY_KEY_FORMAT);
             });
 
         $mergedTimestampsByDay = $timestampsByDay
-            ->map(function (Collection $timestampsOfDay) {
+            ->map(function (Collection $timestampsOfDay): Collection {
                 return $this->mergeOverlappingTimestamps($timestampsOfDay);
             });
 
         $this->secondsByDay = $mergedTimestampsByDay
-            ->map(function (Collection $timestampsOfDay) {
-                return $timestampsOfDay->sum(fn (TimestampData $timestamp) => $timestamp->seconds());
+            ->map(function (Collection $timestampsOfDay): int {
+                return $timestampsOfDay->sum(fn (TimestampData $timestamp): int => $timestamp->seconds());
             });
 
-        foreach ($this->secondsOfEventDurationsByDay as $day => $secondsOfEventDurations) {
-            $this->secondsByDay[$day] = ($this->secondsByDay[$day] ?? 0) + $secondsOfEventDurations;
+        foreach ($this->untimedSecondsByDay as $day => $untimedSeconds) {
+            $this->secondsByDay[$day] = ($this->secondsByDay[$day] ?? 0) + $untimedSeconds;
         }
     }
 
     /**
-     * @param  EventData|Generator<int,Collection<int,EventData>>|iterable  $eventOrBatches
+     * @param  Generator<int,Collection<int,EventData>>|iterable<iterable<int,EventData>>  $eventBatches
      */
-    public static function from(EventData|Generator|iterable $eventOrBatches, PeriodData $datasetPeriod): self
+    public static function from(Generator|iterable $eventBatches, PeriodData $datasetPeriod): self
     {
-        return new self($eventOrBatches, $datasetPeriod);
+        return new self($eventBatches, $datasetPeriod);
     }
 
     protected function getSecondsOfDay(CarbonImmutable $day): int
@@ -95,8 +91,12 @@ final class EventHoursService extends DayWalkingHoursService
      */
     private function mergeOverlappingTimestamps(Collection $timestamps): Collection
     {
+        if ($timestamps->isEmpty()) {
+            return collect();
+        }
+
         $inputTimestamps = $timestamps
-            ->sortBy(fn (TimestampData $timestamp) => $timestamp->from->unix())
+            ->sortBy(fn (TimestampData $timestamp): int => $timestamp->from->unix())
             ->values();
 
         $sequentialTimestamps = collect();
@@ -116,7 +116,10 @@ final class EventHoursService extends DayWalkingHoursService
         return $sequentialTimestamps;
     }
 
-    private function handleEventByDuration(EventData $event): void
+    /**
+     * Handles an event without timestamps, using its own duration and date instead of the underlying timestamps.
+     */
+    private function handleUntimedEvent(EventData $event): void
     {
         if ($event->duration->isZero()) {
             return;
@@ -124,13 +127,16 @@ final class EventHoursService extends DayWalkingHoursService
 
         $key = $event->day->format(self::DAY_KEY_FORMAT);
 
-        $this->secondsOfEventDurationsByDay[$key] = ($this->secondsOfEventDurationsByDay[$key] ?? 0) + $event->duration->totalSeconds;
+        $this->untimedSecondsByDay[$key] = ($this->untimedSecondsByDay[$key] ?? 0) + $event->duration->totalSeconds;
     }
 
-    private function handleEventByTimestamps(EventData $event): void
+    /**
+     * Handles an event with timestamps, splitting multi-day timestamps into their fragments.
+     */
+    private function handleTimedEvent(EventData $event): void
     {
         $timestampFragments = $event->timestamps
-            ->flatMap(fn (TimestampData $timestamp) => $timestamp->fragments());
+            ->flatMap(fn (TimestampData $timestamp): Collection => $timestamp->fragments());
 
         $this->allTimestamps->push(...$timestampFragments);
     }

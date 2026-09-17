@@ -4,6 +4,7 @@ use App\Data\OAuthTokenData;
 use App\Enums\Setting;
 use App\Services\TimelyAuthService;
 use App\Support\UserConfig;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
@@ -98,7 +99,7 @@ it('refreshes an expired access token and persists the result', function () {
         ->and(UserConfig::get(Setting::AccessToken))->toBe('fresh')
         ->and(UserConfig::get(Setting::RefreshToken))->toBe('rt2');
 
-    Http::assertSent(fn ($request) => $request['grant_type'] === 'refresh_token' && $request['refresh_token'] === 'rt');
+    Http::assertSent(fn (Request $request): bool => $request['grant_type'] === 'refresh_token' && $request['refresh_token'] === 'rt');
 });
 
 it('returns the stored token while it is still valid', function () {

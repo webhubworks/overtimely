@@ -44,7 +44,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->applyHostTimezone();
 
-        $this->app->bind(TimelyDataService::class, function () {
+        $this->app->bind(TimelyDataService::class, function (): TimelyDataService {
             $client = Http::baseUrl(config('timely.base_url'))
                 ->withToken(app(TimelyAuthService::class)->validAccessToken())
                 ->acceptJson()
@@ -52,21 +52,27 @@ class AppServiceProvider extends ServiceProvider
                 ->retry(3, 200)
                 ->throw();
 
+            $accountId = $this->requireNumericId(
+                Setting::AccountId->getConfigValue(),
+                'No valid Timely account ID set. Run config:set account-id first.'
+            );
+
+            $userId = filled(Setting::UserId->getConfigValue())
+                ? $this->requireNumericId(
+                    Setting::UserId->getConfigValue(),
+                    'No valid Timely user ID set. Run auth:whoami first.'
+                )
+                : null;
+
+            $userCreatedAt = filled(Setting::UserCreatedAt->getConfigValue())
+                ? CarbonImmutable::createFromFormat('!Y-m-d', Setting::UserCreatedAt->getConfigValue())
+                : null;
+
             return new TimelyDataService(
                 $client,
-                $this->requireNumericId(
-                    Setting::AccountId->getConfigValue(),
-                    'No valid Timely account ID set. Run config:set account-id first.'
-                ),
-                filled(Setting::UserId->getConfigValue())
-                    ? $this->requireNumericId(
-                        Setting::UserId->getConfigValue(),
-                        'No valid Timely user ID set. Run auth:whoami first.'
-                    )
-                    : null,
-                filled(Setting::UserCreatedAt->getConfigValue())
-                    ? CarbonImmutable::createFromFormat('!Y-m-d', Setting::UserCreatedAt->getConfigValue())
-                    : null,
+                $accountId,
+                $userId,
+                $userCreatedAt,
             );
         });
     }

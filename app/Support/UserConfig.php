@@ -123,7 +123,7 @@ final class UserConfig
      */
     public static function isConfigured(): bool
     {
-        return array_all(Setting::credentials(), fn (Setting $key) => filled($key->getConfigValue()));
+        return array_all(Setting::credentials(), fn (Setting $key): bool => filled($key->getConfigValue()));
     }
 
     /**

@@ -11,7 +11,7 @@ beforeEach(function () {
     Setting::ClientSecret->setConfigValue('secret');
 });
 
-dataset('credentials', fn () => collect(Setting::credentials())
+dataset('credentials', fn (): array => collect(Setting::credentials())
     ->mapWithKeys(fn (Setting $key): array => [$key->name => $key])
     ->all());
 

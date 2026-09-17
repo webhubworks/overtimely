@@ -5,6 +5,7 @@ use App\Data\DailyDurationData;
 use App\Data\DurationData;
 use App\Enums\Setting;
 use Carbon\CarbonImmutable;
+use Illuminate\Http\Client\Factory;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -21,7 +22,7 @@ use Tests\TestCase;
 */
 
 uses(TestCase::class)
-    ->beforeEach(fn () => Http::preventStrayRequests())
+    ->beforeEach(fn (): Factory => Http::preventStrayRequests())
     ->in('Feature');
 
 /*

@@ -19,7 +19,7 @@ final readonly class CapacityService
     public function __construct(CapacityData|Collection|array $capacities)
     {
         $this->capacities = Collection::wrap($capacities)
-            ->sortByDesc(fn (CapacityData $capacity): int => $capacity->startDate->getTimestamp())
+            ->sortByDesc(fn (CapacityData $capacity): int => $capacity->startDate->unix())
             ->values();
     }
 
