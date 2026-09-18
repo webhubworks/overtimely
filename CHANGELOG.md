@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.1.2 - 2026-09-18
+### Fixed
+- Fixed the narrow handling of malformed inputs for the `--since` and `--until` options.
+
 ## 2.1.1 - 2026-09-17
 ### Removed
 - Removed the `debug` command which was not intended to be shipped in the first place.
@@ -12,10 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 2.1.0 - 2026-09-17
 ### Added
 - Added the [*Fetching Modes*](#new-feature-fetching-modes) feature.
-- Added the `-m`|`--mode` option to the balance commands to set the [fetching mode](#new-feature-fetching-modes) for the run of that command
+- Added the `--mode` option to the balance commands to set the [fetching mode](#new-feature-fetching-modes) for the run of that command
 - Added a config setting for a custom default [fetching mode](#new-feature-fetching-modes).\
   Run `overtimely config:set report-fetch-mode` to set it.
-- Added a config setting for a custom default for the `-u`|`--until` option.\
+- Added a config setting for a custom default for the `--until` option.\
   Run `overtimely config:set report-until` to set it.
 
 ### Changed
@@ -42,12 +46,12 @@ Two parallel timestamps of one hour will result in the `Totals` mode counting **
 ## 2.0.2 - 2026-08-28
 
 ### Fixed
-- Fixed the `-s`|`--since` and `-u`|`--until` option descriptions not mentioning their supported formats anymore.
+- Fixed the `--since` and `--until` option descriptions not mentioning their supported formats anymore.
 
 ## 2.0.1 - 2026-08-28
 
 ### Fixed
-- Fixed a `-s`|`--since` after `-u`|`--until` being a valid input resulting in no data being fetched.
+- Fixed a `--since` after `--until` being a valid input resulting in no data being fetched.
 - Fixed `config:set since [value]` not allowing relative dates, although the app could already handle them.
 - Fixed outdated instructions for supported date formats throughout the app.
 - Fixed UTC being used instead of the user's timezone.\
@@ -60,7 +64,7 @@ Two parallel timestamps of one hour will result in the `Totals` mode counting **
     - `config:path`: Prints the path to the config file. With `-o`/ `--open` it tries to open the file in your default editor.
     - `config:list` : Lists every setting with its current value and where that value comes from. Secrets are masked.
     - `config:get <setting>` : Prints a single config setting's value.
-- Added the `-p`|`--period` option to every `balance:*` command. It cannot be combined with the `-s`|`--since` and `-u`|`--until` options and takes one of:
+- Added the `--period` option to every `balance:*` command. It cannot be combined with the `--since` and `--until` options and takes one of:
   - `this-week`
   - `last-week`
   - `this-month`
