@@ -159,16 +159,16 @@ abstract class BalanceCommand extends Command
 
         $since = $this->parseDateOption(
             '--since',
-            $this->option('since')
-                ?? Setting::ReportSince->getConfigValue()
-                ?? Setting::UserCreatedAt->getConfigValue()
+            trim($this->option('since'))
+                ?: trim(Setting::ReportSince->getConfigValue())
+                ?: Setting::UserCreatedAt->getConfigValue()
         );
 
         $until = $this->parseDateOption(
             '--until',
-            $this->option('until')
-                ?? Setting::ReportUntil->getConfigValue()
-                ?? CarbonImmutable::yesterday()
+            trim($this->option('until'))
+                ?: trim(Setting::ReportUntil->getConfigValue())
+                ?: CarbonImmutable::yesterday()
         );
 
         if ($since === null || $until === null) {
