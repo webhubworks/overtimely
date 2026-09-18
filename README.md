@@ -36,6 +36,9 @@ overtimely config:setup
 
 Run `overtimely` to get a list of the available commands and use the `--help` option with a command to see its description, arguments and options.
 
+### Date Formats
+Any and all date inputs accept [all formats supported by PHP](https://www.php.net/manual/en/datetime.formats.php). This enables even **relative** formats like for example "last friday" to be used as option values and default settings.
+
 ### Fetching Modes
 Throughout the app you will find it referencing `fetching modes`.
 
