@@ -4,6 +4,7 @@ namespace App\Data;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
@@ -24,7 +25,7 @@ class EventData extends Data
         public bool $deleted,
         public bool $draft,
 
-        /** @var Collection<int,TimestampData> */
+        #[DataCollectionOf(TimestampData::class)]
         public Collection $timestamps,
     ) {}
 }
