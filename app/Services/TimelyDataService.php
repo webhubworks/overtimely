@@ -37,6 +37,9 @@ final readonly class TimelyDataService
         return $factoryOrPool->baseUrl(config('timely.base_url'))
             ->withToken($this->accessToken)
             ->acceptJson()
+            ->withHeaders([
+                'Accept-Encoding' => 'gzip',
+            ])
             ->timeout(config('timely.timeout'))
             ->retry(3, 200)
             ->throw();
