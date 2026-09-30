@@ -32,9 +32,10 @@ final readonly class TimelyDataService
         private ?CarbonImmutable $userCreatedAt = null,
     ) {}
 
-    private function client(Factory|Pool $factoryOrPool): Factory|Pool|PendingRequest
+    private function client(Factory|Pool $factoryOrPool): PendingRequest
     {
-        return $factoryOrPool->baseUrl(config('timely.base_url'))
+        /** @var PendingRequest $request */
+        $request = $factoryOrPool->baseUrl(config('timely.base_url'))
             ->withToken($this->accessToken)
             ->acceptJson()
             ->withHeaders([
@@ -43,6 +44,8 @@ final readonly class TimelyDataService
             ->timeout(config('timely.timeout'))
             ->retry(3, 200)
             ->throw();
+
+        return $request;
     }
 
     /**
