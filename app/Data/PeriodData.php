@@ -50,7 +50,7 @@ final class PeriodData extends Data
         return collect(CarbonPeriodImmutable::create($this->since->startOfMonth(), '1 month', $this->until))
             ->map(fn (CarbonImmutable $monthStart): self => new self(
                 since: $monthStart->startOfMonth()->max($this->since),
-                until: $monthStart->endOfMonth()->startOfDay()->min($this->until),
+                until: $monthStart->endOfMonth()->min($this->until),
             ));
     }
 
@@ -66,7 +66,37 @@ final class PeriodData extends Data
         return collect(CarbonPeriodImmutable::create($this->since->startOfWeek(), '1 week', $this->until))
             ->map(fn (CarbonImmutable $weekStart): self => new self(
                 since: $weekStart->startOfWeek()->max($this->since),
-                until: $weekStart->endOfWeek()->startOfDay()->min($this->until),
+                until: $weekStart->endOfWeek()->min($this->until),
             ));
+    }
+
+    /**
+     * Splits this period into `$count` equally long periods.
+     *
+     * @return Collection<int, self>
+     */
+    public function chunks(int $count = 1): Collection
+    {
+        if ($count <= 1) {
+            return collect([$this]);
+        }
+
+        $daysInChunk = (int) ceil($this->totalDays() / $count);
+
+        return collect(CarbonPeriodImmutable::create($this->since, $daysInChunk.' days', $this->until))
+            ->map(fn (CarbonImmutable $chunkStart): self => new self(
+                since: $chunkStart,
+                until: $chunkStart->addDays($daysInChunk - 1)->min($this->until),
+            ));
+    }
+
+    /**
+     * The total number of days in the period.\
+     * We add one so the math checks out, and a single-day period correctly returns its one day,
+     * as Carbon's `diffInDays()` would return zero.
+     */
+    public function totalDays(): int
+    {
+        return (int) round($this->since->diffInDays($this->until)) + 1;
     }
 }
