@@ -8,7 +8,6 @@ use App\Services\TimelyDataService;
 use App\Support\UserConfig;
 use Carbon\CarbonImmutable;
 use DateTimeZone;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ServiceProvider;
 use IntlTimeZone;
 use RuntimeException;
@@ -45,12 +44,7 @@ class AppServiceProvider extends ServiceProvider
         $this->applyHostTimezone();
 
         $this->app->bind(TimelyDataService::class, function (): TimelyDataService {
-            $client = Http::baseUrl(config('timely.base_url'))
-                ->withToken(app(TimelyAuthService::class)->validAccessToken())
-                ->acceptJson()
-                ->timeout(config('timely.timeout'))
-                ->retry(3, 200)
-                ->throw();
+            $accessToken = app(TimelyAuthService::class)->validAccessToken();
 
             $accountId = $this->requireNumericId(
                 Setting::AccountId->getConfigValue(),
@@ -69,7 +63,7 @@ class AppServiceProvider extends ServiceProvider
                 : null;
 
             return new TimelyDataService(
-                $client,
+                $accessToken,
                 $accountId,
                 $userId,
                 $userCreatedAt,

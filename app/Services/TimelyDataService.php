@@ -11,8 +11,11 @@ use App\Data\PeriodData;
 use Carbon\CarbonImmutable;
 use Generator;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\Pool;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
 
 final readonly class TimelyDataService
 {
@@ -23,11 +26,21 @@ final readonly class TimelyDataService
     private const int EVENTS_PER_PAGE = 5000;
 
     public function __construct(
-        private PendingRequest $client,
+        private ?string $accessToken,
         private int $accountId,
         private ?int $userId = null,
         private ?CarbonImmutable $userCreatedAt = null,
     ) {}
+
+    private function client(Factory|Pool $factoryOrPool): Factory|Pool|PendingRequest
+    {
+        return $factoryOrPool->baseUrl(config('timely.base_url'))
+            ->withToken($this->accessToken)
+            ->acceptJson()
+            ->timeout(config('timely.timeout'))
+            ->retry(3, 200)
+            ->throw();
+    }
 
     /**
      * @throws ConnectionException
@@ -35,8 +48,8 @@ final readonly class TimelyDataService
     public function getCurrentUser(): CurrentUserData
     {
         return CurrentUserData::from(
-            $this->client
-                ->get("{$this->accountId}/users/current")
+            $this->client(Http::getFacadeRoot())
+                ->get("$this->accountId/users/current")
                 ->json()
         );
     }
@@ -49,14 +62,16 @@ final readonly class TimelyDataService
         return $this->userCreatedAt ?? $this->getCurrentUser()->createdAt->startOfDay();
     }
 
-    /** @return Collection<int, CapacityData>
+    /**
+     * @return Collection<int, CapacityData>
+     *
      * @throws ConnectionException
      */
     public function getCapacities(): Collection
     {
         return CapacityData::collect(
-            $this->client
-                ->get("{$this->accountId}/users/{$this->userId}/capacities")
+            $this->client(Http::getFacadeRoot())
+                ->get("$this->accountId/users/$this->userId/capacities")
                 ->collect()
         );
     }
@@ -70,8 +85,8 @@ final readonly class TimelyDataService
      */
     public function getTotalHoursForPeriod(PeriodData $period): DurationData
     {
-        return DurationData::from($this->client
-            ->get("{$this->accountId}/reports/filter", [
+        return DurationData::from($this->client(Http::getFacadeRoot())
+            ->get("$this->accountId/reports/filter", [
                 'since' => $period->since?->format('Y-m-d'),
                 'until' => $period->until?->format('Y-m-d'),
                 'user_ids' => 'self',
@@ -88,8 +103,8 @@ final readonly class TimelyDataService
      */
     public function getDailyTotalHoursForPeriod(PeriodData $period): Collection
     {
-        return DailyDurationData::collect($this->client
-            ->get("{$this->accountId}/reports/filter", [
+        return DailyDurationData::collect($this->client(Http::getFacadeRoot())
+            ->get("$this->accountId/reports/filter", [
                 'since' => $period->since?->format('Y-m-d'),
                 'until' => $period->until?->format('Y-m-d'),
                 'user_ids' => 'self',
@@ -109,8 +124,8 @@ final readonly class TimelyDataService
         $page = 1;
 
         do {
-            $eventBatch = EventData::collect($this->client
-                ->get("{$this->accountId}/hours", [
+            $eventBatch = EventData::collect($this->client(Http::getFacadeRoot())
+                ->get("$this->accountId/hours", [
                     'since' => $period->since?->format('Y-m-d'),
                     'upto' => $period->until?->format('Y-m-d'),
                     'user_id' => $this->userId,
