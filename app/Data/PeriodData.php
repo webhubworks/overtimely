@@ -9,17 +9,22 @@ use Spatie\LaravelData\Data;
 
 final class PeriodData extends Data
 {
-    public function __construct(
-        public CarbonImmutable $since,
-        public CarbonImmutable $until,
-    ) {}
+    public CarbonImmutable $since;
+
+    public CarbonImmutable $until;
+
+    public function __construct(CarbonImmutable $since, CarbonImmutable $until)
+    {
+        $this->since = $since->startOfDay();
+        $this->until = $until->startOfDay();
+    }
 
     /**
      * Returns a period for the interval [`since`, `until`].
      */
     public static function fromBoundaries(CarbonImmutable $since, CarbonImmutable $until): self
     {
-        return new self($since->startOfDay(), $until->startOfDay());
+        return new self($since, $until);
     }
 
     public function includes(PeriodData $period): bool
