@@ -35,15 +35,16 @@ final readonly class TimelyDataService
     private function client(Factory|Pool $factoryOrPool): PendingRequest
     {
         /** @var PendingRequest $request */
-        $request = $factoryOrPool->baseUrl(config('timely.base_url'))
+        $request = $factoryOrPool
+            ->baseUrl(config('timely.api.base_url'))
             ->withToken($this->accessToken)
+            ->timeout(config('timely.api.timeout'))
+            ->retry(config('timely.api.retry'), 200)
+            ->throw()
             ->acceptJson()
             ->withHeaders([
                 'Accept-Encoding' => 'gzip',
-            ])
-            ->timeout(config('timely.timeout'))
-            ->retry(3, 200)
-            ->throw();
+            ]);
 
         return $request;
     }
