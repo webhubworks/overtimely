@@ -5,8 +5,9 @@ use App\Enums\Setting;
 return [
     'api' => [
         'base_url' => env('TIMELY_API_BASE_URL', 'https://api.timelyapp.com/1.1/'),
-        'timeout' => env('TIMELY_API_TIMEOUT', 40),
-        'retry' => env('TIMELY_API_RETRY', 3),
+        'connect_timeout' => env('TIMELY_API_CONNECT_TIMEOUT', 5),
+        'timeout' => env('TIMELY_API_TIMEOUT', 60),
+        'attempts' => env('TIMELY_API_ATTEMPTS', 2),
     ],
 
     'oauth' => [

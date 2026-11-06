@@ -38,8 +38,9 @@ final readonly class TimelyDataService
         $request = $factoryOrPool
             ->baseUrl(config('timely.api.base_url'))
             ->withToken($this->accessToken)
+            ->connectTimeout(config('timely.api.connect_timeout'))
             ->timeout(config('timely.api.timeout'))
-            ->retry(config('timely.api.retry'), 200)
+            ->retry(config('timely.api.attempts'), 1000)
             ->throw()
             ->acceptJson()
             ->withHeaders([
