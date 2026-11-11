@@ -8,7 +8,6 @@ use App\Data\DailyDurationData;
 use App\Data\DurationData;
 use App\Data\EventData;
 use App\Data\PeriodData;
-use Carbon\CarbonImmutable;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Factory;
@@ -126,11 +125,11 @@ final readonly class TimelyDataService
     }
 
     /**
-     * @return Collection<int, Collection<int, EventData>>
+     * @return Collection<int, EventData>
      *
      * @throws ConnectionException|Throwable
      */
-    public function getEventBatchesForPeriod(PeriodData $period): Collection
+    public function getEventsForPeriod(PeriodData $period): Collection
     {
         $pendingChunks = $this->chunkPeriod($period)
             ->map(fn (PeriodData $chunk): array => [
@@ -142,7 +141,7 @@ final readonly class TimelyDataService
 
         while ($pendingChunks->isNotEmpty()) {
             $pooledResponses = Http::pool(fn (Pool $pool): array => $pendingChunks
-                ->map(fn (array $chunk): PromiseInterface => $this->getEventBatch($pool, $chunk['period'], $chunk['page']))
+                ->map(fn (array $chunk): PromiseInterface => $this->getEventBatchForPeriod($pool, $chunk['period'], $chunk['page']))
                 ->all());
 
             $chunksWithMoreThanOnePage = collect();
@@ -167,7 +166,7 @@ final readonly class TimelyDataService
             $pendingChunks = $chunksWithMoreThanOnePage->values();
         }
 
-        return $eventBatches;
+        return $eventBatches->collapse();
     }
 
     /**
@@ -183,7 +182,7 @@ final readonly class TimelyDataService
     /**
      * @throws ConnectionException
      */
-    private function getEventBatch(Pool $pool, PeriodData $period, int $page): PromiseInterface
+    private function getEventBatchForPeriod(Pool $pool, PeriodData $period, int $page): PromiseInterface
     {
         return $this->client($pool)
             ->get("$this->accountId/hours", [

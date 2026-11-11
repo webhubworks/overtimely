@@ -22,31 +22,28 @@ final class EventHoursService extends DayWalkingHoursService
     private Collection $untimedSecondsByDay;
 
     /**
-     * @param  iterable<int,iterable<int,EventData>>  $eventBatches
+     * @param  iterable<int, EventData>  $events
      */
-    public function __construct(iterable $eventBatches, PeriodData $datasetPeriod)
+    public function __construct(iterable $events, PeriodData $datasetPeriod)
     {
         parent::__construct($datasetPeriod);
 
         $this->allTimestamps = collect();
         $this->untimedSecondsByDay = collect();
 
-        foreach ($eventBatches as $events) {
-
-            /** @var EventData $event */
-            foreach ($events as $event) {
-                if ($event->draft || $event->deleted) {
-                    continue;
-                }
-
-                if ($event->timestamps->isEmpty()) {
-                    $this->handleUntimedEvent($event);
-
-                    continue;
-                }
-
-                $this->handleTimedEvent($event);
+        /** @var EventData $event */
+        foreach ($events as $event) {
+            if ($event->draft || $event->deleted) {
+                continue;
             }
+
+            if ($event->timestamps->isEmpty()) {
+                $this->handleUntimedEvent($event);
+
+                continue;
+            }
+
+            $this->handleTimedEvent($event);
         }
 
         $timestampsByDay = $this->allTimestamps
@@ -70,11 +67,11 @@ final class EventHoursService extends DayWalkingHoursService
     }
 
     /**
-     * @param  iterable<iterable<int,EventData>>  $eventBatches
+     * @param  iterable<int, EventData>  $events
      */
-    public static function from(iterable $eventBatches, PeriodData $datasetPeriod): self
+    public static function from(iterable $events, PeriodData $datasetPeriod): self
     {
-        return new self($eventBatches, $datasetPeriod);
+        return new self($events, $datasetPeriod);
     }
 
     protected function getSecondsOfDay(CarbonImmutable $day): int

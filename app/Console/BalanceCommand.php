@@ -128,9 +128,9 @@ abstract class BalanceCommand extends Command
      */
     protected function buildEventHoursService(): EventHoursService
     {
-        $eventBatches = $this->timely->getEventBatchesForPeriod($this->period);
+        $events = $this->timely->getEventsForPeriod($this->period);
 
-        return EventHoursService::from($eventBatches, $this->period);
+        return EventHoursService::from($events, $this->period);
     }
 
     private static function baseOptions(): string

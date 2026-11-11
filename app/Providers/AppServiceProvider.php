@@ -6,7 +6,6 @@ use App\Enums\Setting;
 use App\Services\TimelyAuthService;
 use App\Services\TimelyDataService;
 use App\Support\UserConfig;
-use Carbon\CarbonImmutable;
 use DateTimeZone;
 use Illuminate\Support\ServiceProvider;
 use IntlTimeZone;
