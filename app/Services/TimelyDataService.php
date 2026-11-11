@@ -41,7 +41,6 @@ final readonly class TimelyDataService
         private ?string $accessToken,
         private int $accountId,
         private ?int $userId = null,
-        private ?CarbonImmutable $userCreatedAt = null,
     ) {}
 
     private function client(Factory|Pool $factoryOrPool): PendingRequest
@@ -75,14 +74,6 @@ final readonly class TimelyDataService
     }
 
     /**
-     * @throws ConnectionException
-     */
-    public function getCreationDate(): CarbonImmutable
-    {
-        return $this->userCreatedAt ?? $this->getCurrentUser()->createdAt->startOfDay();
-    }
-
-    /**
      * @return Collection<int, CapacityData>
      *
      * @throws ConnectionException
@@ -97,9 +88,9 @@ final readonly class TimelyDataService
     }
 
     /**
-     * The totals are always unaffected by the grouping and come with every scope=totals report.
-     * The groupings provided via the group_by parameter produce **additional** output which we don't need in all scenarios.
-     * Omitting the group_by parameter will return all the possible groupings, so we **explicitly** set it to an empty string.
+     * The totals are always unaffected by the grouping and come with every `scope=totals` report.
+     * The groupings provided via the `group_by` parameter produce **additional** output which we don't need in all scenarios.
+     * Omitting the `group_by` parameter will return all the possible groupings, so we **explicitly** set it to an empty string.
      *
      * @throws ConnectionException
      */
@@ -107,8 +98,8 @@ final readonly class TimelyDataService
     {
         return DurationData::from($this->client(Http::getFacadeRoot())
             ->get("$this->accountId/reports/filter", [
-                'since' => $period->since?->format('Y-m-d'),
-                'until' => $period->until?->format('Y-m-d'),
+                'since' => $period->since->format('Y-m-d'),
+                'until' => $period->until->format('Y-m-d'),
                 'user_ids' => 'self',
                 'group_by' => '',
                 'scope' => 'totals',
@@ -125,8 +116,8 @@ final readonly class TimelyDataService
     {
         return DailyDurationData::collect($this->client(Http::getFacadeRoot())
             ->get("$this->accountId/reports/filter", [
-                'since' => $period->since?->format('Y-m-d'),
-                'until' => $period->until?->format('Y-m-d'),
+                'since' => $period->since->format('Y-m-d'),
+                'until' => $period->until->format('Y-m-d'),
                 'user_ids' => 'self',
                 'group_by' => 'days',
                 'scope' => 'totals',

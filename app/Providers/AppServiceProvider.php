@@ -58,15 +58,10 @@ class AppServiceProvider extends ServiceProvider
                 )
                 : null;
 
-            $userCreatedAt = filled(Setting::UserCreatedAt->getConfigValue())
-                ? CarbonImmutable::createFromFormat('!Y-m-d', Setting::UserCreatedAt->getConfigValue())
-                : null;
-
             return new TimelyDataService(
                 $accessToken,
                 $accountId,
                 $userId,
-                $userCreatedAt,
             );
         });
     }
