@@ -9,13 +9,14 @@ use App\Data\DurationData;
 use App\Data\EventData;
 use App\Data\PeriodData;
 use Carbon\CarbonImmutable;
-use Generator;
+use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Pool;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
+use Throwable;
 
 final readonly class TimelyDataService
 {
@@ -24,6 +25,17 @@ final readonly class TimelyDataService
      * We leverage that to reduce the number of requests to a minimum.
      */
     private const int EVENTS_PER_PAGE = 5000;
+
+    /**
+     * The maximum number of event chunks to fetch concurrently.
+     * Past 12 there is no significant performance gain.
+     */
+    private const int MAX_CONCURRENT_CHUNKS = 12;
+
+    /**
+     * The aimed length in days of each period chunk.
+     */
+    private const int TARGET_DAYS_PER_CHUNK = 31;
 
     public function __construct(
         private ?string $accessToken,
@@ -123,31 +135,74 @@ final readonly class TimelyDataService
     }
 
     /**
-     * @return Generator<int, Collection<int, EventData>>
+     * @return Collection<int, Collection<int, EventData>>
      *
+     * @throws ConnectionException|Throwable
+     */
+    public function getEventBatchesForPeriod(PeriodData $period): Collection
+    {
+        $pendingChunks = $this->chunkPeriod($period)
+            ->map(fn (PeriodData $chunk): array => [
+                'period' => $chunk,
+                'page' => 1,
+            ])->values();
+
+        $eventBatches = collect();
+
+        while ($pendingChunks->isNotEmpty()) {
+            $pooledResponses = Http::pool(fn (Pool $pool): array => $pendingChunks
+                ->map(fn (array $chunk): PromiseInterface => $this->getEventBatch($pool, $chunk['period'], $chunk['page']))
+                ->all());
+
+            $chunksWithMoreThanOnePage = collect();
+
+            foreach ($pooledResponses as $index => $response) {
+                if ($response instanceof Throwable) {
+                    throw $response;
+                }
+
+                $events = $response->collect();
+
+                $eventBatches->push(EventData::collect($events));
+
+                if ($events->count() === self::EVENTS_PER_PAGE) {
+                    $chunksWithMoreThanOnePage->push([
+                        'period' => $pendingChunks[$index]['period'],
+                        'page' => $pendingChunks[$index]['page'] + 1,
+                    ]);
+                }
+            }
+
+            $pendingChunks = $chunksWithMoreThanOnePage->values();
+        }
+
+        return $eventBatches;
+    }
+
+    /**
+     * @return Collection<int, PeriodData>
+     */
+    private function chunkPeriod(PeriodData $period): Collection
+    {
+        $chunkCount = min(self::MAX_CONCURRENT_CHUNKS, (int) ceil($period->totalDays() / self::TARGET_DAYS_PER_CHUNK));
+
+        return $period->chunks($chunkCount);
+    }
+
+    /**
      * @throws ConnectionException
      */
-    public function yieldEventBatchesForPeriod(PeriodData $period): Generator
+    private function getEventBatch(Pool $pool, PeriodData $period, int $page): PromiseInterface
     {
-        $page = 1;
-
-        do {
-            $eventBatch = EventData::collect($this->client(Http::getFacadeRoot())
-                ->get("$this->accountId/hours", [
-                    'since' => $period->since?->format('Y-m-d'),
-                    'upto' => $period->until?->format('Y-m-d'),
-                    'user_id' => $this->userId,
-                    'per_page' => self::EVENTS_PER_PAGE,
-                    'page' => $page,
-                    'sort' => 'day',
-                    'order' => 'asc',
-                ])->collect()
-            );
-
-            yield $eventBatch;
-
-            $page++;
-
-        } while ($eventBatch->count() === self::EVENTS_PER_PAGE);
+        return $this->client($pool)
+            ->get("$this->accountId/hours", [
+                'since' => $period->since->format('Y-m-d'),
+                'upto' => $period->until->format('Y-m-d'),
+                'user_id' => $this->userId,
+                'per_page' => self::EVENTS_PER_PAGE,
+                'page' => $page,
+                'sort' => 'day',
+                'order' => 'asc',
+            ]);
     }
 }

@@ -18,6 +18,7 @@ use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Http\Client\ConnectionException;
 use LaravelZero\Framework\Commands\Command;
 use RuntimeException;
+use Throwable;
 
 abstract class BalanceCommand extends Command
 {
@@ -123,12 +124,13 @@ abstract class BalanceCommand extends Command
 
     /**
      * @throws ConnectionException
+     * @throws Throwable
      */
     protected function buildEventHoursService(): EventHoursService
     {
-        $eventBatchGenerator = $this->timely->yieldEventBatchesForPeriod($this->period);
+        $eventBatches = $this->timely->getEventBatchesForPeriod($this->period);
 
-        return EventHoursService::from($eventBatchGenerator, $this->period);
+        return EventHoursService::from($eventBatches, $this->period);
     }
 
     private static function baseOptions(): string

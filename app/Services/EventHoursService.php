@@ -6,7 +6,6 @@ use App\Data\EventData;
 use App\Data\PeriodData;
 use App\Data\TimestampData;
 use Carbon\CarbonImmutable;
-use Generator;
 use Illuminate\Support\Collection;
 
 final class EventHoursService extends DayWalkingHoursService
@@ -23,9 +22,9 @@ final class EventHoursService extends DayWalkingHoursService
     private Collection $untimedSecondsByDay;
 
     /**
-     * @param  Generator<int,Collection<int,EventData>>|iterable<int,iterable<int,EventData>>  $eventBatches
+     * @param  iterable<int,iterable<int,EventData>>  $eventBatches
      */
-    public function __construct(Generator|iterable $eventBatches, PeriodData $datasetPeriod)
+    public function __construct(iterable $eventBatches, PeriodData $datasetPeriod)
     {
         parent::__construct($datasetPeriod);
 
@@ -71,9 +70,9 @@ final class EventHoursService extends DayWalkingHoursService
     }
 
     /**
-     * @param  Generator<int,Collection<int,EventData>>|iterable<iterable<int,EventData>>  $eventBatches
+     * @param  iterable<iterable<int,EventData>>  $eventBatches
      */
-    public static function from(Generator|iterable $eventBatches, PeriodData $datasetPeriod): self
+    public static function from(iterable $eventBatches, PeriodData $datasetPeriod): self
     {
         return new self($eventBatches, $datasetPeriod);
     }
