@@ -9,7 +9,7 @@ use App\Services\EventHoursService;
  */
 function makeEventHours(array $events, PeriodData $datasetPeriod): EventHoursService
 {
-    return EventHoursService::from([$events], $datasetPeriod);
+    return EventHoursService::from(collect($events), $datasetPeriod);
 }
 
 function day(string $day): PeriodData
@@ -212,15 +212,4 @@ it('returns the same result however often it is asked', function () {
     expect($service->forPeriod($period)->totalHours)->toBe(3.0)
         ->and($service->forPeriod($period)->totalHours)->toBe(3.0)
         ->and($service->forPeriod($period)->totalHours)->toBe(3.0);
-});
-
-it('merges across the batches of a generator', function () {
-    $period = makePeriod('2026-06-01', '2026-06-01');
-
-    $batches = (function (): Generator {
-        yield collect([makeEvent('2026-06-01', [['2026-06-01 09:00', '2026-06-01 11:00']])]);
-        yield collect([makeEvent('2026-06-01', [['2026-06-01 10:00', '2026-06-01 12:00']])]);
-    })();
-
-    expect(EventHoursService::from($batches, $period)->forPeriod($period)->totalHours)->toBe(3.0);
 });
