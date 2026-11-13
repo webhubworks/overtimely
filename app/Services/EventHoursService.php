@@ -12,64 +12,31 @@ final class EventHoursService extends DayWalkingHoursService
 {
     private const string DAY_KEY_FORMAT = 'Y-m-d';
 
-    /** @var Collection<int, TimestampData> */
-    private Collection $allTimestamps;
-
     /** @var Collection<string, int> */
     private Collection $secondsByDay;
 
-    /** @var Collection<string, int> */
-    private Collection $untimedSecondsByDay;
-
     /**
-     * @param  iterable<int, EventData>  $events
+     * @param  Collection<int, EventData>  $events
      */
-    public function __construct(iterable $events, PeriodData $datasetPeriod)
+    public function __construct(Collection $events, PeriodData $datasetPeriod)
     {
         parent::__construct($datasetPeriod);
 
-        $this->allTimestamps = collect();
-        $this->untimedSecondsByDay = collect();
+        [$untimedEvents, $timedEvents] = $events
+            ->reject(fn (EventData $event): bool => $event->draft || $event->deleted)
+            ->partition(fn (EventData $event): bool => $event->timestamps->isEmpty());
 
-        /** @var EventData $event */
-        foreach ($events as $event) {
-            if ($event->draft || $event->deleted) {
-                continue;
-            }
+        $this->secondsByDay = $this->timedSecondsByDay($timedEvents);
 
-            if ($event->timestamps->isEmpty()) {
-                $this->handleUntimedEvent($event);
-
-                continue;
-            }
-
-            $this->handleTimedEvent($event);
-        }
-
-        $timestampsByDay = $this->allTimestamps
-            ->groupBy(function (TimestampData $timestamp): string {
-                return $timestamp->from->format(self::DAY_KEY_FORMAT);
-            });
-
-        $mergedTimestampsByDay = $timestampsByDay
-            ->map(function (Collection $timestampsOfDay): Collection {
-                return $this->mergeOverlappingTimestamps($timestampsOfDay);
-            });
-
-        $this->secondsByDay = $mergedTimestampsByDay
-            ->map(function (Collection $timestampsOfDay): int {
-                return $timestampsOfDay->sum(fn (TimestampData $timestamp): int => $timestamp->seconds());
-            });
-
-        foreach ($this->untimedSecondsByDay as $day => $untimedSeconds) {
-            $this->secondsByDay[$day] = ($this->secondsByDay[$day] ?? 0) + $untimedSeconds;
+        foreach ($this->untimedSecondsByDay($untimedEvents) as $day => $seconds) {
+            $this->secondsByDay[$day] = ($this->secondsByDay[$day] ?? 0) + $seconds;
         }
     }
 
     /**
-     * @param  iterable<int, EventData>  $events
+     * @param  Collection<int, EventData>  $events
      */
-    public static function from(iterable $events, PeriodData $datasetPeriod): self
+    public static function from(Collection $events, PeriodData $datasetPeriod): self
     {
         return new self($events, $datasetPeriod);
     }
@@ -113,27 +80,36 @@ final class EventHoursService extends DayWalkingHoursService
     }
 
     /**
-     * Handles an event without timestamps, using its own duration and date instead of the underlying timestamps.
+     * @param  Collection<int, EventData>  $events
+     * @return Collection<string, int>
      */
-    private function handleUntimedEvent(EventData $event): void
+    private function timedSecondsByDay(Collection $events): Collection
     {
-        if ($event->duration->isZero()) {
-            return;
-        }
-
-        $key = $event->day->format(self::DAY_KEY_FORMAT);
-
-        $this->untimedSecondsByDay[$key] = ($this->untimedSecondsByDay[$key] ?? 0) + $event->duration->totalSeconds;
+        return $events
+            ->flatMap(function (EventData $event): Collection {
+                return $event->timestamps
+                    ->flatMap(fn (TimestampData $timestamp): Collection => $timestamp->fragments());
+            })
+            ->groupBy(fn (TimestampData $timestamp): string => $timestamp->from->format(self::DAY_KEY_FORMAT))
+            ->map(fn (Collection $timestampsOfDay): Collection => $this->mergeOverlappingTimestamps($timestampsOfDay))
+            ->map(function (Collection $timestampsOfDay): int {
+                return $timestampsOfDay
+                    ->sum(fn (TimestampData $timestamp): int => $timestamp->seconds());
+            });
     }
 
     /**
-     * Handles an event with timestamps, splitting multi-day timestamps into their fragments.
+     * @param  Collection<int, EventData>  $events
+     * @return Collection<string, int>
      */
-    private function handleTimedEvent(EventData $event): void
+    private function untimedSecondsByDay(Collection $events): Collection
     {
-        $timestampFragments = $event->timestamps
-            ->flatMap(fn (TimestampData $timestamp): Collection => $timestamp->fragments());
-
-        $this->allTimestamps->push(...$timestampFragments);
+        return $events
+            ->reject(fn (EventData $event): bool => $event->duration->isZero())
+            ->groupBy(fn (EventData $event): string => $event->day->format(self::DAY_KEY_FORMAT))
+            ->map(function (Collection $eventsOfDay): int {
+                return $eventsOfDay
+                    ->sum(fn (EventData $event): int => $event->duration->totalSeconds);
+            });
     }
 }
