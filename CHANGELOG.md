@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.2.0 - 2026-11-16
+### Added
+- Added the environment variable `TIMELY_API_ATTEMPTS` to set the total number of attempts for each API request. Defaults to `2` attemps.
+- Added the environment variable `TIMELY_API_CONNECT_TIMEOUT` to set the time in seconds waited before closing a non-responsive API connection. Defaults to `5` seconds.
+
+### Changed
+- Changed the environment variable `TIMELY_API_URL` to `TIMELY_API_BASE_URL`.
+- Changed the default value of the environment variable `TIMELY_API_TIMEOUT` from `15` to `60`
+
+### Fixed
+- Improved the performance of all commands in all modes by accepting compressed API responses.
+- Improved the performance of all commands in the `events` mode **drastically** by pooling API requests.
+
 ## 2.1.2 - 2026-09-18
 ### Fixed
 - Fixed the narrow handling of malformed inputs for the `--since` and `--until` options.
